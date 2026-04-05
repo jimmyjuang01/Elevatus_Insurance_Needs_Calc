@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elevatus 保障需求分析系統 | Jimmy Chuang</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+        body { font-family: 'Noto Sans TC', sans-serif; }
+        .card { @apply bg-white p-6 rounded-2xl shadow-sm border border-slate-100 transition-all hover:shadow-md; }
+        .input-label { @apply block text-slate-500 text-xs font-bold mb-1 uppercase tracking-wider; }
+        input[type="number"], input[type="text"], select { 
+            @apply w-full bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-4 text-slate-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all; 
+        }
+        .section-title { @apply text-xl font-black mb-5 flex items-center text-slate-800 border-l-4 border-blue-600 pl-3; }
+        .guide-box { @apply p-4 rounded-xl mb-4 border; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen p-4 md:p-8 text-slate-700">
+
+    <div class="max-w-7xl mx-auto">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <div>
+                <h1 class="text-3xl font-black text-slate-900 tracking-tight">保障需求分析系統 <span class="text-blue-600 text-lg">v1.2</span></h1>
+                <p class="text-slate-500 font-medium tracking-wide">Elevatus Business Consultants | 專業跨境財務諮詢</p>
+            </div>
+            <div class="bg-white px-6 py-3 rounded-2xl shadow-sm border border-slate-100 text-right">
+                <p class="text-sm font-bold text-slate-800">顧問：Jimmy Chuang</p>
+                <p id="display_date" class="text-xs text-slate-400"></p>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <div class="lg:col-span-8 space-y-6">
+                
+                <section class="card">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="input-label">客戶姓名 / 案件代號</label>
+                            <input type="text" id="client_name" placeholder="例如：林先生 / Case A">
+                        </div>
+                        <div>
+                            <label class="input-label">諮詢備註</label>
+                            <input type="text" id="notes" placeholder="家庭狀況、特殊需求...">
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2 class="section-title">01. 家庭責任與身故保障</h2>
+                    <div class="guide-box bg-red-50 border-red-100">
+                        <p class="text-red-800 font-bold mb-3 text-sm">Step 1: 負債清償 (房貸與其他貸款)</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><label class="input-label">房屋貸款餘額 (USD)</label><input type="number" id="mortgage" value="500000" oninput="calculate()"></div>
+                            <div><label class="input-label">其他貸款額度</label><input type="number" id="other_debt" value="0" oninput="calculate()"></div>
+                        </div>
+                    </div>
+                    <div class="guide-box bg-blue-50 border-blue-100">
+                        <p class="text-blue-800 font-bold mb-3 text-sm">Step 2: 生活維繫 (收入替代計畫)</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><label class="input-label">目前個人年收入 (USD)</label><input type="number" id="annual_income" value="150000" oninput="calculate()"></div>
+                            <div><label class="input-label">預計替代年數</label>
+                                <select id="income_years" onchange="calculate()">
+                                    <option value="5">5 年 (短期過渡)</option>
+                                    <option value="10" selected>10 年 (標準責任期)</option>
+                                    <option value="15">15 年 (完整成長期)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="guide-box bg-emerald-50 border-emerald-100">
+                        <p class="text-emerald-800 font-bold mb-3 text-sm">Step 3: 子女夢想 (教育基金預留)</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><label class="input-label">每位子女預算</label><input type="number" id="edu_per_child" value="200000" oninput="calculate()"></div>
+                            <div><label class="input-label">子女數量</label><input type="number" id="child_count" value="1" oninput="calculate()"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2 class="section-title">02. 醫療與重疾應急金</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div><label class="input-label">醫療自付上限預留 (2年)</label><input type="number" id="medical_oop" value="18000" oninput="calculate()"></div>
+                        <div><label class="input-label">重疾康復生活費 (1-2年年薪)</label><input type="number" id="recovery_fund" value="100000" oninput="calculate()"></div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2 class="section-title">03. 長期照護跨境選擇</h2>
+                    <div class="flex bg-slate-100 p-1 rounded-xl mb-4">
+                        <button id="btn_us" onclick="setLTCPath('US')" class="flex-1 py-3 rounded-lg font-bold text-sm bg-white shadow-sm text-blue-600 transition-all">美國在地照護</button>
+                        <button id="btn_tw" onclick="setLTCPath('TW')" class="flex-1 py-3 rounded-lg font-bold text-sm text-slate-500 transition-all">返回台灣照護</button>
+                    </div>
+                    <p id="ltc_market_info" class="text-sm text-slate-400 italic text-center">正在抓取最新市場行情...</p>
+                </section>
+
+                <section class="card bg-slate-900 text-white">
+                    <h2 class="text-lg font-bold mb-4 flex items-center">🛡️ 最後一步：扣除已擁有的資產</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div><label class="
