@@ -22,7 +22,7 @@
         <header class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
             <div>
                 <h1 class="text-3xl font-black text-slate-900">保障需求分析系統 <span class="text-blue-600">v1.2</span></h1>
-                <p class="text-slate-500 font-medium text-sm">Elevatus Business Consultants | 專業跨境財務諮詢</p>
+                <p class="text-slate-500 font-medium text-sm text-center md:text-left">Elevatus Business Consultants | 專業跨境財務諮詢</p>
             </div>
             <div class="bg-white px-6 py-3 rounded-2xl border border-slate-100 text-right shadow-sm">
                 <p class="text-sm font-bold text-slate-800">顧問：Jimmy Chuang</p>
@@ -31,7 +31,6 @@
         </header>
 
         <div class="flex flex-col lg:flex-row gap-8 items-start">
-            
             <div class="w-full lg:w-2/3">
                 <section class="card">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -43,14 +42,14 @@
                 <section class="card">
                     <h2 class="section-title">01. 家庭責任與身故保障</h2>
                     <div class="p-4 rounded-xl mb-4 bg-red-50 border border-red-100">
-                        <p class="text-red-800 font-bold mb-3 text-sm">Step 1: 負債清償 (房貸與其他貸款)</p>
+                        <p class="text-red-800 font-bold mb-3 text-sm">Step 1: 負債清償</p>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div><label class="input-label">房屋貸款餘額 (USD)</label><input type="number" id="mortgage" value="500000" oninput="calculate()"></div>
                             <div><label class="input-label">其他貸款額度</label><input type="number" id="other_debt" value="100000" oninput="calculate()"></div>
                         </div>
                     </div>
                     <div class="p-4 rounded-xl mb-4 bg-blue-50 border border-blue-100">
-                        <p class="text-blue-800 font-bold mb-3 text-sm">Step 2: 生活維繫 (收入替代計畫)</p>
+                        <p class="text-blue-800 font-bold mb-3 text-sm">Step 2: 生活維繫 (收入替代)</p>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div><label class="input-label">目前年收入 (USD)</label><input type="number" id="annual_income" value="150000" oninput="calculate()"></div>
                             <div><label class="input-label">預計替代年數</label>
@@ -61,7 +60,7 @@
                         </div>
                     </div>
                     <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-100">
-                        <p class="text-emerald-800 font-bold mb-3 text-sm">Step 3: 子女夢想 (教育基金預留)</p>
+                        <p class="text-emerald-800 font-bold mb-3 text-sm">Step 3: 子女夢想 (教育金)</p>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div><label class="input-label">每位子女預算</label><input type="number" id="edu_per_child" value="200000" oninput="calculate()"></div>
                             <div><label class="input-label">子女數量</label><input type="number" id="child_count" value="1" oninput="calculate()"></div>
@@ -72,8 +71,8 @@
                 <section class="card">
                     <h2 class="section-title">02. 醫療與重疾應急金</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div><label class="input-label">醫療自付上限 (OOP Max x 2年)</label><input type="number" id="medical_oop" value="18000" oninput="calculate()"></div>
-                        <div><label class="input-label">重疾康復生活費 (1-2年年薪)</label><input type="number" id="recovery_fund" value="100000" oninput="calculate()"></div>
+                        <div><label class="input-label">醫療自付上限 (2年)</label><input type="number" id="medical_oop" value="18000" oninput="calculate()"></div>
+                        <div><label class="input-label">重疾康復生活費</label><input type="number" id="recovery_fund" value="100000" oninput="calculate()"></div>
                     </div>
                 </section>
 
@@ -83,14 +82,14 @@
                         <button id="btn_us" onclick="setLTCPath('US')" class="flex-1 py-3 rounded-lg font-bold text-sm bg-white shadow-sm text-blue-600">美國在地照護</button>
                         <button id="btn_tw" onclick="setLTCPath('TW')" class="flex-1 py-3 rounded-lg font-bold text-sm text-slate-500">返回台灣照護</button>
                     </div>
-                    <p id="ltc_market_info" class="text-xs text-slate-400 text-center italic">正在連線至雲端數據庫...</p>
+                    <p id="ltc_market_info" class="text-xs text-slate-400 text-center italic">數據狀態同步中...</p>
                 </section>
 
                 <section class="card bg-slate-900 text-white">
-                    <h2 class="text-lg font-bold mb-4">🛡️ 最後一步：扣除已擁有的資產</h2>
+                    <h2 class="text-lg font-bold mb-4 font-black tracking-widest">最後一步：扣除已擁有的資產</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div><label class="input-label text-slate-400">目前總保額</label><input type="number" id="current_insurance" value="200000" oninput="calculate()" class="bg-slate-800 border-none text-white"></div>
-                        <div><label class="input-label text-slate-400">可用存款/投資</label><input type="number" id="current_assets" value="50000" oninput="calculate()" class="bg-slate-800 border-none text-white"></div>
+                        <div><label class="input-label text-slate-400">目前總保額</label><input type="number" id="current_insurance" value="500000" oninput="calculate()" class="bg-slate-800 border-none text-white"></div>
+                        <div><label class="input-label text-slate-400">可用存款/投資</label><input type="number" id="current_assets" value="100000" oninput="calculate()" class="bg-slate-800 border-none text-white"></div>
                     </div>
                 </section>
             </div>
@@ -98,24 +97,13 @@
             <div class="w-full lg:w-1/3 lg:sticky lg:top-8">
                 <div class="bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-slate-100">
                     <div class="bg-blue-600 p-8 text-center text-white">
-                        <h3 class="text-xs font-bold opacity-60 uppercase tracking-widest mb-2">保障缺口分析總覽</h3>
-                        <div id="total_gap_val" class="text-5xl font-black">$0</div>
+                        <h3 class="text-xs font-bold opacity-60 uppercase tracking-widest mb-2 font-black">保障缺口分析總覽</h3>
+                        <div id="total_gap_val" class="text-5xl font-black tracking-tighter">$0</div>
                     </div>
-                    
                     <div class="p-8 space-y-6">
-                        <div class="flex justify-between items-center border-b pb-4">
-                            <p class="text-xs font-bold text-slate-400 uppercase">身故保障缺口</p>
-                            <p id="life_gap_val" class="text-2xl font-bold text-red-600">$0</p>
-                        </div>
-                        <div class="flex justify-between items-center border-b pb-4">
-                            <p class="text-xs font-bold text-slate-400 uppercase">生前福利缺口</p>
-                            <p id="medical_gap_val" class="text-2xl font-bold text-orange-500">$0</p>
-                        </div>
-                        <div class="flex justify-between items-center border-b pb-4">
-                            <p class="text-xs font-bold text-slate-400 uppercase">長期照護缺口</p>
-                            <p id="ltc_gap_val" class="text-2xl font-bold text-purple-600">$0</p>
-                        </div>
-
+                        <div class="flex justify-between items-center border-b pb-4"><p class="text-xs font-bold text-slate-400 uppercase">身故保障缺口</p><p id="life_gap_val" class="text-2xl font-bold text-red-600">$0</p></div>
+                        <div class="flex justify-between items-center border-b pb-4"><p class="text-xs font-bold text-slate-400 uppercase">生前福利缺口</p><p id="medical_gap_val" class="text-2xl font-bold text-orange-500">$0</p></div>
+                        <div class="flex justify-between items-center border-b pb-4"><p class="text-xs font-bold text-slate-400 uppercase">長期照護缺口</p><p id="ltc_gap_val" class="text-2xl font-bold text-purple-600">$0</p></div>
                         <div class="pt-4 space-y-4">
                             <button id="saveBtn" onclick="saveToSheet()" class="w-full bg-slate-900 text-white font-black py-4 rounded-xl hover:bg-black transition-all shadow-lg active:scale-95">儲存諮詢紀錄</button>
                             <button onclick="window.print()" class="w-full bg-slate-100 text-slate-500 font-bold py-3 rounded-xl text-sm hover:bg-slate-200">列印報告</button>
@@ -128,84 +116,64 @@
 
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxEsNTWhldPnUc1xxnUHJcaH14Wbd0J1CMSOnhI9r_5ckZ-jRwHEhPR1lZdptHe3H6o/exec";
-        let globalRates = { US_LTC_Monthly: 8500, TW_LTC_Monthly: 3200 }; // 預設值
+        let globalRates = { US_LTC_Monthly: 8500, TW_LTC_Monthly: 3200 };
         let currentLTCPath = 'US';
 
         window.onload = function() {
             document.getElementById('display_date').innerText = "諮詢日期：" + new Date().toLocaleDateString();
-            
-            // 先立即計算一次 (保證畫面不會是 $0)
             calculate();
-
-            // 嘗試抓取最新行情
-            fetch(SCRIPT_URL)
-                .then(res => res.json())
-                .then(data => {
-                    globalRates = data;
-                    document.getElementById('ltc_market_info').innerText = "✅ 已同步最新行情";
-                    calculate();
-                })
-                .catch(err => {
-                    document.getElementById('ltc_market_info').innerText = "⚠️ 使用離線行情數據";
-                    calculate();
-                });
+            fetch(SCRIPT_URL).then(res => res.json()).then(data => { globalRates = data; calculate(); document.getElementById('ltc_market_info').innerText = "✅ 雲端行情已更新"; }).catch(e => { document.getElementById('ltc_market_info').innerText = "⚠️ 離線模式"; });
         };
 
         function setLTCPath(path) {
             currentLTCPath = path;
-            const btnUs = document.getElementById('btn_us');
-            const btnTw = document.getElementById('btn_tw');
-            if(path === 'US') {
-                btnUs.className = "flex-1 py-3 rounded-lg font-bold text-sm bg-white shadow-sm text-blue-600";
-                btnTw.className = "flex-1 py-3 rounded-lg font-bold text-sm text-slate-500";
-            } else {
-                btnTw.className = "flex-1 py-3 rounded-lg font-bold text-sm bg-white shadow-sm text-blue-600";
-                btnUs.className = "flex-1 py-3 rounded-lg font-bold text-sm text-slate-500";
-            }
+            document.getElementById('btn_us').className = (path === 'US') ? "flex-1 py-3 rounded-lg font-bold text-sm bg-white shadow-sm text-blue-600" : "flex-1 py-3 rounded-lg font-bold text-sm text-slate-500";
+            document.getElementById('btn_tw').className = (path === 'TW') ? "flex-1 py-3 rounded-lg font-bold text-sm bg-white shadow-sm text-blue-600" : "flex-1 py-3 rounded-lg font-bold text-sm text-slate-500";
             calculate();
         }
 
         function calculate() {
-            try {
-                // 讀取數值
-                const mortgage = parseFloat(document.getElementById('mortgage').value) || 0;
-                const other_debt = parseFloat(document.getElementById('other_debt').value) || 0;
-                const income = parseFloat(document.getElementById('annual_income').value) || 0;
-                const years = parseInt(document.getElementById('income_years').value) || 10;
-                const edu = (parseFloat(document.getElementById('edu_per_child').value) || 0) * (parseInt(document.getElementById('child_count').value) || 0);
-                
-                const medical = (parseFloat(document.getElementById('medical_oop').value) || 0) + (parseFloat(document.getElementById('recovery_fund').value) || 0);
-                const ltc_monthly = (currentLTCPath === 'US') ? globalRates.US_LTC_Monthly : globalRates.TW_LTC_Monthly;
-                const ltc_total = ltc_monthly * 12 * 3;
+            const mortgage = parseFloat(document.getElementById('mortgage').value) || 0;
+            const otherDebt = parseFloat(document.getElementById('other_debt').value) || 0;
+            const income = parseFloat(document.getElementById('annual_income').value) || 0;
+            const years = parseInt(document.getElementById('income_years').value) || 10;
+            const edu = (parseFloat(document.getElementById('edu_per_child').value) || 0) * (parseInt(document.getElementById('child_count').value) || 0);
+            const med = (parseFloat(document.getElementById('medical_oop').value) || 0) + (parseFloat(document.getElementById('recovery_fund').value) || 0);
+            const ltc = ((currentLTCPath === 'US') ? globalRates.US_LTC_Monthly : globalRates.TW_LTC_Monthly) * 36;
+            const resources = (parseFloat(document.getElementById('current_insurance').value) || 0) + (parseFloat(document.getElementById('current_assets').value) || 0);
 
-                const resources = (parseFloat(document.getElementById('current_insurance').value) || 0) + (parseFloat(document.getElementById('current_assets').value) || 0);
-
-                // 計算缺口
-                const life_gap = Math.max(0, (mortgage + other_debt + (income * years) + edu + 20000) - resources);
-                
-                // 更新 UI
-                document.getElementById('life_gap_val').innerText = '$' + Math.round(life_gap).toLocaleString();
-                document.getElementById('medical_gap_val').innerText = '$' + Math.round(medical).toLocaleString();
-                document.getElementById('ltc_gap_val').innerText = '$' + Math.round(ltc_total).toLocaleString();
-                document.getElementById('total_gap_val').innerText = '$' + Math.round(life_gap + medical + ltc_total).toLocaleString();
-            } catch (e) { console.log(e); }
+            const lifeGap = Math.max(0, (mortgage + otherDebt + (income * years) + edu + 20000) - resources);
+            document.getElementById('life_gap_val').innerText = '$' + Math.round(lifeGap).toLocaleString();
+            document.getElementById('medical_gap_val').innerText = '$' + Math.round(med).toLocaleString();
+            document.getElementById('ltc_gap_val').innerText = '$' + Math.round(ltc).toLocaleString();
+            document.getElementById('total_gap_val').innerText = '$' + Math.round(lifeGap + med + ltc).toLocaleString();
         }
 
         async function saveToSheet() {
             const btn = document.getElementById('saveBtn');
-            btn.innerText = '儲存中...'; btn.disabled = true;
+            btn.innerText = '同步中...'; btn.disabled = true;
+            const payload = {
+                name: document.getElementById('client_name').value,
+                mortgage: document.getElementById('mortgage').value,
+                otherDebt: document.getElementById('other_debt').value,
+                annualIncome: document.getElementById('annual_income').value,
+                incomeYears: document.getElementById('income_years').value,
+                eduPerChild: document.getElementById('edu_per_child').value,
+                childCount: document.getElementById('child_count').value,
+                medOOP: document.getElementById('medical_oop').value,
+                recoveryFund: document.getElementById('recovery_fund').value,
+                ltcPath: currentLTCPath,
+                currentIns: document.getElementById('current_insurance').value,
+                currentAssets: document.getElementById('current_assets').value,
+                lifeGap: document.getElementById('life_gap_val').innerText,
+                medGap: document.getElementById('medical_gap_val').innerText,
+                ltcGap: document.getElementById('ltc_gap_val').innerText,
+                totalGap: document.getElementById('total_gap_val').innerText,
+                notes: document.getElementById('notes').value
+            };
             try {
-                const payload = {
-                    name: document.getElementById('client_name').value || "未命名",
-                    lifeGap: document.getElementById('life_gap_val').innerText,
-                    medGap: document.getElementById('medical_gap_val').innerText,
-                    ltcPath: currentLTCPath,
-                    ltcGap: document.getElementById('ltc_gap_val').innerText,
-                    totalGap: document.getElementById('total_gap_val').innerText,
-                    notes: document.getElementById('notes').value
-                };
                 await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-                alert('✅ 紀錄已成功儲存至 Google Sheets');
+                alert('✅ 諮詢紀錄已完整儲存至 Google Sheet！');
             } catch (e) { alert('儲存失敗'); }
             finally { btn.innerText = '儲存諮詢紀錄'; btn.disabled = false; }
         }
