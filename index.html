@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elevatus 保障需求分析系統 v2.0 | Jimmy Chuang</title>
+    <title>Elevatus 保障需求分析系統 v2.2 | Jimmy Chuang</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -16,7 +16,8 @@
         }
         input:focus { @apply border-blue-500 ring-2 ring-blue-100 outline-none; }
         .section-title { font-size: 1.25rem; font-weight: 900; margin-bottom: 1.25rem; display: flex; align-items: center; color: #1e293b; border-left: 5px solid #2563eb; padding-left: 0.75rem; }
-        .ltc-input-group { @apply grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 p-4 bg-slate-50 rounded-xl border border-slate-100; }
+        .ltc-option-card { @apply flex items-center p-4 rounded-xl border-2 transition-all cursor-pointer mb-3; }
+        .ltc-option-card.active { @apply border-blue-600 bg-blue-50; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen p-4 md:p-8">
@@ -24,8 +25,8 @@
     <div class="max-w-7xl mx-auto">
         <header class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
             <div>
-                <h1 class="text-3xl font-black text-slate-900 tracking-tight">保障需求分析系統 <span class="text-blue-600">v2.0</span></h1>
-                <p class="text-slate-500 font-medium text-sm">Elevatus Business Consultants | 專業跨境財務諮詢</p>
+                <h1 class="text-3xl font-black text-slate-900 tracking-tight">保障需求分析系統 <span class="text-blue-600">v2.2</span></h1>
+                <p class="text-slate-500 font-medium text-sm text-center md:text-left">Elevatus Business Consultants | 專業跨境財務諮詢</p>
             </div>
             <div class="bg-white px-6 py-3 rounded-2xl border border-slate-100 text-right shadow-sm">
                 <p class="text-sm font-bold text-slate-800">顧問：Jimmy Chuang</p>
@@ -36,13 +37,6 @@
         <div class="flex flex-col lg:flex-row gap-8 items-start">
             
             <div class="w-full lg:w-2/3">
-                <section class="card">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div><label class="input-label">客戶姓名 / 案件代號</label><input type="text" id="client_name" value="王先生"></div>
-                        <div><label class="input-label">諮詢備註</label><input type="text" id="notes" value="一家四口"></div>
-                    </div>
-                </section>
-
                 <section class="card">
                     <h2 class="section-title text-red-600 border-red-600">01. 家庭責任與身故保障</h2>
                     <div class="space-y-4">
@@ -74,47 +68,70 @@
                 </section>
 
                 <section class="card">
-                    <h2 class="section-title text-purple-600 border-purple-600">03. 長期照護跨境選擇</h2>
-                    <div class="flex bg-slate-100 p-1 rounded-xl mb-4 gap-1">
-                        <button id="btn_us" onclick="setLTCPath('US')" class="flex-1 py-3 rounded-lg font-bold text-sm bg-white shadow-sm text-blue-600 transition-all">美國各州在地照護</button>
-                        <button id="btn_tw" onclick="setLTCPath('TW')" class="flex-1 py-3 rounded-lg font-bold text-sm text-slate-500 transition-all">返回台灣跨境照護</button>
+                    <h2 class="section-title text-purple-600 border-purple-600">03. 長期照護路徑與方案選取</h2>
+                    
+                    <div class="flex bg-slate-100 p-1 rounded-xl mb-6 gap-1">
+                        <button id="btn_us" onclick="setLTCPath('US')" class="flex-1 py-3 rounded-lg font-bold text-sm bg-white shadow-sm text-blue-600">美國在地照護 (US)</button>
+                        <button id="btn_tw" onclick="setLTCPath('TW')" class="flex-1 py-3 rounded-lg font-bold text-sm text-slate-500">返回台灣照護 (TW)</button>
                     </div>
 
-                    <div id="us_ltc_details" class="space-y-4">
-                        <div class="flex justify-between items-center bg-blue-50 p-3 rounded-lg">
-                            <span class="text-sm font-bold text-blue-800">🔍 查詢最新各州數據：</span>
-                            <a href="https://www.carescout.com/cost-of-care" target="_blank" class="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-full hover:bg-blue-700 transition">CareScout (Genworth) 官網</a>
+                    <div class="mb-6 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <label class="input-label text-blue-700">選擇預計需要照護的時間長度 (月數)</label>
+                        <select id="ltc_duration" onchange="calculate()" class="mt-2 text-lg font-bold">
+                            <option value="12">12 個月 (1 年)</option>
+                            <option value="24">24 個月 (2 年)</option>
+                            <option value="36" selected>36 個月 (3 年 - 平均值)</option>
+                            <option value="48">48 個月 (4 年)</option>
+                            <option value="60">60 個月 (5 年 - 完整保障)</option>
+                        </select>
+                    </div>
+
+                    <div id="us_ltc_details" class="space-y-3">
+                        <div class="flex justify-between items-center mb-4 px-2">
+                            <span class="text-xs font-bold text-slate-400 italic">點擊右側按鈕查詢各州最新數據 ➔</span>
+                            <a href="https://www.carescout.com/cost-of-care" target="_blank" class="text-[10px] bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-bold">CareScout 數據工具</a>
                         </div>
-                        <div class="ltc-input-group">
-                            <div>
-                                <label class="input-label">In-Home Care (月)</label>
-                                <input type="number" id="us_inhome" value="6500" oninput="calculate()">
+
+                        <div class="ltc-option-card border-slate-200" id="card_inhome" onclick="selectLtcType('inhome')">
+                            <input type="radio" name="ltc_type" id="radio_inhome" value="inhome" checked class="w-5 h-5">
+                            <div class="ml-4 flex-grow">
+                                <label class="input-label">In-Home Care (居家照護/月)</label>
+                                <input type="number" id="us_inhome" value="5529" class="bg-transparent border-b border-slate-300 py-1" onclick="event.stopPropagation()" oninput="calculate()">
                             </div>
-                            <div>
-                                <label class="input-label">Assisted Living (月)</label>
-                                <input type="number" id="us_assisted" value="5500" oninput="calculate()">
+                        </div>
+
+                        <div class="ltc-option-card border-slate-200" id="card_assisted" onclick="selectLtcType('assisted')">
+                            <input type="radio" name="ltc_type" id="radio_assisted" value="assisted" class="w-5 h-5">
+                            <div class="ml-4 flex-grow">
+                                <label class="input-label">Assisted Living (輔助生活機構/月)</label>
+                                <input type="number" id="us_assisted" value="6350" class="bg-transparent border-b border-slate-300 py-1" onclick="event.stopPropagation()" oninput="calculate()">
                             </div>
-                            <div>
-                                <label class="input-label">Nursing Home (月)</label>
-                                <input type="number" id="us_nursing" value="10500" oninput="calculate()">
+                        </div>
+
+                        <div class="ltc-option-card border-slate-200" id="card_nursing" onclick="selectLtcType('nursing')">
+                            <input type="radio" name="ltc_type" id="radio_nursing" value="nursing" class="w-5 h-5">
+                            <div class="ml-4 flex-grow">
+                                <label class="input-label">Nursing Home Care (專業護理機構/月)</label>
+                                <input type="number" id="us_nursing" value="8015" class="bg-transparent border-b border-slate-300 py-1" onclick="event.stopPropagation()" oninput="calculate()">
                             </div>
                         </div>
                     </div>
 
-                    <div id="tw_ltc_details" class="hidden p-4 bg-purple-50 rounded-xl border border-purple-100">
-                        <p class="text-sm text-purple-800 font-bold mb-2">台灣長期照護行情預估：</p>
-                        <div class="flex justify-between items-center">
-                            <span class="text-xs text-purple-600 italic">包含外籍看護或優質機構月費：</span>
-                            <span class="text-lg font-black text-purple-700">$3,200 / Month</span>
+                    <div id="tw_ltc_details" class="hidden">
+                        <div class="ltc-option-card border-blue-600 bg-blue-50">
+                            <div class="flex-grow">
+                                <label class="input-label">台灣照護估算 (外籍看護+耗材或機構/月)</label>
+                                <p class="text-xl font-black text-blue-700 mt-1">$3,200 <span class="text-xs font-normal">/ Month</span></p>
+                            </div>
                         </div>
                     </div>
                 </section>
 
                 <section class="card bg-slate-900 text-white">
-                    <h2 class="text-lg font-bold mb-4 flex items-center"><span class="mr-2">🛡️</span> 最後一步：扣除已擁有的資產</h2>
+                    <h2 class="text-lg font-bold mb-4 flex items-center font-black tracking-widest text-blue-400">最後一步：扣除已擁有的資產</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div><label class="input-label text-slate-400">目前已有總保額 (USD)</label><input type="number" id="current_insurance" value="300000" oninput="calculate()" class="bg-slate-800 border-none text-white focus:bg-slate-700"></div>
-                        <div><label class="input-label text-slate-400">流動性存款/投資 (USD)</label><input type="number" id="current_assets" value="50000" oninput="calculate()" class="bg-slate-800 border-none text-white focus:bg-slate-700"></div>
+                        <div><label class="input-label text-slate-400">目前已有總保額 (USD)</label><input type="number" id="current_insurance" value="300000" oninput="calculate()" class="bg-slate-800 border-none text-white focus:ring-2 focus:ring-blue-500"></div>
+                        <div><label class="input-label text-slate-400">流動性存款/投資 (USD)</label><input type="number" id="current_assets" value="100000" oninput="calculate()" class="bg-slate-800 border-none text-white focus:ring-2 focus:ring-blue-500"></div>
                     </div>
                 </section>
             </div>
@@ -122,27 +139,27 @@
             <div class="w-full lg:w-1/3 lg:sticky lg:top-8">
                 <div class="bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-100">
                     <div class="bg-blue-600 p-8 text-center text-white">
-                        <h3 class="text-xs font-bold opacity-60 uppercase tracking-[0.2em] mb-2">保障缺口分析總覽</h3>
+                        <h3 class="text-xs font-bold opacity-60 uppercase tracking-[0.2em] mb-2 font-black">保障缺口分析總覽</h3>
                         <div id="total_gap_val" class="text-5xl font-black tracking-tighter">$0</div>
                     </div>
                     
                     <div class="p-8 space-y-6">
-                        <div class="relative h-64 w-full">
+                        <div class="relative h-60 w-full mb-4">
                             <canvas id="gapChart"></canvas>
                         </div>
 
-                        <div class="space-y-4 pt-4">
+                        <div class="space-y-4">
                             <div class="flex justify-between items-center border-b pb-3">
                                 <p class="text-xs font-bold text-slate-400 uppercase">身故保障需求</p>
-                                <p id="life_gap_val" class="text-xl font-bold text-red-600">$0</p>
+                                <p id="life_need_display" class="text-xl font-bold text-red-600">$0</p>
                             </div>
                             <div class="flex justify-between items-center border-b pb-3">
                                 <p class="text-xs font-bold text-slate-400 uppercase">生前福利需求</p>
-                                <p id="medical_gap_val" class="text-xl font-bold text-orange-500">$0</p>
+                                <p id="medical_need_display" class="text-xl font-bold text-orange-500">$0</p>
                             </div>
                             <div class="flex justify-between items-center border-b pb-3">
                                 <p class="text-xs font-bold text-slate-400 uppercase">長期照護預備</p>
-                                <p id="ltc_gap_val" class="text-xl font-bold text-purple-600">$0</p>
+                                <p id="ltc_need_display" class="text-xl font-bold text-purple-600">$0</p>
                             </div>
                         </div>
 
@@ -193,39 +210,55 @@
             calculate();
         }
 
+        function selectLtcType(type) {
+            document.getElementById('radio_' + type).checked = true;
+            // 視覺更新
+            ['inhome', 'assisted', 'nursing'].forEach(t => {
+                const card = document.getElementById('card_' + t);
+                if(t === type) card.classList.add('active', 'border-blue-600', 'bg-blue-50');
+                else card.classList.remove('active', 'border-blue-600', 'bg-blue-50');
+            });
+            calculate();
+        }
+
         function calculate() {
-            // Inputs
+            // 身故與責任
             const mortgage = parseFloat(document.getElementById('mortgage').value) || 0;
             const other_debt = parseFloat(document.getElementById('other_debt').value) || 0;
-            const income = (parseFloat(document.getElementById('annual_income').value) || 0) * (parseInt(document.getElementById('income_years').value) || 10);
+            const annual = parseFloat(document.getElementById('annual_income').value) || 0;
+            const years = parseInt(document.getElementById('income_years').value) || 10;
             const edu = (parseFloat(document.getElementById('edu_per_child').value) || 0) * (parseInt(document.getElementById('child_count').value) || 0);
+            
+            const lifeTotalNeed = mortgage + other_debt + (annual * years) + edu + 20000; // +20k final expenses
+
+            // 醫療
             const med = (parseFloat(document.getElementById('medical_oop').value) || 0) + (parseFloat(document.getElementById('recovery_fund').value) || 0);
             
-            // LTC Calculation
-            let ltc_total = 0;
+            // 長照 (關鍵點：根據勾選的 Radio 與 下拉月數計算)
+            let monthlyRate = 0;
+            const duration = parseInt(document.getElementById('ltc_duration').value) || 36;
+
             if(currentLTCPath === 'US') {
-                const inHome = parseFloat(document.getElementById('us_inhome').value) || 0;
-                const assisted = parseFloat(document.getElementById('us_assisted').value) || 0;
-                const nursing = parseFloat(document.getElementById('us_nursing').value) || 0;
-                // 假設平均照護需求分散在這三類，共 3 年
-                ltc_total = ((inHome + assisted + nursing) / 3) * 12 * 3;
+                const selectedType = document.querySelector('input[name="ltc_type"]:checked').value;
+                monthlyRate = parseFloat(document.getElementById('us_' + selectedType).value) || 0;
             } else {
-                ltc_total = globalRates.TW_LTC_Monthly * 12 * 3;
+                monthlyRate = globalRates.TW_LTC_Monthly;
             }
+            const ltcTotalNeed = monthlyRate * duration;
 
-            const totalNeeds = (mortgage + other_debt + income + edu) + med + ltc_total + 20000;
-            const currentIns = parseFloat(document.getElementById('current_insurance').value) || 0;
-            const currentAssets = parseFloat(document.getElementById('current_assets').value) || 0;
-            const totalResources = currentIns + currentAssets;
-            const gap = Math.max(0, totalNeeds - totalResources);
+            // 資產
+            const ins = parseFloat(document.getElementById('current_insurance').value) || 0;
+            const asset = parseFloat(document.getElementById('current_assets').value) || 0;
+            const totalResources = ins + asset;
+            const gap = Math.max(0, (lifeTotalNeed + med + ltcTotalNeed) - totalResources);
 
-            // Update UI
-            document.getElementById('life_gap_val').innerText = '$' + Math.round(mortgage + other_debt + income + edu).toLocaleString();
-            document.getElementById('medical_gap_val').innerText = '$' + Math.round(med).toLocaleString();
-            document.getElementById('ltc_gap_val').innerText = '$' + Math.round(ltc_total).toLocaleString();
+            // 更新 UI
+            document.getElementById('life_need_display').innerText = '$' + Math.round(lifeTotalNeed).toLocaleString();
+            document.getElementById('medical_need_display').innerText = '$' + Math.round(med).toLocaleString();
+            document.getElementById('ltc_need_display').innerText = '$' + Math.round(ltcTotalNeed).toLocaleString();
             document.getElementById('total_gap_val').innerText = '$' + Math.round(gap).toLocaleString();
 
-            updateChart(mortgage + other_debt + income + edu, med, ltc_total, currentIns, currentAssets);
+            updateChart(lifeTotalNeed, med, ltcTotalNeed, ins, asset);
         }
 
         function initChart() {
@@ -234,40 +267,25 @@
                 type: 'doughnut',
                 data: {
                     datasets: [
-                        { // 外環：總保障需求 (Total Needs)
-                            label: '保障需求',
+                        { // 外環：需求
                             data: [1, 1, 1],
-                            backgroundColor: ['#ef4444', '#f97316', '#a855f7'], // 紅、橘、紫
-                            borderWidth: 0,
-                            weight: 1.5
+                            backgroundColor: ['#ef4444', '#f97316', '#a855f7'],
+                            borderWidth: 0, weight: 1.5
                         },
-                        { // 內環：現有保障 (Existing) vs 缺口 (Gap)
-                            label: '現有資源',
+                        { // 內環：資源 vs 缺口
                             data: [1, 1, 1],
-                            backgroundColor: ['#1e293b', '#64748b', '#e2e8f0'], // 深灰(保險)、淺灰(資產)、白(缺口)
-                            borderWidth: 0,
-                            weight: 1
+                            backgroundColor: ['#22c55e', '#bbf7d0', '#f1f5f9'],
+                            borderWidth: 0, weight: 1
                         }
                     ]
                 },
-                options: {
-                    cutout: '40%',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } }
-                }
+                options: { cutout: '40%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
         }
 
         function updateChart(life, med, ltc, ins, asset) {
-            const totalNeeds = life + med + ltc;
-            const gap = Math.max(0, totalNeeds - (ins + asset));
-            
-            // 更新外環 (需求細分)
+            const gap = Math.max(0, (life + med + ltc) - (ins + asset));
             myChart.data.datasets[0].data = [life, med, ltc];
-            
-            // 更新內環 (保險 vs 資產 vs 缺口)
-            // 如果資源超過需求，缺口為 0
             myChart.data.datasets[1].data = [ins, asset, gap];
             myChart.update();
         }
@@ -275,16 +293,17 @@
         async function saveToSheet() {
             const btn = document.getElementById('saveBtn');
             btn.innerText = '正在存檔...'; btn.disabled = true;
-            const payload = {
-                name: document.getElementById('client_name').value,
-                ltcPath: currentLTCPath,
-                totalGap: document.getElementById('total_gap_val').innerText,
-                notes: document.getElementById('notes').value
-            };
             try {
+                const payload = {
+                    name: document.getElementById('client_name').value || "未命名",
+                    ltcPath: currentLTCPath,
+                    ltcDuration: document.getElementById('ltc_duration').value,
+                    totalGap: document.getElementById('total_gap_val').innerText,
+                    notes: document.getElementById('notes').value
+                };
                 await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-                alert('✅ 諮詢紀錄已儲存。');
-            } catch (e) { alert('連線失敗'); }
+                alert('✅ 諮詢紀錄已成功同步。');
+            } catch (e) { alert('儲存失敗'); }
             finally { btn.innerText = '儲存諮詢紀錄'; btn.disabled = false; }
         }
     </script>
