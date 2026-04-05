@@ -3,28 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elevatus 保障需求分析系統 v2.5 | Jimmy Chuang</title>
+    <title>Elevatus 保障需求分析系統 v2.6 | Jimmy Chuang</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
         body { font-family: 'Noto Sans TC', sans-serif; }
-        .card { background: white; padding: 1.5rem; border-radius: 1.5rem; border: 1px solid #f1f5f9; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); margin-bottom: 1.5rem; }
-        .input-label { display: block; color: #64748b; font-size: 0.75rem; font-weight: 700; margin-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 0.025em; }
         
-        /* 統一輸入框樣式 */
+        /* 基礎卡片樣式 */
+        .card { @apply bg-white p-6 rounded-2xl border border-slate-100 shadow-sm mb-6 transition-all; }
+        
+        /* 標準標籤樣式 */
+        .input-label { @apply block text-slate-500 text-[11px] font-bold mb-1.5 uppercase tracking-wider; }
+        
+        /* 統一輸入框樣式：讓所有欄位（文字、下拉選單）視覺一致 */
         input[type="text"], select { 
-            width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 0.6rem 1rem; color: #1e293b; font-weight: 600; transition: all 0.2s;
+            @apply w-full bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-4 text-slate-700 font-semibold text-sm transition-all outline-none;
         }
-        input:focus { @apply border-blue-500 ring-2 ring-blue-100 outline-none bg-white; }
+        input:focus, select:focus { @apply bg-white border-blue-500 ring-4 ring-blue-50; }
         
-        .section-title { font-size: 1.25rem; font-weight: 900; margin-bottom: 1.25rem; display: flex; align-items: center; color: #1e293b; border-left: 5px solid #2563eb; padding-left: 0.75rem; }
-        .ltc-option-card { @apply flex items-center p-4 rounded-xl border-2 transition-all cursor-pointer mb-3 bg-white; }
-        .ltc-option-card.active { @apply border-blue-600 bg-blue-50 shadow-sm; }
+        /* 各區塊標題線條 */
+        .section-title { @apply text-xl font-black mb-5 flex items-center text-slate-800 border-l-4 pl-3; }
         
-        /* 綠色區塊專屬樣式 */
-        .green-input { background: #022c22 !important; border: none !important; color: white !important; }
-        .green-input:focus { @apply ring-2 ring-emerald-500; }
+        /* 長照方案卡片 */
+        .ltc-option-card { @apply flex items-center p-4 rounded-xl border border-slate-200 transition-all cursor-pointer mb-3 bg-white; }
+        .ltc-option-card.active { @apply border-blue-500 bg-blue-50/50 shadow-sm; }
+        
+        /* 現有資產區塊專屬（綠色系） */
+        .asset-input { @apply bg-emerald-50/50 border-emerald-100 text-emerald-900; }
+        .asset-input:focus { @apply bg-white border-emerald-500 ring-4 ring-emerald-100; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen p-4 md:p-8">
@@ -32,12 +39,12 @@
     <div class="max-w-7xl mx-auto">
         <header class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
             <div>
-                <h1 class="text-3xl font-black text-slate-900 tracking-tight italic">ELEVATUS <span class="text-blue-600 not-italic">保障需求分析 v2.5</span></h1>
-                <p class="text-slate-500 font-medium text-sm tracking-widest uppercase">Professional Cross-Border Financial Consulting</p>
+                <h1 class="text-3xl font-black text-slate-900 tracking-tight italic">ELEVATUS <span class="text-blue-600 not-italic text-2xl ml-1">保障需求分析 v2.6</span></h1>
+                <p class="text-slate-500 font-medium text-[11px] tracking-[0.3em] uppercase mt-1">Professional Cross-Border Financial Consulting</p>
             </div>
             <div class="bg-white px-6 py-3 rounded-2xl border border-slate-100 text-right shadow-sm">
-                <p class="text-sm font-bold text-slate-800">顧問：Jimmy Chuang</p>
-                <p id="display_date" class="text-xs text-slate-400"></p>
+                <p class="text-sm font-bold text-slate-800 tracking-tight">顧問：Jimmy Chuang</p>
+                <p id="display_date" class="text-[10px] text-slate-400 font-medium"></p>
             </div>
         </header>
 
@@ -52,21 +59,21 @@
                 </section>
 
                 <section class="card">
-                    <h2 class="section-title text-red-600 border-red-600">01. 家庭責任與身故保障</h2>
+                    <h2 class="section-title text-red-600 border-red-500">01. 家庭責任與身故保障</h2>
                     <div class="space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-red-50/50 p-4 rounded-xl">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-red-50/30 p-4 rounded-xl">
                             <div><label class="input-label text-red-700">房屋貸款餘額 (USD)</label><input type="text" id="mortgage" value="$350,000" oninput="handleCurrencyInput(this)"></div>
                             <div><label class="input-label text-red-700">其他個人/商業貸款</label><input type="text" id="other_debt" value="$100,000" oninput="handleCurrencyInput(this)"></div>
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-blue-50/50 p-4 rounded-xl">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-blue-50/30 p-4 rounded-xl">
                             <div><label class="input-label text-blue-700">目前年收入 (USD)</label><input type="text" id="annual_income" value="$80,000" oninput="handleCurrencyInput(this)"></div>
                             <div><label class="input-label text-blue-700">預計替代年數</label>
                                 <select id="income_years" onchange="calculate()">
-                                    <option value="5">5 年 (短期過渡)</option><option value="10" selected>10 年 (標準責任)</option><option value="15">15 年 (長期守護)</option>
+                                    <option value="5">5 年</option><option value="10" selected>10 年 (標準責任)</option><option value="15">15 年</option>
                                 </select>
                             </div>
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-emerald-50/50 p-4 rounded-xl">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-emerald-50/30 p-4 rounded-xl">
                             <div><label class="input-label text-emerald-700">每位子女教育預算 (USD)</label><input type="text" id="edu_per_child" value="$150,000" oninput="handleCurrencyInput(this)"></div>
                             <div><label class="input-label text-emerald-700">子女數量</label><input type="text" id="child_count" value="2" oninput="calculate()"></div>
                         </div>
@@ -84,67 +91,63 @@
                 <section class="card">
                     <h2 class="section-title text-purple-600 border-purple-600">03. 長期照護路徑與方案選取</h2>
                     <div class="flex bg-slate-100 p-1 rounded-xl mb-6 gap-1">
-                        <button id="btn_us" onclick="setLTCPath('US')" class="flex-1 py-3 rounded-lg font-bold text-sm bg-white shadow-sm text-blue-600 transition-all">美國在地照護 (US)</button>
-                        <button id="btn_tw" onclick="setLTCPath('TW')" class="flex-1 py-3 rounded-lg font-bold text-sm text-slate-500 transition-all">返回台灣照護 (TW)</button>
+                        <button id="btn_us" onclick="setLTCPath('US')" class="flex-1 py-2.5 rounded-lg font-bold text-xs bg-white shadow-sm text-blue-600 transition-all">美國在地照護 (US)</button>
+                        <button id="btn_tw" onclick="setLTCPath('TW')" class="flex-1 py-2.5 rounded-lg font-bold text-xs text-slate-500 transition-all">返回台灣照護 (TW)</button>
                     </div>
 
                     <div class="mb-6 bg-slate-50 p-4 rounded-xl border border-slate-200">
-                        <label class="input-label text-blue-700 font-black">選擇預計照護時間長度 (月數)</label>
-                        <select id="ltc_duration" onchange="calculate()" class="mt-2 text-lg font-bold">
-                            <option value="12">12 個月 (1 年)</option>
-                            <option value="24">24 個月 (2 年)</option>
+                        <label class="input-label text-blue-700">選擇預計照護時間長度 (月數)</label>
+                        <select id="ltc_duration" onchange="calculate()">
+                            <option value="12">12 個月</option><option value="24">24 個月</option>
                             <option value="36" selected>36 個月 (3 年 - 平均值)</option>
-                            <option value="48">48 個月 (4 年)</option>
-                            <option value="60">60 個月 (5 年 - 完整保障)</option>
+                            <option value="48">48 個月</option><option value="60">60 個月 (5 年)</option>
                         </select>
                     </div>
 
                     <div id="us_ltc_details" class="space-y-3">
-                        <div class="ltc-option-card border-blue-600 bg-blue-50" id="card_inhome" onclick="selectLtcType('inhome')">
-                            <input type="radio" name="ltc_type" id="radio_inhome" value="inhome" checked class="w-5 h-5">
+                        <div class="ltc-option-card active" id="card_inhome" onclick="selectLtcType('inhome')">
+                            <input type="radio" name="ltc_type" id="radio_inhome" value="inhome" checked class="w-4 h-4">
                             <div class="ml-4 flex-grow">
                                 <label class="input-label">In-Home Care (居家照護/月)</label>
-                                <input type="text" id="us_inhome" value="$5,529" class="bg-transparent border-b border-slate-300 py-1" onclick="event.stopPropagation()" oninput="handleCurrencyInput(this)">
+                                <input type="text" id="us_inhome" value="$5,529" class="bg-transparent border-b border-slate-200 py-1 font-bold text-slate-700 outline-none w-full" onclick="event.stopPropagation()" oninput="handleCurrencyInput(this)">
                             </div>
                         </div>
-                        <div class="ltc-option-card border-slate-200" id="card_assisted" onclick="selectLtcType('assisted')">
-                            <input type="radio" name="ltc_type" id="radio_assisted" value="assisted" class="w-5 h-5">
+                        <div class="ltc-option-card" id="card_assisted" onclick="selectLtcType('assisted')">
+                            <input type="radio" name="ltc_type" id="radio_assisted" value="assisted" class="w-4 h-4">
                             <div class="ml-4 flex-grow">
                                 <label class="input-label">Assisted Living (輔助生活/月)</label>
-                                <input type="text" id="us_assisted" value="$6,350" class="bg-transparent border-b border-slate-300 py-1" onclick="event.stopPropagation()" oninput="handleCurrencyInput(this)">
+                                <input type="text" id="us_assisted" value="$6,350" class="bg-transparent border-b border-slate-200 py-1 font-bold text-slate-700 outline-none w-full" onclick="event.stopPropagation()" oninput="handleCurrencyInput(this)">
                             </div>
                         </div>
-                        <div class="ltc-option-card border-slate-200" id="card_nursing" onclick="selectLtcType('nursing')">
-                            <input type="radio" name="ltc_type" id="radio_nursing" value="nursing" class="w-5 h-5">
+                        <div class="ltc-option-card" id="card_nursing" onclick="selectLtcType('nursing')">
+                            <input type="radio" name="ltc_type" id="radio_nursing" value="nursing" class="w-4 h-4">
                             <div class="ml-4 flex-grow">
                                 <label class="input-label">Nursing Home Care (專業護理/月)</label>
-                                <input type="text" id="us_nursing" value="$8,015" class="bg-transparent border-b border-slate-300 py-1" onclick="event.stopPropagation()" oninput="handleCurrencyInput(this)">
+                                <input type="text" id="us_nursing" value="$8,015" class="bg-transparent border-b border-slate-200 py-1 font-bold text-slate-700 outline-none w-full" onclick="event.stopPropagation()" oninput="handleCurrencyInput(this)">
                             </div>
                         </div>
                     </div>
 
                     <div id="tw_ltc_details" class="hidden">
-                        <div class="ltc-option-card border-blue-600 bg-blue-50">
-                            <div class="flex-grow p-2">
+                        <div class="ltc-option-card border-blue-500 bg-blue-50/50">
+                            <div class="flex-grow">
                                 <label class="input-label">台灣照護月費估算 (USD/月)</label>
-                                <input type="text" id="tw_monthly" value="$3,200" class="bg-transparent border-b border-blue-300 text-2xl font-black text-blue-700 w-full focus:outline-none" oninput="handleCurrencyInput(this)">
+                                <input type="text" id="tw_monthly" value="$3,500" class="bg-transparent border-b border-blue-200 py-1 font-bold text-slate-700 outline-none w-full" oninput="handleCurrencyInput(this)">
                             </div>
                         </div>
                     </div>
                 </section>
 
-                <section class="card bg-[#064e3b] text-white shadow-2xl">
-                    <h2 class="text-xl font-black mb-6 flex items-center tracking-widest text-emerald-400">
-                        最後一步：現有資產與保障
-                    </h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <section class="card">
+                    <h2 class="section-title text-emerald-600 border-emerald-600">最後一步：現有資產與保障</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-emerald-50/30 p-4 rounded-xl">
                         <div>
-                            <label class="input-label text-emerald-500">目前已有總保額 (USD)</label>
-                            <input type="text" id="current_insurance" value="$300,000" oninput="handleCurrencyInput(this)" class="green-input">
+                            <label class="input-label text-emerald-700">目前已有總保額 (USD)</label>
+                            <input type="text" id="current_insurance" value="$300,000" oninput="handleCurrencyInput(this)" class="asset-input">
                         </div>
                         <div>
-                            <label class="input-label text-emerald-500">流動性存款/投資 (USD)</label>
-                            <input type="text" id="current_assets" value="$100,000" oninput="handleCurrencyInput(this)" class="green-input">
+                            <label class="input-label text-emerald-700">流動性存款/投資 (USD)</label>
+                            <input type="text" id="current_assets" value="$100,000" oninput="handleCurrencyInput(this)" class="asset-input">
                         </div>
                     </div>
                 </section>
@@ -153,7 +156,7 @@
             <div class="w-full lg:w-1/3 lg:sticky lg:top-8">
                 <div class="bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-100">
                     <div class="bg-blue-600 p-8 text-center text-white">
-                        <h3 class="text-xs font-bold opacity-60 uppercase tracking-[0.2em] mb-2 font-black">保障缺口分析總覽</h3>
+                        <h3 class="text-[10px] font-bold opacity-60 uppercase tracking-[0.2em] mb-2">保障缺口分析總覽</h3>
                         <div id="total_gap_val" class="text-4xl font-black tracking-tighter">$0</div>
                     </div>
                     <div class="p-8 space-y-6">
@@ -161,22 +164,22 @@
                             <canvas id="gapChart"></canvas>
                         </div>
                         <div class="space-y-4">
-                            <div class="flex justify-between items-center border-b pb-3">
-                                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">身故保障需求</p>
-                                <p id="life_need_display" class="text-xl font-bold text-red-600">$0</p>
+                            <div class="flex justify-between items-center border-b border-slate-50 pb-3">
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">身故保障需求</p>
+                                <p id="life_need_display" class="text-lg font-bold text-red-600">$0</p>
                             </div>
-                            <div class="flex justify-between items-center border-b pb-3">
-                                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">生前福利需求</p>
-                                <p id="medical_need_display" class="text-xl font-bold text-orange-500">$0</p>
+                            <div class="flex justify-between items-center border-b border-slate-50 pb-3">
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">生前福利需求</p>
+                                <p id="medical_need_display" class="text-lg font-bold text-orange-500">$0</p>
                             </div>
-                            <div class="flex justify-between items-center border-b pb-3">
-                                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">長期照護預備</p>
-                                <p id="ltc_need_display" class="text-xl font-bold text-purple-600">$0</p>
+                            <div class="flex justify-between items-center border-b border-slate-50 pb-3">
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">長期照護預備</p>
+                                <p id="ltc_need_display" class="text-lg font-bold text-purple-600">$0</p>
                             </div>
                         </div>
                         <div class="pt-4 space-y-3">
-                            <button id="saveBtn" onclick="saveToSheet()" class="w-full bg-slate-900 text-white font-black py-4 rounded-xl hover:bg-black transition-all shadow-lg">儲存諮詢紀錄</button>
-                            <button onclick="window.print()" class="w-full bg-slate-100 text-slate-500 font-bold py-3 rounded-xl text-sm">列印報告 PDF</button>
+                            <button id="saveBtn" onclick="saveToSheet()" class="w-full bg-slate-900 text-white font-black py-4 rounded-xl hover:bg-black transition-all shadow-lg active:scale-95">儲存諮詢紀錄</button>
+                            <button onclick="window.print()" class="w-full bg-slate-100 text-slate-500 font-bold py-3 rounded-xl text-xs hover:bg-slate-200">列印報告 PDF</button>
                         </div>
                     </div>
                 </div>
@@ -190,43 +193,31 @@
         let currentLTCPath = 'US';
         let myChart = null;
 
-        // 金額格式化函數 (純數字 -> $1,000)
         function formatUSD(val) {
             return new Intl.NumberFormat('en-US', {
                 style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0,
             }).format(val);
         }
 
-        // 解析金額文字 ($1,000 -> 1000)
         function parseCurrency(str) {
             return parseFloat(str.replace(/[$,]/g, '')) || 0;
         }
 
-        // 處理輸入框動態格式化
         function handleCurrencyInput(el) {
             let cursorPosition = el.selectionStart;
             let originalLength = el.value.length;
-            
-            let val = el.value.replace(/[^\d]/g, ''); // 只留數字
-            if (val === '') {
-                el.value = '';
-                calculate();
-                return;
-            }
-            
+            let val = el.value.replace(/[^\d]/g, '');
+            if (val === '') { el.value = ''; calculate(); return; }
             let formatted = formatUSD(parseInt(val, 10));
             el.value = formatted;
-            
-            // 修正光標位置
             let newLength = el.value.length;
             cursorPosition = cursorPosition + (newLength - originalLength);
             el.setSelectionRange(cursorPosition, cursorPosition);
-            
             calculate();
         }
 
         window.onload = function() {
-            document.getElementById('display_date').innerText = "諮詢日期：" + new Date().toLocaleDateString();
+            document.getElementById('display_date').innerText = "報告日期：" + new Date().toLocaleDateString();
             initChart();
             calculate();
             fetch(SCRIPT_URL).then(res => res.json()).then(data => {
@@ -238,8 +229,8 @@
 
         function setLTCPath(path) {
             currentLTCPath = path;
-            document.getElementById('btn_us').className = (path === 'US') ? "flex-1 py-3 rounded-lg font-bold text-sm bg-white shadow-sm text-blue-600" : "flex-1 py-3 rounded-lg font-bold text-sm text-slate-500";
-            document.getElementById('btn_tw').className = (path === 'TW') ? "flex-1 py-3 rounded-lg font-bold text-sm bg-white shadow-sm text-blue-600" : "flex-1 py-3 rounded-lg font-bold text-sm text-slate-500";
+            document.getElementById('btn_us').className = (path === 'US') ? "flex-1 py-2.5 rounded-lg font-bold text-xs bg-white shadow-sm text-blue-600 transition-all" : "flex-1 py-2.5 rounded-lg font-bold text-xs text-slate-500 transition-all";
+            document.getElementById('btn_tw').className = (path === 'TW') ? "flex-1 py-2.5 rounded-lg font-bold text-xs bg-white shadow-sm text-blue-600 transition-all" : "flex-1 py-2.5 rounded-lg font-bold text-xs text-slate-500 transition-all";
             document.getElementById('us_ltc_details').classList.toggle('hidden', path !== 'US');
             document.getElementById('tw_ltc_details').classList.toggle('hidden', path !== 'TW');
             calculate();
@@ -248,7 +239,7 @@
         function selectLtcType(type) {
             document.getElementById('radio_' + type).checked = true;
             ['inhome', 'assisted', 'nursing'].forEach(t => {
-                document.getElementById('card_' + t).className = (t === type) ? "ltc-option-card border-blue-600 bg-blue-50 active" : "ltc-option-card border-slate-200 bg-white";
+                document.getElementById('card_' + t).className = (t === type) ? "ltc-option-card active border-blue-500 bg-blue-50/50 shadow-sm" : "ltc-option-card border-slate-200 bg-white";
             });
             calculate();
         }
@@ -259,10 +250,8 @@
             const annual = parseCurrency(document.getElementById('annual_income').value);
             const years = parseInt(document.getElementById('income_years').value) || 10;
             const edu = parseCurrency(document.getElementById('edu_per_child').value) * (parseFloat(document.getElementById('child_count').value) || 0);
-            
             const lifeTotalNeed = mortgage + other_debt + (annual * years) + edu + 20000;
             const med = parseCurrency(document.getElementById('medical_oop').value) + parseCurrency(document.getElementById('recovery_fund').value);
-            
             const duration = parseInt(document.getElementById('ltc_duration').value) || 36;
             let monthlyRate = 0;
             if(currentLTCPath === 'US') {
@@ -272,7 +261,6 @@
                 monthlyRate = parseCurrency(document.getElementById('tw_monthly').value);
             }
             const ltcTotalNeed = monthlyRate * duration;
-
             const ins = parseCurrency(document.getElementById('current_insurance').value);
             const asset = parseCurrency(document.getElementById('current_assets').value);
             const gap = Math.max(0, (lifeTotalNeed + med + ltcTotalNeed) - (ins + asset));
@@ -281,7 +269,6 @@
             document.getElementById('medical_need_display').innerText = formatUSD(med);
             document.getElementById('ltc_need_display').innerText = formatUSD(ltcTotalNeed);
             document.getElementById('total_gap_val').innerText = formatUSD(gap);
-
             updateChart(lifeTotalNeed, med, ltcTotalNeed, ins, asset);
         }
 
