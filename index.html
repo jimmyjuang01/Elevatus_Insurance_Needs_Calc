@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elevatus 保障需求分析系統 v4.9 | Jimmy Chuang</title>
+    <title>Elevatus 保障需求分析系統 v5.0 | Jimmy Chuang</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
@@ -11,72 +11,87 @@
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
         body { font-family: 'Noto Sans TC', sans-serif; background-color: #f8fafc; color: #1e293b; }
         
-        /* 基礎網頁 UI */
+        /* 網頁 UI */
         .card-box { background-color: white; padding: 2rem; border-radius: 2rem; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1); border: 1px solid #f1f5f9; margin-bottom: 2rem; }
         .section-title { font-size: 1.25rem; font-weight: 900; margin-bottom: 1.5rem; display: flex; align-items: center; border-left: 5px solid; padding-left: 1rem; }
         .input-label { display: block; font-size: 11px; font-weight: 700; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
-        .input-field { width: 100%; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 0.875rem 1rem; color: #1e293b; font-weight: 700; outline: none; }
+        .input-field { width: 100%; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 0.875rem 1rem; color: #1e293b; font-weight: 700; outline: none; transition: all 0.2s; }
         .ltc-card { display: flex; align-items: center; padding: 1rem; border-radius: 0.75rem; border: 2px solid #f1f5f9; background-color: white; transition: all 0.2s; margin-bottom: 0.75rem; }
         .ltc-card.active { border-color: #a855f7; background-color: #faf5ff; }
         .toggle-checkbox:checked { right: 0; border-color: #10b981; }
         .toggle-checkbox:checked + .toggle-label { background-color: #10b981; }
 
-        /* 🚀 v4.9 終極列印與圓角修正 */
+        /* 🚀 V5.0 深度列印優化 (Independent Report Mode) */
         @media print {
             @page { 
                 size: letter; 
-                margin: 0 !important; /* 隱藏瀏覽器標註 */
+                margin: 18mm 15mm !important; /* 🌟 核心修正：保留適當邊距，避免內容太靠頁首頁尾 */
             }
             body { 
-                padding: 12mm 15mm !important; 
                 background-color: white !important; 
                 -webkit-print-color-adjust: exact !important; 
-                print-color-adjust: exact !important; 
+                print-color-adjust: exact !important;
+                padding: 0 !important;
             }
             
-            /* 修正 1：恢復標題顯示，並賦予正式報告外觀 */
-            .app-title-print { display: block !important; margin-bottom: 15px !important; }
+            /* 1. 恢復標題與顧問資訊，確保第一頁完整 */
+            .app-title-print { display: block !important; margin-bottom: 20px !important; }
             .no-print, button, input[type="range"], #inflation_control, .flex.justify-end.mb-3 { display: none !important; }
             
-            /* 修正 2：強化摘要面板圓角 (解決 Page 3 格式問題) */
-            #report-summary-panel { order: -1 !important; margin-bottom: 30px !important; width: 100% !important; }
+            /* 2. 修正摘要面板：圓角強化與背景裁切 */
+            #report-summary-panel { order: -1 !important; margin-bottom: 40px !important; width: 100% !important; }
             #report-summary-panel > div { 
-                border-radius: 2.5rem !important; 
+                border-radius: 2rem !important; 
                 overflow: hidden !important; 
-                border: 1px solid #e2e8f0 !important;
-                box-shadow: none !important;
+                border: 1.5px solid #e2e8f0 !important;
                 background-color: white !important;
+                box-shadow: none !important;
             }
-            /* 強制藍色區塊圓角裁剪 */
             #report-summary-panel .bg-blue-600 {
-                border-top-left-radius: 2.5rem !important;
-                border-top-right-radius: 2.5rem !important;
-                -webkit-mask-image: -webkit-radial-gradient(white, black); /* 修正 Safari/Chrome 圓角溢出 */
+                background-color: #2563eb !important;
+                border-top-left-radius: 2rem !important;
+                border-top-right-radius: 2rem !important;
+                padding: 30px !important;
+                /* 確保列印時圓角不溢出 */
+                -webkit-clip-path: inset(0 0 0 0 round 2rem 2rem 0 0);
+                clip-path: inset(0 0 0 0 round 2rem 2rem 0 0);
             }
             
-            /* 極簡底線風格 */
+            /* 3. 欄位美化：移除表單感，保留正式底線 */
             .input-field, select, .consultant-input, .child-age-input, .child-name { 
-                border: none !important; border-bottom: 1.5px solid #000 !important; 
-                background: transparent !important; padding: 2px 0 !important; 
-                border-radius: 0 !important; -webkit-appearance: none !important; 
-                appearance: none !important; color: black !important; 
-                font-weight: 700 !important; box-shadow: none !important;
+                border: none !important; 
+                border-bottom: 1.2px solid #1e293b !important; 
+                background: transparent !important; 
+                padding: 2px 0 !important; 
+                border-radius: 0 !important; 
+                -webkit-appearance: none !important; 
+                appearance: none !important; 
+                color: black !important; 
+                font-weight: 700 !important;
             }
-            .input-label { color: #64748b !important; font-size: 10px !important; }
+            .input-label { color: #475569 !important; font-size: 10px !important; margin-bottom: 2px !important; }
             
-            /* 強制雙欄並排 */
-            .grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 20px !important; }
+            /* 4. 分頁控制與區塊間距 */
+            .card-box { 
+                page-break-inside: avoid !important; 
+                break-inside: avoid !important; 
+                margin-bottom: 35px !important; /* 區塊間留白 */
+                padding: 20px !important;
+                border: 1px solid #f1f5f9 !important;
+                border-radius: 1.5rem !important;
+            }
+            
+            /* 5. 強制雙欄：不受手機響應式影響 */
+            .grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 25px !important; }
             .sm\:col-span-2, .lg\:w-7\/12, .lg\:w-5\/12 { width: 100% !important; grid-column: span 2 / span 2 !important; }
-            
-            /* 防斷頁 */
-            .card-box { page-break-inside: avoid !important; break-inside: avoid !important; border: 1px solid #e2e8f0 !important; border-radius: 12px !important; padding: 20px !important; margin-bottom: 25px !important; }
+
             .ltc-card:not(.active) { display: none !important; }
-            .ltc-card.active { border: 1px solid #a855f7 !important; background: transparent !important; padding: 10px !important; }
+            .ltc-card.active { border: 1px solid #a855f7 !important; background: transparent !important; padding: 15px !important; }
         }
 
         #print-footer { display: none; }
         @media print {
-            #print-footer { display: block; position: fixed; bottom: 8mm; left: 0; right: 0; text-align: center; font-size: 8px; color: #94a3b8; padding: 5px 0; }
+            #print-footer { display: block; position: fixed; bottom: 0; left: 0; right: 0; text-align: center; font-size: 8px; color: #94a3b8; padding: 10px 0; border-top: 0.5px solid #f1f5f9; }
         }
     </style>
 </head>
@@ -88,8 +103,8 @@
                 <img src="./logo.png" alt="Elevatus Logo" class="h-10 sm:h-14 object-contain">
                 <div class="border-l-2 border-slate-200 pl-4">
                     <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight app-title-print">
-                        <span data-i18n="app_title">Coverage Needs Analysis</span>
-                        <span class="text-blue-600 text-sm no-print">v4.9</span>
+                        <span data-i18n="app_title">保障需求分析</span>
+                        <span class="text-blue-600 text-sm no-print">v5.0</span>
                     </h1>
                     <p class="text-slate-400 font-bold text-[10px] uppercase tracking-widest mt-1">Cross-Border Financial Consulting</p>
                 </div>
@@ -127,20 +142,20 @@
                 <section class="card-box">
                     <h2 class="section-title border-red-500 text-red-600" data-i18n="sec1_title">01. 家庭責任與身故保障</h2>
                     <div class="grid grid-cols-2 gap-x-6 gap-y-5">
-                        <div><label class="input-label text-red-500" data-i18n="mortgage">房屋貸款餘額 (USD)</label><input type="text" id="mortgage" value="$350,000" oninput="handleCurrencyInput(this)" class="input-field"></div>
-                        <div><label class="input-label text-red-500" data-i18n="other_debt">其他個人/商業貸款</label><input type="text" id="other_debt" value="$100,000" oninput="handleCurrencyInput(this)" class="input-field"></div>
-                        <div><label class="input-label text-blue-500" data-i18n="annual_income">目前年收入 (USD)</label><input type="text" id="annual_income" value="$80,000" oninput="handleCurrencyInput(this)" class="input-field"></div>
-                        <div><label class="input-label text-blue-500" data-i18n="income_years">預計替代年數</label><select id="income_years" onchange="calculate()" class="input-field cursor-pointer"><option value="5" data-i18n="yr_5">5 年</option><option value="10" selected data-i18n="yr_10">10 年</option><option value="15" data-i18n="yr_15">15 年</option></select></div>
-                        <div><label class="input-label text-emerald-500" data-i18n="edu_budget">每位子女教育預算</label><input type="text" id="edu_per_child" value="$150,000" oninput="handleCurrencyInput(this)" class="input-field"></div>
-                        <div><label class="input-label text-emerald-500" data-i18n="child_sync">子女數量 (同步)</label><input type="text" id="child_count" value="1" class="input-field" readonly></div>
+                        <div><label class="input-label" data-i18n="mortgage">房屋貸款餘額 (USD)</label><input type="text" id="mortgage" value="$350,000" oninput="handleCurrencyInput(this)" class="input-field"></div>
+                        <div><label class="input-label" data-i18n="other_debt">其他個人/商業貸款</label><input type="text" id="other_debt" value="$100,000" oninput="handleCurrencyInput(this)" class="input-field"></div>
+                        <div><label class="input-label" data-i18n="annual_income">目前年收入 (USD)</label><input type="text" id="annual_income" value="$80,000" oninput="handleCurrencyInput(this)" class="input-field"></div>
+                        <div><label class="input-label" data-i18n="income_years">預計替代年數</label><select id="income_years" onchange="calculate()" class="input-field cursor-pointer"><option value="5" data-i18n="yr_5">5 年</option><option value="10" selected data-i18n="yr_10">10 年</option><option value="15" data-i18n="yr_15">15 年</option></select></div>
+                        <div><label class="input-label" data-i18n="edu_budget">每位子女教育預算</label><input type="text" id="edu_per_child" value="$150,000" oninput="handleCurrencyInput(this)" class="input-field"></div>
+                        <div><label class="input-label" data-i18n="child_sync">子女數量 (同步)</label><input type="text" id="child_count" value="1" class="input-field" readonly></div>
                     </div>
                 </section>
 
                 <section class="card-box">
                     <h2 class="section-title border-orange-400 text-orange-500" data-i18n="sec2_title">02. 醫療與重疾應急金</h2>
                     <div class="grid grid-cols-2 gap-6">
-                        <div><label class="input-label text-orange-500" data-i18n="oop_max">醫療自付上限預留</label><input type="text" id="medical_oop" value="$18,000" oninput="handleCurrencyInput(this)" class="input-field"></div>
-                        <div><label class="input-label text-orange-500" data-i18n="recovery_fund">重大疾病應急金</label><input type="text" id="recovery_fund" value="$160,000" oninput="handleCurrencyInput(this)" class="input-field"></div>
+                        <div><label class="input-label" data-i18n="oop_max">醫療自付上限預留</label><input type="text" id="medical_oop" value="$18,000" oninput="handleCurrencyInput(this)" class="input-field"></div>
+                        <div><label class="input-label" data-i18n="recovery_fund">重大疾病應急金</label><input type="text" id="recovery_fund" value="$160,000" oninput="handleCurrencyInput(this)" class="input-field"></div>
                     </div>
                 </section>
 
@@ -151,8 +166,8 @@
                         <button id="btn_tw" onclick="setLTCPath('TW')" class="flex-1 py-3 rounded-lg font-bold text-sm text-slate-500">返回台灣照護 (TW)</button>
                     </div>
                     <div class="grid grid-cols-2 gap-6 mb-6">
-                        <div><label class="input-label text-purple-600" data-i18n="ltc_duration">選擇預計照護時間長度</label><select id="ltc_duration" onchange="calculate()" class="input-field cursor-pointer bg-white"><option value="12" data-i18n="mo_12">12 個月</option><option value="24" data-i18n="mo_24">24 個月</option><option value="36" selected data-i18n="mo_36">36 個月</option><option value="48" data-i18n="mo_48">48 個月</option><option value="60" data-i18n="mo_60">60 個月</option></select></div>
-                        <div><label class="input-label text-purple-600" data-i18n="ltc_start_age">預計啟動長照年齡</label><input type="number" id="ltc_start_age" value="75" class="input-field bg-white" oninput="calculate()"></div>
+                        <div><label class="input-label" data-i18n="ltc_duration">選擇預計照護時間長度</label><select id="ltc_duration" onchange="calculate()" class="input-field cursor-pointer bg-white"><option value="12" data-i18n="mo_12">12 個月</option><option value="24" data-i18n="mo_24">24 個月</option><option value="36" selected data-i18n="mo_36">36 個月</option><option value="48" data-i18n="mo_48">48 個月</option><option value="60" data-i18n="mo_60">60 個月</option></select></div>
+                        <div><label class="input-label" data-i18n="ltc_start_age">預計啟動長照年齡</label><input type="number" id="ltc_start_age" value="75" class="input-field bg-white" oninput="calculate()"></div>
                     </div>
                     <div id="us_ltc_details">
                         <div class="flex justify-end mb-3 no-print"><a href="https://www.carescout.com/cost-of-care" target="_blank" class="text-xs font-bold text-blue-500 flex items-center gap-1" data-i18n="carescout_link">查詢 CareScout 最新費率</a></div>
@@ -175,7 +190,7 @@
             </div>
 
             <div id="report-summary-panel" class="w-full lg:w-5/12 xl:w-1/3 lg:sticky lg:top-10">
-                <div class="bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-slate-100 flex flex-col">
+                <div class="bg-white rounded-[2rem] shadow-xl overflow-hidden border border-slate-100 flex flex-col">
                     <div class="bg-blue-600 p-8 text-center text-white">
                         <h3 class="text-sm font-black opacity-90 uppercase tracking-widest mb-2" data-i18n="summary_title">保障缺口分析總覽</h3>
                         <div id="total_gap_val" class="text-4xl sm:text-5xl font-black tracking-tighter">$0</div>
@@ -207,7 +222,7 @@
     </div>
 
     <footer id="print-footer">
-        © <span id="year-display"></span> Elevatus Business Consultants. 本報告內容僅供財務規劃參考。
+        © <span id="year-display"></span> Elevatus Business Consultants. 本報告內容僅供初步財務分析規劃參考。
     </footer>
 
     <script>
