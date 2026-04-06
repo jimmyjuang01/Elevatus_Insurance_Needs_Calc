@@ -109,7 +109,7 @@
                     <h2 class="section-title border-blue-500 text-blue-600" data-i18n="sec0_title">00. 客戶基本資料</h2>
                     <div class="grid grid-cols-2 gap-4">
                         <div><label class="input-label" data-i18n="client_name">Client Name</label><input type="text" id="client_name" placeholder="王先生" value="" class="input-field"></div>
-                        <div><label class="input-label" data-i18n="gender">Sex</label><select id="client_gender" class="input-field cursor-pointer"><option data-i18n="male">男</option><option data-i18n="female">女</option></select></div>
+                        <div><label class="input-label" data-i18n="gender">Sex</label><select id="client_gender" class="input-field cursor-pointer"><option data-i18n="male" value="男">男</option><option data-i18n="female" value="女">女</option></select></div>
                         <div><label class="input-label" data-i18n="age">Age</label><input type="number" id="client_age" placeholder="35" value="" class="input-field" oninput="calculate()"></div>
                         <div><label class="input-label" data-i18n="phone">Phone</label><input type="text" id="client_phone" placeholder="(XXX) XXX-XXXX" value="" class="input-field"></div>
                         <div class="col-span-2 border-t border-slate-100 pt-4 mt-1 flex justify-between items-center">
@@ -212,7 +212,7 @@
         };
         
         let currentLang = 'zh'; let myChart = null; let currentLTCPath = 'US'; 
-        let isCleared = false; // 🚀 控制是否處於「清空狀態」的核心變數
+        let isCleared = false; 
         window.chartBreakdown = { life: [], med: [], ltc: [] }; 
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxEsNTWhldPnUc1xxnUHJcaH14Wbd0J1CMSOnhI9r_5ckZ-jRwHEhPR1lZdptHe3H6o/exec";
 
@@ -269,10 +269,9 @@
         function toggleFV() { document.getElementById('inflation_control').classList.toggle('hidden', !document.getElementById('fv_toggle').checked); calculate(); }
         function updateInflationLabel() { document.getElementById('inflation_display').innerText = document.getElementById('inflation_rate').value + '%'; }
 
-        // 🚀 一鍵清空邏輯
         function clearAllData() {
             if(confirm(currentLang==='zh' ? '確定要清空所有輸入的資料嗎？(重新整理網頁可回復預設)' : 'Are you sure you want to clear all data? (Refresh page to restore defaults)')) {
-                isCleared = true; // 開啟清空狀態
+                isCleared = true; 
                 document.querySelectorAll('input').forEach(el => {
                     if(el.type === 'text' || el.type === 'number') {
                         el.value = '';
@@ -283,12 +282,10 @@
             }
         }
 
-        // 🚀 核心智慧取值邏輯：判斷要抓取實體輸入值、預設提示字，還是清空歸零
         function getInputValue(id, type = 'currency') {
             const el = document.getElementById(id);
             if (!el) return type === 'text' ? '' : 0;
             let valStr = el.value;
-            // 如果欄位是空的，檢查是否處於「清空狀態」
             if (valStr === '') {
                 valStr = isCleared ? (type === 'text' ? '' : '0') : (el.placeholder || (type === 'text' ? '' : '0'));
             }
@@ -475,8 +472,10 @@
                 const payload = {
                     consultant: document.getElementById('consultant_name').value, 
                     name: getInputValue('client_name', 'text'), 
+                    gender: document.getElementById('client_gender').value,
                     age: getInputValue('client_age', 'number'), 
                     phone: getInputValue('client_phone', 'text'),
+                    email: "",
                     childCount: getInputValue('master_child_count', 'number'), 
                     childDetails: childDetailsStr, 
                     isFV: document.getElementById('fv_toggle').checked ? "Yes" : "No", 
@@ -489,10 +488,18 @@
                     medicalOop: formatUSD(getInputValue('medical_oop', 'currency')), 
                     recoveryFund: formatUSD(getInputValue('recovery_fund', 'currency')), 
                     ltcPath: currentLTCPath, 
+                    ltcType: currentLTCPath === 'US' ? document.querySelector('input[name="ltc_type"]:checked').value : 'TW_Monthly',
                     ltcMonthly: formatUSD(getInputValue(currentLTCPath==='US'?'us_'+document.querySelector('input[name="ltc_type"]:checked').value:'tw_monthly', 'currency')),
+                    ltcDuration: document.getElementById('ltc_duration').options[document.getElementById('ltc_duration').selectedIndex]?.text || "",
+                    ltcStartAge: getInputValue('ltc_start_age', 'number'),
                     currentIns: formatUSD(getInputValue('current_insurance', 'currency')), 
                     currentAssets: formatUSD(getInputValue('current_assets', 'currency')), 
-                    totalGap: document.getElementById('total_gap_val').innerText
+                    lifeNeed: document.getElementById('life_need_display').innerText,
+                    medNeed: document.getElementById('medical_need_display').innerText,
+                    ltcNeed: document.getElementById('ltc_need_display').innerText,
+                    assets: document.getElementById('merged_assets_display').innerText,
+                    totalGap: document.getElementById('total_gap_val').innerText,
+                    notes: getInputValue('notes', 'text')
                 };
                 await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
                 alert('✅ 諮詢紀錄已成功儲存。');
