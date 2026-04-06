@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elevatus 保障需求分析系統 v6.8 | Jimmy Chuang</title>
+    <title>Elevatus 保障需求分析系統 V7.2 | Jimmy Chuang</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
@@ -47,18 +47,16 @@
             #report-summary-panel .bg-blue-600 { background-color: #f8fafc !important; color: black !important; padding: 15px !important; border-bottom: 1px solid #e2e8f0 !important; }
             #total_gap_val { color: #2563eb !important; font-size: 2.8rem !important; }
             
-            /* 🚀 這裡新增 PDF 通膨註記的顏色與粗體設定 */
-            #inflation_note_print {
-                color: #2563eb !important; /* 深藍色，對比明顯 */
-                font-weight: 700 !important; /* 粗體，增加清晰度 */
-            }
+            /* 🚀 PDF 通膨註記顏色與粗體設定 */
+            #inflation_note_print { color: #2563eb !important; font-weight: 700 !important; font-size: 11px !important; }
             
-            .child-data-row { display: flex !important; flex-direction: row !important; gap: 8px !important; border-bottom: 1px solid #e2e8f0 !important; padding-bottom: 4px !important; margin-top: 4px !important; }
-            .child-name-col { width: 45% !important; }
-            .child-gender-col { width: 30% !important; }
-            .child-age-col { width: 25% !important; }
+            /* PDF 子女資料單行 Table Layout */
+            .child-data-row { display: table !important; width: 100% !important; border-bottom: 1px solid #e2e8f0 !important; padding-bottom: 4px !important; margin-top: 4px !important; }
+            .child-name-col { display: table-cell !important; width: 50% !important; padding-right: 10px !important; }
+            .child-gender-col { display: table-cell !important; width: 25% !important; padding-right: 10px !important; }
+            .child-age-col { display: table-cell !important; width: 25% !important; }
             
-            .input-field, select, .consultant-input, .child-age-input, .child-name { border: none !important; border-bottom: 1.2px solid black !important; background: transparent !important; padding: 0 !important; border-radius: 0 !important; -webkit-appearance: none !important; color: black !important; font-weight: 700 !important; }
+            .input-field, select, .consultant-input, .child-age-input, .child-name { border: none !important; border-bottom: 1.2px solid black !important; background: transparent !important; padding: 0 !important; border-radius: 0 !important; -webkit-appearance: none !important; color: black !important; font-weight: 700 !important; width: 100% !important; }
             .grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 15px !important; }
             .sm\:col-span-2, .lg\:w-7\/12, .lg\:w-5\/12 { width: 100% !important; grid-column: span 2 / span 2 !important; }
             .ltc-card:not(.active) { display: none !important; }
@@ -76,7 +74,6 @@
                 <div class="border-l-2 border-slate-200 pl-4">
                     <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight app-title-print">
                         <span data-i18n="app_title">保障需求分析</span>
-                        <span class="text-blue-600 text-xs no-print ml-1">v6.8</span>
                     </h1>
                     <p class="text-slate-400 font-bold text-[8px] sm:text-[10px] uppercase tracking-widest mt-1">Cross-Border Financial Consulting</p>
                 </div>
@@ -185,7 +182,7 @@
                         <input type="range" id="inflation_rate" min="0" max="10" step="0.5" value="3" class="w-full accent-emerald-500 cursor-pointer" oninput="updateInflationLabel(); calculate();">
                     </div>
                     <div class="p-6 bg-white flex-grow">
-                        <div class="relative h-44 sm:h-52 w-full mb-6"><canvas id="gapChart"></canvas></div>
+                        <div class="relative w-full mb-6" style="height: 220px;"><canvas id="gapChart"></canvas></div>
                         <div class="space-y-4 mb-6">
                             <div class="flex justify-between items-center border-b border-slate-50 pb-1"><p class="text-sm font-black text-slate-600 uppercase" data-i18n="disp_life">身故保障需求</p><p id="life_need_display" class="text-lg font-black text-red-500">$0</p></div>
                             <div class="flex justify-between items-center border-b border-slate-50 pb-1"><p class="text-sm font-black text-slate-600 uppercase" data-i18n="disp_med">重疾醫療需求</p><p id="medical_need_display" class="text-lg font-black text-orange-500">$0</p></div>
@@ -206,13 +203,29 @@
     <script>
         const dict = {
             zh: { app_title: "保障需求分析", advisor: "顧問:", sec0_title: "00. 客戶基本資料", client_name: "客戶姓名", gender: "性別", male: "男", female: "女", age: "目前年齡", phone: "聯絡電話", child_count: "No. of Children", notes: "諮詢備註", sec1_title: "01. 家庭責任與身故保障", mortgage: "房貸餘額 (USD)", other_debt: "其他個人/商業貸款", annual_income: "年收入 (USD)", income_years: "替代年數", edu_budget: "教育預算/人", child_sync: "子女數量 (同步)", sec2_title: "02. 醫療與重疾應急金", medical_oop: "醫療自付上限預留", recovery_fund: "重大疾病應急金", sec3_title: "03. 長期照護準備", ltc_duration: "預計月數", ltc_start_age: "啟動年齡", us_inhome: "In-Home Care", us_assisted: "Assisted Living", us_nursing: "Nursing Home", tw_monthly: "台灣照護月費估算", sec4_title: "04. 現有資產與保障", cur_ins_full: "現有總保額 (USD)", cur_assets_full: "流動性存款/投資", summary_title: "保障缺口分析總覽", fv_toggle: "通膨精算 (FV)", inflation_rate: "年通膨率", disp_life: "身故保障需求", disp_med: "重疾醫療需求", disp_ltc: "長期照護準備", disp_assets: "現有資產與保障", cur_ins_short: "現有總保額", cur_assets_short: "流動性存款/投資", gap_short: "家庭保障缺口", btn_save: "儲存諮詢紀錄", btn_print: "列印 PDF 報告", filename_pref: "保障需求分析", yr_opts: ["5", "10", "15"], yr_labels: ["5 年 (過渡緩衝)", "10 年 (標準責任)", "15 年 (長期守護)"], ltc_opts: ["12", "24", "36", "48", "60"], ltc_labels: ["12", "24", "36 (3年-平均值)", "48", "60"], us_btn: "美國", tw_btn: "台灣", inf_note: "採用通膨率 (FV): ", child_name_lb: "姓名" },
-            en: { app_title: "Coverage Needs Analysis", advisor: "Advisor:", sec0_title: "00. CLIENT INFORMATION", client_name: "Client Name", gender: "Gender", male: "Male", female: "Female", age: "Age", phone: "Phone", child_count: "No. of Children", notes: "Notes", sec1_title: "01. OBLIGATIONS & LIFE NEED", mortgage: "Mortgage Balance (USD)", other_debt: "Other Personal/Business Debt", annual_income: "Annual Income (USD)", income_years: "Income Replacement Years", edu_budget: "Education Budget / Child", child_sync: "No. of Children (Synced)", sec2_title: "02. LIVING BENEFITS & CRITICAL ILLNESS", medical_oop: "Medical Out-of-Pocket Max", recovery_fund: "Recovery Fund for Critical Illness", sec3_title: "03. LONG-TERM CARE PREPARATION", ltc_duration: "Expected Duration (Months)", ltc_start_age: "Start Age", us_inhome: "In-Home Care", us_assisted: "Assisted Living", us_nursing: "Nursing Home", tw_monthly: "Estimated Taiwan LTC Monthly Cost", sec4_title: "04. CURRENT ASSETS", cur_ins_full: "Total Coverage (USD)", cur_assets_full: "Liquid Assets/Investments", summary_title: "GAP SUMMARY", fv_toggle: "Inflation (FV)", inflation_rate: "Inflation Rate", disp_life: "Life Insurance Need", disp_med: "Critical Illness Need", disp_ltc: "LTC Preparation", disp_assets: "Existing Assets & Protection", cur_ins_short: "Total Coverage", cur_assets_short: "Liquid Assets", gap_short: "Gap", btn_save: "Save Record", btn_print: "Print PDF", filename_pref: "Needs_Analysis", yr_opts: ["5", "10", "15"], yr_labels: ["5 Years (Buffer)", "10 Years (Standard)", "15 Years (Long-term)"], ltc_opts: ["12", "24", "36", "48", "60"], ltc_labels: ["12", "24", "36 (Avg - 3 Yrs)", "48", "60"], us_btn: "U.S.", tw_btn: "Taiwan", inf_note: "Applied Inflation Rate (FV): ", child_name_lb: "Name" }
+            en: { app_title: "Coverage Needs Analysis", advisor: "Advisor:", sec0_title: "00. CLIENT INFORMATION", client_name: "Client Name", gender: "Gender", male: "Male", female: "Female", age: "Age", phone: "Phone", child_count: "NO. OF CHILDREN", notes: "Notes", sec1_title: "01. OBLIGATIONS & LIFE NEED", mortgage: "Mortgage Balance (USD)", other_debt: "Other Personal/Business Debt", annual_income: "Annual Income (USD)", income_years: "Income Replacement Years", edu_budget: "Education Budget / Child", child_sync: "NO. OF CHILDREN (SYNCED)", sec2_title: "02. LIVING BENEFITS & CRITICAL ILLNESS", medical_oop: "Medical Out-of-Pocket Max", recovery_fund: "Recovery Fund for Critical Illness", sec3_title: "03. LONG-TERM CARE PREPARATION", ltc_duration: "Expected Duration (Months)", ltc_start_age: "Start Age", us_inhome: "In-Home Care", us_assisted: "Assisted Living", us_nursing: "Nursing Home", tw_monthly: "Estimated Taiwan LTC Monthly Cost", sec4_title: "04. CURRENT ASSETS", cur_ins_full: "Total Coverage (USD)", cur_assets_full: "Liquid Assets/Investments", summary_title: "GAP SUMMARY", fv_toggle: "Inflation (FV)", inflation_rate: "Inflation Rate", disp_life: "Life Insurance Need", disp_med: "Critical Illness Need", disp_ltc: "LTC Preparation", disp_assets: "Existing Assets & Protection", cur_ins_short: "Total Coverage", cur_assets_short: "Liquid Assets", gap_short: "Gap", btn_save: "Save Record", btn_print: "Print PDF", filename_pref: "Needs_Analysis", yr_opts: ["5", "10", "15"], yr_labels: ["5 Years (Buffer)", "10 Years (Standard)", "15 Years (Long-term)"], ltc_opts: ["12", "24", "36", "48", "60"], ltc_labels: ["12", "24", "36 (Avg - 3 Yrs)", "48", "60"], us_btn: "U.S.", tw_btn: "Taiwan", inf_note: "Applied Inflation Rate (FV): ", child_name_lb: "Name" }
         };
+        
         let currentLang = 'zh'; let myChart = null; let currentLTCPath = 'US'; 
         window.chartBreakdown = { life: [], med: [], ltc: [] }; 
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxEsNTWhldPnUc1xxnUHJcaH14Wbd0J1CMSOnhI9r_5ckZ-jRwHEhPR1lZdptHe3H6o/exec";
 
-        function toggleLang() { currentLang = currentLang === 'zh' ? 'en' : 'zh'; updateLangButtonUI(); syncDropdowns(); calculate(); }
+        let currentDisplayedGap = 0;
+        let gapAnimationId = null;
+
+        window.onload = function() { 
+            document.getElementById('display_date').innerText = new Date().toLocaleDateString(); 
+            document.getElementById('year-display').innerText = new Date().getFullYear(); 
+            initChart(); 
+            syncDropdowns(); 
+            updateLangButtonUI(); 
+        };
+
+        function toggleLang() { 
+            currentLang = currentLang === 'zh' ? 'en' : 'zh'; 
+            syncDropdowns(); 
+            updateLangButtonUI(); 
+        }
 
         function updateLangButtonUI() {
             const zh = document.getElementById('lang-zh'); const en = document.getElementById('lang-en');
@@ -224,65 +237,137 @@
         }
 
         function syncDropdowns() {
-            const yr_sel = document.getElementById('income_years'); const ltc_sel = document.getElementById('ltc_duration');
-            const yr_idx = yr_sel.selectedIndex === -1 ? 1 : yr_sel.selectedIndex; const ltc_idx = ltc_sel.selectedIndex === -1 ? 2 : ltc_sel.selectedIndex;
-            yr_sel.innerHTML = dict[currentLang].yr_opts.map((o,i) => `<option value="${[5,10,15][i]}" ${i===yr_idx?'selected':''}>${o}</option>`).join('');
-            ltc_sel.innerHTML = dict[currentLang].ltc_opts.map((o,i) => `<option value="${[12,24,36,48,60][i]}" ${i===ltc_idx?'selected':''}>${o}</option>`).join('');
+            const yr_sel = document.getElementById('income_years'); 
+            const ltc_sel = document.getElementById('ltc_duration');
+            const current_yr_val = yr_sel.value || "10"; 
+            const current_ltc_val = ltc_sel.value || "36";
+
+            yr_sel.innerHTML = dict[currentLang].yr_opts.map((val, i) => `<option value="${val}">${dict[currentLang].yr_labels[i]}</option>`).join('');
+            ltc_sel.innerHTML = dict[currentLang].ltc_opts.map((val, i) => `<option value="${val}">${dict[currentLang].ltc_labels[i]}</option>`).join('');
+
+            yr_sel.value = current_yr_val;
+            ltc_sel.value = current_ltc_val;
         }
 
         function formatUSD(v) { return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(v); }
         function parseCurrency(s) { return parseFloat(String(s).replace(/[$,]/g, '')) || 0; }
-        function handleCurrencyInput(el) { let cursor = el.selectionStart; let len = el.value.length; let val = el.value.replace(/[^\d]/g, ''); if (val === '') { el.value = ''; calculate(); return; } el.value = formatUSD(parseInt(val, 10)); el.setSelectionRange(cursor + (el.value.length - len), cursor + (el.value.length - len)); calculate(); }
+        
+        function handleCurrencyInput(el) { 
+            let cursor = el.selectionStart; let len = el.value.length; let val = el.value.replace(/[^\d]/g, ''); 
+            if (val === '') { el.value = ''; calculate(); return; } 
+            el.value = formatUSD(parseInt(val, 10)); 
+            el.setSelectionRange(cursor + (el.value.length - len), cursor + (el.value.length - len)); 
+            calculate(); 
+        }
+        
         function toggleFV() { document.getElementById('inflation_control').classList.toggle('hidden', !document.getElementById('fv_toggle').checked); calculate(); }
         function updateInflationLabel() { document.getElementById('inflation_display').innerText = document.getElementById('inflation_rate').value + '%'; }
+
+        function animateValue(id, start, end, duration) {
+            if (start === end) return;
+            const obj = document.getElementById(id);
+            if (gapAnimationId) cancelAnimationFrame(gapAnimationId); 
+            
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const easeProgress = 1 - Math.pow(1 - progress, 3);
+                const currentVal = Math.floor(easeProgress * (end - start) + start);
+                
+                obj.innerText = formatUSD(currentVal);
+                if (progress < 1) {
+                    gapAnimationId = window.requestAnimationFrame(step);
+                } else {
+                    obj.innerText = formatUSD(end); 
+                }
+            };
+            gapAnimationId = window.requestAnimationFrame(step);
+        }
 
         function calculate() {
             const isFV = document.getElementById('fv_toggle').checked; const r = isFV ? (parseFloat(document.getElementById('inflation_rate').value)/100) : 0;
             const age = parseInt(document.getElementById('client_age').value) || 35;
-            const mort = parseCurrency(document.getElementById('mortgage').value); const debt = parseCurrency(document.getElementById('other_debt').value);
-            const ann = parseCurrency(document.getElementById('annual_income').value); const yrs = parseInt(document.getElementById('income_years').value) || 10;
+            
+            const mort = parseCurrency(document.getElementById('mortgage').value); 
+            const debt = parseCurrency(document.getElementById('other_debt').value);
+            const ann = parseCurrency(document.getElementById('annual_income').value); 
+            const yrs = parseInt(document.getElementById('income_years').value) || 10;
+            
             let replacement = r > 0 ? ann * (Math.pow(1 + r, yrs) - 1) / r : ann * yrs;
-            let eduT = 0; document.querySelectorAll('.child-age-input').forEach(i => { eduT += parseCurrency(document.getElementById('edu_per_child').value) * Math.pow(1 + r, Math.max(0, 18 - (parseInt(i.value) || 0))); });
+            let eduT = 0; 
+            document.querySelectorAll('.child-age-input').forEach(i => { eduT += parseCurrency(document.getElementById('edu_per_child').value) * Math.pow(1 + r, Math.max(0, 18 - (parseInt(i.value) || 0))); });
+            
             const lifeT = mort + debt + replacement + eduT;
+            
             const medOOP_FV = parseCurrency(document.getElementById('medical_oop').value) * Math.pow(1+r, Math.max(0, 65-age));
             const medRec_FV = parseCurrency(document.getElementById('recovery_fund').value) * Math.pow(1+r, Math.max(0, 65-age));
             const medT = medOOP_FV + medRec_FV;
+            
             const ltcRate = parseCurrency(document.getElementById(currentLTCPath==='US'?'us_'+document.querySelector('input[name="ltc_type"]:checked').value:'tw_monthly').value);
             const ltcT = (ltcRate * (parseInt(document.getElementById('ltc_duration').value)||36)) * Math.pow(1+r, Math.max(0, (parseInt(document.getElementById('ltc_start_age').value)||75)-age));
-            const ins = parseCurrency(document.getElementById('current_insurance').value); const cash = parseCurrency(document.getElementById('current_assets').value);
+            
+            const ins = parseCurrency(document.getElementById('current_insurance').value); 
+            const cash = parseCurrency(document.getElementById('current_assets').value);
             const gap = Math.max(0, (lifeT + medT + ltcT) - (ins + cash));
 
             const t = dict[currentLang];
             const yrLabel = document.getElementById('income_years').options[document.getElementById('income_years').selectedIndex]?.text || `${yrs}`;
+            
             window.chartBreakdown = {
-                life: [`【${t.disp_life}: ${formatUSD(lifeT)}】`, `${t.mortgage}: ${formatUSD(mort)}`, `${t.other_debt}: ${formatUSD(debt)}`, `${yrLabel} ${currentLang==='zh'?'收入替代':'Replacement'}: ${formatUSD(replacement)}`, `${t.edu_budget}: ${formatUSD(eduT)}`],
+                life: [`【${t.disp_life}: ${formatUSD(lifeT)}】`, `${t.mortgage}: ${formatUSD(mort)}`, `${t.other_debt}: ${formatUSD(debt)}`, `${currentLang==='zh'?yrs+'年收入替代':yrLabel+' Replacement'}: ${formatUSD(replacement)}`, `${t.edu_budget}: ${formatUSD(eduT)}`],
                 med: [`【${t.disp_med}: ${formatUSD(medT)}】`, `${t.medical_oop}: ${formatUSD(medOOP_FV)}`, `${t.recovery_fund}: ${formatUSD(medRec_FV)}`],
                 ltc: [`【${t.disp_ltc}: ${formatUSD(ltcT)}】`, `${currentLang==='zh'?'預計月費':'Monthly Rate'}: ${formatUSD(ltcRate)}`, `${t.ltc_duration}: ${document.getElementById('ltc_duration').options[document.getElementById('ltc_duration').selectedIndex]?.text || ""}`, `${t.ltc_start_age}: ${document.getElementById('ltc_start_age').value}`]
             };
 
-            document.getElementById('life_need_display').innerText = formatUSD(lifeT); document.getElementById('medical_need_display').innerText = formatUSD(medT);
-            document.getElementById('ltc_need_display').innerText = formatUSD(ltcT); document.getElementById('merged_assets_display').innerText = formatUSD(ins + cash);
-            document.getElementById('total_gap_val').innerText = formatUSD(gap);
+            document.getElementById('life_need_display').innerText = formatUSD(lifeT); 
+            document.getElementById('medical_need_display').innerText = formatUSD(medT);
+            document.getElementById('ltc_need_display').innerText = formatUSD(ltcT); 
+            document.getElementById('merged_assets_display').innerText = formatUSD(ins + cash);
+            
+            animateValue('total_gap_val', currentDisplayedGap, gap, 600);
+            currentDisplayedGap = gap;
+            
             updateChart(lifeT, medT, ltcT, ins, cash);
         }
 
         function initChart() {
             const ctx = document.getElementById('gapChart').getContext('2d');
             myChart = new Chart(ctx, {
-                type: 'doughnut', data: { datasets: [{ data: [1, 1, 1], backgroundColor: ['#ef4444', '#f97316', '#a855f7'], borderWidth: 0, weight: 1.5 }, { data: [1, 1, 1], backgroundColor: ['#10b981', '#6ee7b7', '#f1f5f9'], borderWidth: 0, weight: 1 }] },
-                options: { cutout: '45%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { 
-                    backgroundColor: 'rgba(15, 23, 42, 0.95)', titleFont: { size: 14, weight: '900' }, bodyFont: { size: 12 }, padding: 16, cornerRadius: 12, callbacks: {
-                        title: (i) => { const t = dict[currentLang]; return i[0].datasetIndex === 0 ? [t.disp_life, t.disp_med, t.disp_ltc][i[0].dataIndex] : [t.cur_ins_short, t.cur_assets_short, t.gap_short][i[0].dataIndex]; },
-                        label: (ctx) => { if (ctx.datasetIndex === 0) { const keys = ['life','med','ltc']; return window.chartBreakdown[keys[ctx.dataIndex]]; } else return (currentLang==='zh'?"總計: ":"Total: ") + formatUSD(ctx.parsed); }
-                    }
-                } } }
+                type: 'doughnut', 
+                data: { 
+                    datasets: [
+                        { data: [1, 1, 1], backgroundColor: ['#ef4444', '#f97316', '#a855f7'], borderWidth: 0, weight: 1.5 }, 
+                        { data: [1, 1, 1], backgroundColor: ['#10b981', '#6ee7b7', '#f1f5f9'], borderWidth: 0, weight: 1 }
+                    ] 
+                },
+                options: { 
+                    cutout: '45%', responsive: true, maintainAspectRatio: false, 
+                    plugins: { 
+                        legend: { display: false }, 
+                        tooltip: { 
+                            backgroundColor: 'rgba(15, 23, 42, 0.95)', titleFont: { size: 14, weight: '900' }, bodyFont: { size: 12 }, padding: 16, cornerRadius: 12, 
+                            callbacks: {
+                                title: (i) => { const t = dict[currentLang]; return i[0].datasetIndex === 0 ? [t.disp_life, t.disp_med, t.disp_ltc][i[0].dataIndex] : [t.cur_ins_short, t.cur_assets_short, t.gap_short][i[0].dataIndex]; },
+                                label: (ctx) => { if (ctx.datasetIndex === 0) { const keys = ['life','med','ltc']; return window.chartBreakdown[keys[ctx.dataIndex]]; } else return (currentLang==='zh'?"總計: ":"Total: ") + formatUSD(ctx.parsed); }
+                            }
+                        } 
+                    } 
+                }
             });
         }
 
-        function updateChart(life, med, ltc, ins, cash) { const gap = Math.max(0, (life + med + ltc) - (ins + cash)); myChart.data.datasets[0].data = [life, med, ltc]; myChart.data.datasets[1].data = [ins, cash, gap]; myChart.update(); }
+        function updateChart(life, med, ltc, ins, cash) { 
+            if (!myChart) return; 
+            const gap = Math.max(0, (life + med + ltc) - (ins + cash)); 
+            myChart.data.datasets[0].data = [life, med, ltc]; 
+            myChart.data.datasets[1].data = [ins, cash, gap]; 
+            myChart.update(); 
+        }
         
         function generateChildRows() { 
-            const count = parseInt(document.getElementById('master_child_count').value) || 0; document.getElementById('child_count').value = count; 
+            const count = parseInt(document.getElementById('master_child_count').value) || 0; 
+            document.getElementById('child_count').value = count; 
             const container = document.getElementById('child_rows_container'); 
             const savedData = Array.from(container.children).map(r => ({ name: r.querySelector('.child-name').value, gender: r.querySelector('.child-gender')?.value, age: r.querySelector('.child-age-input').value })); 
             container.innerHTML = ''; 
@@ -311,8 +396,20 @@
             window.print(); setTimeout(() => { document.title = originalTitle; }, 1000); 
         }
 
-        function setLTCPath(p) { currentLTCPath = p; document.getElementById('btn_us').className = (p==='US')?"flex-1 py-3 rounded-lg font-black text-xs bg-white shadow text-purple-600":"flex-1 py-3 rounded-lg font-bold text-xs text-slate-500"; document.getElementById('btn_tw').className = (p==='TW')?"flex-1 py-3 rounded-lg font-black text-xs bg-white shadow text-purple-600":"flex-1 py-3 rounded-lg font-bold text-xs text-slate-500"; document.getElementById('us_ltc_details').classList.toggle('hidden', p!=='US'); document.getElementById('tw_ltc_details').classList.toggle('hidden', p!=='TW'); calculate(); }
-        function selectLtcType(t) { document.getElementById('radio_'+t).checked = true; ['inhome', 'assisted', 'nursing'].forEach(x => { if(document.getElementById('card_'+x)) document.getElementById('card_'+x).classList.toggle('active', x===t); }); calculate(); }
+        function setLTCPath(p) { 
+            currentLTCPath = p; 
+            document.getElementById('btn_us').className = (p==='US')?"flex-1 py-3 rounded-lg font-black text-xs bg-white shadow text-purple-600":"flex-1 py-3 rounded-lg font-bold text-xs text-slate-500"; 
+            document.getElementById('btn_tw').className = (p==='TW')?"flex-1 py-3 rounded-lg font-black text-xs bg-white shadow text-purple-600":"flex-1 py-3 rounded-lg font-bold text-xs text-slate-500"; 
+            document.getElementById('us_ltc_details').classList.toggle('hidden', p!=='US'); 
+            document.getElementById('tw_ltc_details').classList.toggle('hidden', p!=='TW'); 
+            calculate(); 
+        }
+        
+        function selectLtcType(t) { 
+            document.getElementById('radio_'+t).checked = true; 
+            ['inhome', 'assisted', 'nursing'].forEach(x => { if(document.getElementById('card_'+x)) document.getElementById('card_'+x).classList.toggle('active', x===t); }); 
+            calculate(); 
+        }
 
         async function saveToSheet() {
             const btn = document.getElementById('saveBtn'); const original = btn.innerText; btn.innerText = 'Syncing...'; btn.disabled = true;
@@ -329,12 +426,6 @@
                 alert('✅ 諮詢紀錄已成功儲存。');
             } catch (e) { alert('儲存失敗'); } finally { btn.innerText = original; btn.disabled = false; }
         }
-
-        window.onload = function() { 
-            document.getElementById('display_date').innerText = new Date().toLocaleDateString(); 
-            document.getElementById('year-display').innerText = new Date().getFullYear(); 
-            syncDropdowns(); updateLangButtonUI(); initChart(); calculate(); 
-        };
     </script>
 </body>
 </html>
