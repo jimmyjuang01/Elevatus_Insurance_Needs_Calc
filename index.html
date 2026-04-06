@@ -3,112 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elevatus 保障需求分析系統 v5.3 | Jimmy Chuang</title>
+    <title>Elevatus 保障需求分析系統 v5.5 | Jimmy Chuang</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
-        body { font-family: 'Noto Sans TC', sans-serif; background-color: #f1f5f9; color: #1e293b; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #f1f5f9; color: #1e293b; }
         
-        /* 💻 電腦版基礎 UI (保持圓角與陰影) */
-        .card-box { 
-            background-color: white; 
-            padding: 1.25rem; /* 手機預設 */
-            border-radius: 1.25rem; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05); 
-            margin-bottom: 1.25rem; 
-            border: 1px solid #e2e8f0;
-        }
-        
-        @media (min-width: 640px) {
-            .card-box { padding: 2rem; border-radius: 2rem; margin-bottom: 2rem; }
-        }
+        .card-box { background-color: white; padding: 1.25rem; border-radius: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 1.25rem; border: 1px solid #e2e8f0; }
+        @media (min-width: 640px) { .card-box { padding: 2rem; border-radius: 2rem; margin-bottom: 2rem; } }
 
-        .section-title { 
-            font-size: 1.125rem; font-weight: 900; margin-bottom: 1.25rem; 
-            display: flex; align-items: center; border-left: 5px solid; padding-left: 0.75rem; 
-        }
-        
+        .section-title { font-size: 1.125rem; font-weight: 900; margin-bottom: 1.25rem; display: flex; align-items: center; border-left: 5px solid; padding-left: 0.75rem; }
         .input-label { display: block; font-size: 10px; font-weight: 700; margin-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; }
-        
-        .input-field { 
-            width: 100%; background-color: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 0.75rem; 
-            padding: 0.75rem; color: #1e293b; font-weight: 700; font-size: 16px; outline: none; transition: all 0.2s; 
-        }
+        .input-field { width: 100%; background-color: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 0.75rem; padding: 0.75rem; color: #1e293b; font-weight: 700; font-size: 16px; outline: none; transition: all 0.2s; -webkit-appearance: none; }
         .input-field:focus { border-color: #3b82f6; background-color: white; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
-
+        input.input-field:read-only { background-color: #f1f5f9; cursor: not-allowed; color: #94a3b8; }
+        
         .ltc-card { display: flex; align-items: center; padding: 0.875rem; border-radius: 0.75rem; border: 2px solid #f1f5f9; background-color: white; transition: all 0.2s; margin-bottom: 0.5rem; }
         .ltc-card.active { border-color: #a855f7; background-color: #faf5ff; }
 
-        /* 🚀 V5.3 終極列印優化 (Independent Report Mode) */
+        /* 🚀 V5.5 終極列印優化：移除背景、圓角，並註明通膨率 */
         @media print {
-            @page { size: letter; margin: 15mm !important; }
+            @page { size: letter; margin: 18mm 15mm !important; }
             body { background-color: white !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; padding: 0 !important; }
             
-            /* 1. 移除大欄位圓角背景，直接列印內容 */
-            .card-box, #report-summary-panel > div { 
-                background: transparent !important; 
-                border: none !important; 
-                box-shadow: none !important; 
-                padding: 0 !important; 
-                margin-bottom: 20px !important; 
-                border-radius: 0 !important; 
-                page-break-inside: avoid !important; 
-            }
+            .no-print, button, input[type="range"], #inflation_control, .flex.justify-end.mb-3 { display: none !important; }
+            .card-box, #report-summary-panel > div { background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin-bottom: 25px !important; border-radius: 0 !important; page-break-inside: avoid !important; }
             
-            /* 2. 標題線條化 */
-            .section-title { 
-                border-left: 4px solid #1e293b !important; 
-                border-bottom: 1px solid #e2e8f0 !important; 
-                padding-bottom: 4px !important; 
-                margin-top: 15px !important; 
-                color: black !important; 
-            }
+            .app-title-print { display: block !important; margin-bottom: 15px !important; border-bottom: 2px solid #1e293b; padding-bottom: 8px; }
+            .section-title { border-left: 4px solid #1e293b !important; border-bottom: 1px solid #e2e8f0 !important; padding-bottom: 4px !important; margin-top: 15px !important; color: black !important; }
             
-            /* 3. 摘要面板扁平化，減少首頁留白 */
-            #report-summary-panel { order: -1 !important; width: 100% !important; margin-bottom: 20px !important; }
-            #report-summary-panel .bg-blue-600 { 
-                background-color: #f8fafc !important; 
-                color: black !important; 
-                border: 1.5px solid #1e293b !important; 
-                padding: 15px !important; 
-            }
+            #report-summary-panel { order: -1 !important; width: 100% !important; margin-bottom: 30px !important; }
+            #report-summary-panel .bg-blue-600 { background-color: #f8fafc !important; color: black !important; border: 1.5px solid #1e293b !important; padding: 15px !important; }
             #report-summary-panel .text-white { color: black !important; }
             #total_gap_val { color: #2563eb !important; font-size: 2.5rem !important; }
             
-            /* 4. 欄位底線化 */
-            .input-field, select, .consultant-input, .child-age-input, .child-name { 
-                border: none !important; border-bottom: 1px solid black !important; 
-                background: transparent !important; padding: 0 !important; 
-                border-radius: 0 !important; -webkit-appearance: none !important; 
-                color: black !important; font-weight: 700 !important; 
-            }
-            
-            /* 5. 強制雙欄配置 */
-            .grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 12px !important; }
+            .input-field, select, .consultant-input, .child-age-input, .child-name { border: none !important; border-bottom: 1px solid black !important; background: transparent !important; padding: 0 !important; border-radius: 0 !important; -webkit-appearance: none !important; color: black !important; font-weight: 700 !important; }
+            .grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 18px !important; }
             .sm\:col-span-2, .lg\:w-7\/12, .lg\:w-5\/12 { width: 100% !important; grid-column: span 2 / span 2 !important; }
             
-            .no-print, button, input[type="range"], #inflation_control, .flex.justify-end.mb-3 { display: none !important; }
+            /* 列印時顯示特定的通膨率備註 */
+            #inflation-note-print { display: block !important; font-size: 10px; font-weight: 700; color: #64748b; margin-top: 5px; }
             .ltc-card:not(.active) { display: none !important; }
         }
 
+        #inflation-note-print { display: none; }
         #print-footer { display: none; }
-        @media print {
-            #print-footer { display: block; position: fixed; bottom: 0; left: 0; right: 0; text-align: center; font-size: 8px; color: #94a3b8; padding: 5px 0; border-top: 0.5px solid #f1f5f9; }
-        }
+        @media print { #print-footer { display: block; position: fixed; bottom: 0; left: 0; right: 0; text-align: center; font-size: 8px; color: #94a3b8; padding: 8px 0; border-top: 0.5px solid #f1f5f9; } }
     </style>
 </head>
 <body class="p-3 sm:p-6 lg:p-10">
 
     <div class="max-w-7xl mx-auto">
-        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-10 gap-4">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 px-2">
             <div class="flex items-center gap-4">
                 <img src="./logo.png" alt="Elevatus Logo" class="h-10 sm:h-14 object-contain">
                 <div class="border-l-2 border-slate-200 pl-4">
                     <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight app-title-print">
                         <span data-i18n="app_title">保障需求分析</span>
-                        <span class="text-blue-600 text-xs no-print ml-1">v5.3</span>
+                        <span class="text-blue-600 text-xs no-print ml-1">v5.5</span>
                     </h1>
                     <p class="text-slate-400 font-bold text-[8px] sm:text-[10px] uppercase tracking-widest mt-1">Cross-Border Financial Consulting</p>
                 </div>
@@ -135,10 +89,7 @@
                         <div><label class="input-label" data-i18n="phone">聯絡電話</label><input type="text" id="client_phone" class="input-field" placeholder="(XXX) XXX-XXXX"></div>
                         <div class="col-span-2"><label class="input-label" data-i18n="email">E-mail</label><input type="email" id="client_email" class="input-field" placeholder="example@email.com"></div>
                         <div class="col-span-2 border-t border-slate-100 pt-4 mt-1">
-                            <div class="flex justify-between items-center mb-3">
-                                <label class="input-label text-blue-600" data-i18n="child_count">子女數量</label>
-                                <input type="number" id="master_child_count" value="1" min="0" class="input-field w-20 py-2 text-center" oninput="generateChildRows()">
-                            </div>
+                            <div class="flex justify-between items-center mb-3"><label class="input-label text-blue-600" data-i18n="child_count">子女數量</label><input type="number" id="master_child_count" value="1" min="0" class="input-field w-20 py-2 text-center" oninput="generateChildRows()"></div>
                             <div id="child_rows_container" class="space-y-3"></div>
                         </div>
                         <div class="col-span-2"><label class="input-label text-slate-400" data-i18n="notes">諮詢備註</label><input type="text" id="notes" value="一家四口" class="input-field text-sm"></div>
@@ -151,8 +102,8 @@
                         <div><label class="input-label text-red-500" data-i18n="mortgage">房貸餘額</label><input type="text" id="mortgage" value="$350,000" oninput="handleCurrencyInput(this)" class="input-field"></div>
                         <div><label class="input-label text-red-500" data-i18n="other_debt">其他貸款</label><input type="text" id="other_debt" value="$100,000" oninput="handleCurrencyInput(this)" class="input-field"></div>
                         <div><label class="input-label text-blue-500" data-i18n="annual_income">年收入</label><input type="text" id="annual_income" value="$80,000" oninput="handleCurrencyInput(this)" class="input-field"></div>
-                        <div><label class="input-label text-blue-500" data-i18n="income_years">替代年數</label><select id="income_years" onchange="calculate()" class="input-field"><option value="5" data-i18n="yr_5">5 年</option><option value="10" selected data-i18n="yr_10">10 年</option><option value="15" data-i18n="yr_15">15 年</option></select></div>
-                        <div><label class="input-label text-emerald-500" data-i18n="edu_budget">教育預算</label><input type="text" id="edu_per_child" value="$150,000" oninput="handleCurrencyInput(this)" class="input-field"></div>
+                        <div><label class="input-label text-blue-500" data-i18n="income_years">替代年數</label><select id="income_years" onchange="calculate()" class="input-field cursor-pointer"><option value="5" data-i18n="yr_5">5 年</option><option value="10" selected data-i18n="yr_10">10 年</option><option value="15" data-i18n="yr_15">15 年</option></select></div>
+                        <div><label class="input-label text-emerald-500" data-i18n="edu_budget">教育預算/人</label><input type="text" id="edu_per_child" value="$150,000" oninput="handleCurrencyInput(this)" class="input-field"></div>
                         <div><label class="input-label text-emerald-500" data-i18n="child_sync">數量(同步)</label><input type="text" id="child_count" value="1" class="input-field text-center bg-slate-50" readonly></div>
                     </div>
                 </section>
@@ -172,16 +123,17 @@
                         <button id="btn_tw" onclick="setLTCPath('TW')" class="flex-1 py-3 rounded-lg font-bold text-xs text-slate-500">台灣 (TW)</button>
                     </div>
                     <div class="grid grid-cols-2 gap-4 mb-4">
-                        <div><label class="input-label text-purple-600" data-i18n="ltc_duration">預計月數</label><select id="ltc_duration" onchange="calculate()" class="input-field"><option value="12">12</option><option value="24">24</option><option value="36" selected>36</option><option value="48">48</option><option value="60">60</option></select></div>
+                        <div><label class="input-label text-purple-600" data-i18n="ltc_duration">預計月數</label><select id="ltc_duration" onchange="calculate()" class="input-field cursor-pointer"><option value="12">12</option><option value="24">24</option><option value="36" selected>36</option><option value="48">48</option><option value="60">60</option></select></div>
                         <div><label class="input-label text-purple-600" data-i18n="ltc_start_age">啟動年齡</label><input type="number" id="ltc_start_age" value="75" class="input-field text-center" oninput="calculate()"></div>
                     </div>
                     <div id="us_ltc_details">
-                        <div class="flex justify-end mb-2 no-print"><a href="https://www.carescout.com/cost-of-care" target="_blank" class="text-[10px] font-bold text-blue-500 underline" data-i18n="carescout_link">查詢最新費率</a></div>
-                        <div class="ltc-card active" id="card_inhome" onclick="selectLtcType('inhome')"><input type="radio" name="ltc_type" id="radio_inhome" value="inhome" checked class="no-print mr-2"><div class="flex-grow"><label class="text-[9px] font-bold text-slate-400 uppercase block" data-i18n="us_inhome">In-Home Care</label><input type="text" id="us_inhome" value="$5,529" class="w-full bg-transparent py-1 font-black text-slate-800 outline-none" oninput="handleCurrencyInput(this)"></div></div>
-                        <div class="ltc-card" id="card_assisted" onclick="selectLtcType('assisted')"><input type="radio" name="ltc_type" id="radio_assisted" value="assisted" class="no-print mr-2"><div class="flex-grow"><label class="text-[9px] font-bold text-slate-400 uppercase block" data-i18n="us_assisted">Assisted Living</label><input type="text" id="us_assisted" value="$6,350" class="w-full bg-transparent py-1 font-black text-slate-800 outline-none" oninput="handleCurrencyInput(this)"></div></div>
+                        <div class="flex justify-end mb-2 no-print"><a href="https://www.carescout.com/cost-of-care" target="_blank" class="text-[10px] font-bold text-blue-500 underline" data-i18n="carescout_link">查詢 CareScout 最新費率</a></div>
+                        <div class="ltc-card active" id="card_inhome" onclick="selectLtcType('inhome')"><input type="radio" name="ltc_type" id="radio_inhome" value="inhome" checked class="no-print mr-3"><div class="flex-grow"><label class="text-[9px] font-bold text-slate-400 uppercase block" data-i18n="us_inhome">In-Home Care</label><input type="text" id="us_inhome" value="$5,529" class="w-full bg-transparent py-1 font-black text-slate-800 outline-none" oninput="handleCurrencyInput(this)"></div></div>
+                        <div class="ltc-card" id="card_assisted" onclick="selectLtcType('assisted')"><input type="radio" name="ltc_type" id="radio_assisted" value="assisted" class="no-print mr-3"><div class="flex-grow"><label class="text-[9px] font-bold text-slate-400 uppercase block" data-i18n="us_assisted">Assisted Living</label><input type="text" id="us_assisted" value="$6,350" class="w-full bg-transparent py-1 font-black text-slate-800 outline-none" oninput="handleCurrencyInput(this)"></div></div>
+                        <div class="ltc-card" id="card_nursing" onclick="selectLtcType('nursing')"><input type="radio" name="ltc_type" id="radio_nursing" value="nursing" class="no-print mr-3"><div class="flex-grow"><label class="text-[9px] font-bold text-slate-400 uppercase block" data-i18n="us_nursing">Nursing Home</label><input type="text" id="us_nursing" value="$8,015" class="w-full bg-transparent py-1 font-black text-slate-800 outline-none" oninput="handleCurrencyInput(this)"></div></div>
                     </div>
                     <div id="tw_ltc_details" class="hidden">
-                        <div class="ltc-card active border-purple-500 bg-purple-50/50"><div class="flex-grow px-3"><label class="text-[9px] font-bold text-purple-600 uppercase block" data-i18n="tw_monthly">台灣月費</label><input type="text" id="tw_monthly" value="$3,200" class="w-full bg-transparent py-1 font-black text-purple-800 outline-none" oninput="handleCurrencyInput(this)"></div></div>
+                        <div class="ltc-card active border-purple-500 bg-purple-50/50"><div class="flex-grow px-3"><label class="text-[11px] font-bold text-purple-600 uppercase block mb-1" data-i18n="tw_monthly">台灣照護月費估算</label><input type="text" id="tw_monthly" value="$3,200" class="w-full bg-transparent py-1 font-black text-purple-800 outline-none" oninput="handleCurrencyInput(this)"></div></div>
                     </div>
                 </section>
 
@@ -197,24 +149,30 @@
             <div id="report-summary-panel" class="w-full lg:w-5/12 xl:w-1/3 lg:sticky lg:top-10">
                 <div class="bg-blue-600 rounded-[2rem] shadow-xl overflow-hidden flex flex-col border border-blue-700">
                     <div class="p-6 text-center text-white">
-                        <h3 class="text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1" data-i18n="summary_title">保障缺口分析總覽</h3>
+                        <h3 class="text-[11px] font-bold uppercase tracking-widest opacity-80 mb-1" data-i18n="summary_title">保障缺口分析總覽</h3>
                         <div id="total_gap_val" class="text-3xl sm:text-4xl font-black tracking-tight">$0</div>
+                        <p id="inflation-note-print" class="mt-2 text-blue-200">通貨膨脹率 (FV): <span id="print_fv_rate_val">0%</span></p>
                     </div>
                     <div class="bg-slate-800 px-6 py-4 border-b border-slate-700 no-print flex justify-between items-center">
-                        <span class="text-[10px] font-bold text-emerald-400 uppercase" data-i18n="fv_toggle">通膨精算 (FV)</span>
+                        <span class="text-[11px] font-bold text-emerald-400 uppercase" data-i18n="fv_toggle">通膨精算 (FV)</span>
                         <div class="relative inline-block w-12"><input type="checkbox" id="fv_toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 border-slate-600 appearance-none cursor-pointer" onchange="toggleFV()"/><label for="fv_toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-slate-600 cursor-pointer"></label></div>
                     </div>
+                    <div id="inflation_control" class="bg-slate-800 px-6 pb-4 no-print hidden">
+                        <div class="flex justify-between text-slate-300 text-[10px] font-bold mb-2"><span data-i18n="inflation_rate">年通膨率</span><span id="inflation_display" class="text-white font-black">3.0%</span></div>
+                        <input type="range" id="inflation_rate" min="0" max="10" step="0.5" value="3" class="w-full accent-emerald-500" oninput="updateInflationLabel(); calculate();">
+                    </div>
+
                     <div class="p-6 bg-white flex-grow">
                         <div class="relative h-44 sm:h-52 w-full mb-6"><canvas id="gapChart"></canvas></div>
-                        <div class="space-y-3 mb-6 text-slate-800">
-                            <div class="flex justify-between items-center border-b border-slate-50 pb-2"><p class="text-[10px] font-bold text-slate-400 uppercase" data-i18n="disp_life">身故保障</p><p id="life_need_display" class="text-base font-black text-red-500">$0</p></div>
-                            <div class="flex justify-between items-center border-b border-slate-50 pb-2"><p class="text-[10px] font-bold text-slate-400 uppercase" data-i18n="disp_med">生前福利</p><p id="medical_need_display" class="text-base font-black text-orange-500">$0</p></div>
-                            <div class="flex justify-between items-center border-b border-slate-50 pb-2"><p class="text-[10px] font-bold text-slate-400 uppercase" data-i18n="disp_ltc">長期照護</p><p id="ltc_need_display" class="text-base font-black text-purple-600">$0</p></div>
-                            <div class="flex justify-between items-center border-b border-slate-50 pb-2"><p class="text-[10px] font-bold text-slate-400 uppercase" data-i18n="disp_assets">目前資產</p><p id="assets_display" class="text-base font-black text-emerald-500">$0</p></div>
+                        <div class="space-y-3 mb-6">
+                            <div class="flex justify-between items-center border-b border-slate-50 pb-2"><p class="text-[10px] font-bold text-slate-400 uppercase" data-i18n="disp_life">身故保障</p><p id="life_need_display" class="text-lg font-black text-red-500">$0</p></div>
+                            <div class="flex justify-between items-center border-b border-slate-50 pb-2"><p class="text-[10px] font-bold text-slate-400 uppercase" data-i18n="disp_med">生前福利</p><p id="medical_need_display" class="text-lg font-black text-orange-500">$0</p></div>
+                            <div class="flex justify-between items-center border-b border-slate-50 pb-2"><p class="text-[10px] font-bold text-slate-400 uppercase" data-i18n="disp_ltc">長期照護</p><p id="ltc_need_display" class="text-lg font-black text-purple-600">$0</p></div>
+                            <div class="flex justify-between items-center border-b border-slate-50 pb-2"><p class="text-[10px] font-bold text-slate-400 uppercase" data-i18n="disp_assets">目前資產</p><p id="assets_display" class="text-lg font-black text-emerald-500">$0</p></div>
                         </div>
                         <div class="space-y-2 no-print">
-                            <button id="saveBtn" onclick="saveToSheet()" class="w-full bg-slate-900 text-white font-black py-4 rounded-xl shadow-lg active:scale-95 text-xs tracking-widest" data-i18n="btn_save">儲存諮詢紀錄</button>
-                            <button onclick="handlePrint()" class="w-full bg-white text-slate-600 font-bold py-3 rounded-xl text-xs border border-slate-200" data-i18n="btn_print">列印 PDF 報告</button>
+                            <button id="saveBtn" onclick="saveToSheet()" class="w-full bg-slate-900 text-white font-black py-4 rounded-xl shadow-lg active:scale-95 text-sm tracking-widest" data-i18n="btn_save">儲存諮詢紀錄</button>
+                            <button onclick="handlePrint()" class="w-full bg-white text-slate-600 font-bold py-3.5 rounded-xl text-sm border border-slate-200" data-i18n="btn_print">列印 PDF 報告</button>
                             <button onclick="clearAllData()" class="w-full text-slate-400 hover:text-red-500 font-bold py-1 text-[10px] transition-colors mt-2" data-i18n="btn_reset">↺ 重置所有資料</button>
                         </div>
                     </div>
@@ -223,14 +181,12 @@
         </div>
     </div>
 
-    <footer id="print-footer">
-        © <span id="year-display"></span> Elevatus Business Consultants. 本報告內容僅供初步財務分析參考。
-    </footer>
+    <footer id="print-footer">© <span id="year-display"></span> Elevatus Business Consultants. 本報告內容僅供參考。</footer>
 
     <script>
         const dict = {
-            zh: { app_title: "保障需求分析", advisor: "顧問:", sec0_title: "00. 客戶基本資料", client_name: "客戶姓名", gender: "性別", male: "男", female: "女", age: "目前年齡", phone: "聯絡電話", email: "E-mail", child_count: "子女數量", notes: "諮詢備註", sec1_title: "01. 家庭責任與身故保障", mortgage: "房貸餘額", other_debt: "其他貸款", annual_income: "年收入", income_years: "替代年數", yr_5: "5 年", yr_10: "10 年", yr_15: "15 年", edu_budget: "教育預算", child_sync: "數量(同步)", sec2_title: "02. 醫療與重疾應急金", oop_max: "醫療自付預留", recovery_fund: "重大疾病應急金", sec3_title: "03. 長期照護路徑", us_care: "美國 (US)", tw_care: "台灣 (TW)", carescout_link: "查詢最新費率", ltc_duration: "預計月數", mo_12: "12", ltc_start_age: "啟動年齡", us_inhome: "In-Home Care", us_assisted: "Assisted Living", tw_monthly: "台灣月費", sec4_title: "04. 現有資產與保障", cur_ins: "總保額", cur_assets: "存款投資", summary_title: "保障缺口分析總覽", fv_toggle: "通膨精算 (FV)", disp_life: "身故保障", disp_med: "生前福利", disp_ltc: "長期照護", disp_assets: "目前資產", btn_save: "儲存諮詢紀錄", btn_print: "列印 PDF 報告", btn_reset: "↺ 重置所有資料", child_name_lb: "姓名", child_gender_lb: "性別", child_age_lb: "年齡", chart_gap: "保障缺口", filename_pref: "保障需求分析" },
-            en: { app_title: "Needs Analysis", advisor: "Advisor:", sec0_title: "00. Client Information", client_name: "Client Name", gender: "Gender", male: "Male", female: "Female", age: "Age", phone: "Phone", email: "E-mail", child_count: "Children", notes: "Notes", sec1_title: "01. Family Obligations", mortgage: "Mortgage", other_debt: "Other debt", annual_income: "Income", income_years: "Years", yr_5: "5 Yrs", yr_10: "10 Yrs", yr_15: "15 Yrs", edu_budget: "Edu Budget", child_sync: "No.(Synced)", sec2_title: "02. Living Benefits", oop_max: "OOP Max", recovery_fund: "Recovery Fund", sec3_title: "03. Long-Term Care", us_care: "U.S. (US)", tw_care: "Taiwan (TW)", carescout_link: "Check Rates", ltc_duration: "Months", mo_12: "12", ltc_start_age: "Start Age", us_inhome: "In-Home Care", us_assisted: "Assisted Living", tw_monthly: "Taiwan LTC", sec4_title: "04. Current Assets", cur_ins: "Coverage", cur_assets: "Liquid Assets", summary_title: "Protection Gap Summary", fv_toggle: "Inflation (FV)", disp_life: "Life Insurance", disp_med: "Living Benefits", disp_ltc: "LTC Preparation", disp_assets: "Current Assets", btn_save: "Save Record", btn_print: "Print PDF Report", btn_reset: "↺ Reset All", child_name_lb: "Name", child_gender_lb: "Sex", child_age_lb: "Age", chart_gap: "Protection Gap", filename_pref: "Needs_Analysis" }
+            zh: { app_title: "保障需求分析", advisor: "顧問:", sec0_title: "00. 客戶基本資料", client_name: "客戶姓名", gender: "性別", male: "男", female: "女", age: "目前年齡", phone: "聯絡電話", email: "E-mail", child_count: "子女數量", notes: "諮詢備註", sec1_title: "01. 家庭責任與身故保障", mortgage: "房貸餘額", other_debt: "其他貸款", annual_income: "年收入", income_years: "替代年數", yr_5: "5 年", yr_10: "10 年", yr_15: "15 年", edu_budget: "教育預算/人", child_sync: "數量(同步)", sec2_title: "02. 醫療與重疾應急金", oop_max: "醫療自付預留", recovery_fund: "重大疾病應急金", sec3_title: "03. 長期照護路徑", us_care: "美國 (US)", tw_care: "台灣 (TW)", carescout_link: "查詢最新費率", ltc_duration: "預計月數", us_inhome: "In-Home Care", us_assisted: "Assisted Living", us_nursing: "Nursing Home", tw_monthly: "台灣月費", sec4_title: "04. 現有資產與保障", cur_ins: "總保額", cur_assets: "存款投資", summary_title: "保障缺口分析總覽", fv_toggle: "通膨精算 (FV)", disp_life: "身故保障", disp_med: "生前福利", disp_ltc: "長期照護", disp_assets: "目前資產", btn_save: "儲存諮詢紀錄", btn_print: "列印 PDF 報告", btn_reset: "↺ 重置所有資料", child_name_lb: "姓名", child_gender_lb: "性別", child_age_lb: "年齡", chart_gap: "保障缺口", filename_pref: "保障需求分析", inf_rate_label: "通貨膨脹率 (FV):" },
+            en: { app_title: "Coverage Needs Analysis", advisor: "Advisor:", sec0_title: "00. Client Information", client_name: "Client Name", gender: "Gender", male: "Male", female: "Female", age: "Age", phone: "Phone", email: "E-mail", child_count: "Children", notes: "Notes", sec1_title: "01. Family Obligations", mortgage: "Mortgage", other_debt: "Other debt", annual_income: "Income", income_years: "Years", yr_5: "5 Yrs", yr_10: "10 Yrs", yr_15: "15 Yrs", edu_budget: "Edu Budget/Child", child_sync: "No.(Synced)", sec2_title: "02. Living Benefits", oop_max: "OOP Max", recovery_fund: "Recovery Fund", sec3_title: "03. Long-Term Care", us_care: "U.S. (US)", tw_care: "Taiwan (TW)", carescout_link: "Check Rates", ltc_duration: "Months", us_inhome: "In-Home Care", us_assisted: "Assisted Living", us_nursing: "Nursing Home", tw_monthly: "Taiwan LTC", sec4_title: "04. Current Assets", cur_ins: "Coverage", cur_assets: "Liquid Assets", summary_title: "Protection Gap Summary", fv_toggle: "Inflation (FV)", disp_life: "Life Insurance", disp_med: "Living Benefits", disp_ltc: "LTC Preparation", disp_assets: "Current Assets", btn_save: "Save Record", btn_print: "Print PDF Report", btn_reset: "↺ Reset All", child_name_lb: "Name", child_gender_lb: "Sex", child_age_lb: "Age", chart_gap: "Protection Gap", filename_pref: "Coverage_Needs_Analysis", inf_rate_label: "Inflation Rate (FV):" }
         };
         let currentLang = 'zh';
 
@@ -244,10 +200,22 @@
             generateChildRows(); calculate();
         }
 
+        function toggleFV() { 
+            const isFV = document.getElementById('fv_toggle').checked;
+            document.getElementById('inflation_control').classList.toggle('hidden', !isFV);
+            calculate(); 
+        }
+        function updateInflationLabel() { document.getElementById('inflation_display').innerText = document.getElementById('inflation_rate').value + '%'; }
+
         function handlePrint() {
             const originalTitle = document.title;
             const advisor = document.getElementById('consultant_name').value || "No_Name";
             const dateStr = new Date().toISOString().split('T')[0].replace(/-/g, '');
+            // 在列印前確保通膨率數值正確顯示在 PDF 區塊
+            const isFV = document.getElementById('fv_toggle').checked;
+            const rate = isFV ? document.getElementById('inflation_rate').value : "0";
+            document.getElementById('print_fv_rate_val').innerText = rate + "%";
+            
             document.title = `${dict[currentLang].filename_pref}_${dateStr}_${advisor}`;
             window.print();
             setTimeout(() => { document.title = originalTitle; }, 1000);
@@ -273,31 +241,26 @@
             const count = parseInt(document.getElementById('master_child_count').value) || 0;
             const container = document.getElementById('child_rows_container');
             document.getElementById('child_count').value = count;
-            const savedData = Array.from(container.children).map(r => ({
-                name: r.querySelector('.child-name').value, gender: r.querySelector('.child-gender').value, age: r.querySelector('.child-age-input').value
-            }));
+            const savedData = Array.from(container.children).map(r => ({ name: r.querySelector('.child-name').value, gender: r.querySelector('.child-gender').value, age: r.querySelector('.child-age-input').value }));
             container.innerHTML = '';
             const t = dict[currentLang];
             for (let i = 0; i < count; i++) {
                 const data = savedData[i] || { name: `${t.child_name_lb} ${i+1}`, gender: t.male, age: '0' };
                 const row = document.createElement('div');
-                // 手機版固定為 3 欄緊湊排版
                 row.className = 'grid grid-cols-3 gap-2 bg-slate-50 p-2 sm:p-3 rounded-xl border border-slate-100';
                 row.innerHTML = `
                     <div><label class="text-[8px] sm:text-[9px] font-bold text-slate-400 block">${t.child_name_lb}</label><input type="text" class="child-name w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-bold" value="${data.name}"></div>
                     <div><label class="text-[8px] sm:text-[9px] font-bold text-slate-400 block">${t.child_gender_lb}</label><select class="child-gender w-full bg-white border border-slate-200 rounded-lg px-1 py-1.5 text-xs font-bold"><option ${data.gender===t.male?'selected':''}>${t.male}</option><option ${data.gender===t.female?'selected':''}>${t.female}</option></select></div>
-                    <div><label class="text-[8px] sm:text-[9px] font-bold text-slate-400 block">${t.child_age_lb}</label><input type="number" class="child-age-input w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-bold" value="${data.age}" oninput="calculate()"></div>
+                    <div><label class="text-[8px] sm:text-[9px] font-bold text-slate-400 block">${t.child_age_lb}</label><input type="number" class="child-age-input w-full bg-white border border-blue-200 rounded-lg px-2 py-1.5 text-xs font-bold" value="${data.age}" oninput="calculate()"></div>
                 `;
                 container.appendChild(row);
             }
             calculate();
         }
 
-        function toggleFV() { calculate(); }
-
         function calculate() {
             const isFV = document.getElementById('fv_toggle').checked;
-            const r = isFV ? 0.03 : 0;
+            const r = isFV ? (parseFloat(document.getElementById('inflation_rate').value) / 100) : 0;
             const clientAge = parseInt(document.getElementById('client_age').value) || 35;
             const mortgage = parseCurrency(document.getElementById('mortgage').value);
             const otherDebt = parseCurrency(document.getElementById('other_debt').value);
@@ -310,24 +273,22 @@
             });
             const lifeNeed = mortgage + otherDebt + incomeReplacement + eduTotal;
             const medNeed = (parseCurrency(document.getElementById('medical_oop').value) + parseCurrency(document.getElementById('recovery_fund').value)) * Math.pow(1 + r, Math.max(0, 65 - clientAge));
-            const ltcNeed = (parseCurrency(document.getElementById(currentLTCPath === 'US' ? 'us_' + document.querySelector('input[name="ltc_type"]:checked').value : 'tw_monthly').value) * (parseInt(document.getElementById('ltc_duration').value) || 36)) * Math.pow(1 + r, Math.max(0, (parseInt(document.getElementById('ltc_start_age').value) || 75) - clientAge));
-            const totalAssets = parseCurrency(document.getElementById('current_insurance').value) + parseCurrency(document.getElementById('current_assets').value);
-            const gap = Math.max(0, (lifeNeed + medNeed + ltcNeed) - totalAssets);
+            const monthlyRate = parseCurrency(document.getElementById(currentLTCPath === 'US' ? 'us_' + document.querySelector('input[name="ltc_type"]:checked').value : 'tw_monthly').value);
+            const ltcNeed = (monthlyRate * (parseInt(document.getElementById('ltc_duration').value) || 36)) * Math.pow(1 + r, Math.max(0, (parseInt(document.getElementById('ltc_start_age').value) || 75) - clientAge));
+            const assets = parseCurrency(document.getElementById('current_insurance').value) + parseCurrency(document.getElementById('current_assets').value);
+            const gap = Math.max(0, (lifeNeed + medNeed + ltcNeed) - assets);
 
             document.getElementById('life_need_display').innerText = formatUSD(lifeNeed);
             document.getElementById('medical_need_display').innerText = formatUSD(medNeed);
             document.getElementById('ltc_need_display').innerText = formatUSD(ltcNeed);
-            document.getElementById('assets_display').innerText = formatUSD(totalAssets);
+            document.getElementById('assets_display').innerText = formatUSD(assets);
             document.getElementById('total_gap_val').innerText = formatUSD(gap);
             updateChart(lifeNeed, medNeed, ltcNeed, parseCurrency(document.getElementById('current_insurance').value), parseCurrency(document.getElementById('current_assets').value));
         }
 
         function initChart() {
             const ctx = document.getElementById('gapChart').getContext('2d');
-            myChart = new Chart(ctx, {
-                type: 'doughnut', data: { datasets: [{ data: [1, 1, 1], backgroundColor: ['#ef4444', '#f97316', '#a855f7'], borderWidth: 0, weight: 1.5 }, { data: [1, 1, 1], backgroundColor: ['#10b981', '#6ee7b7', '#f1f5f9'], borderWidth: 0, weight: 1 }] },
-                options: { cutout: '45%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-            });
+            myChart = new Chart(ctx, { type: 'doughnut', data: { datasets: [{ data: [1, 1, 1], backgroundColor: ['#ef4444', '#f97316', '#a855f7'], borderWidth: 0, weight: 1.5 }, { data: [1, 1, 1], backgroundColor: ['#10b981', '#6ee7b7', '#f1f5f9'], borderWidth: 0, weight: 1 }] }, options: { cutout: '45%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
         }
 
         function updateChart(life, med, ltc, ins, asset) {
@@ -347,25 +308,21 @@
 
         function selectLtcType(type) {
             document.getElementById('radio_' + type).checked = true;
-            ['inhome', 'assisted'].forEach(t => { if(document.getElementById('card_' + t)) document.getElementById('card_' + t).className = (t === type) ? "ltc-card active" : "ltc-card"; });
+            ['inhome', 'assisted', 'nursing'].forEach(t => { if(document.getElementById('card_' + t)) document.getElementById('card_' + t).className = (t === type) ? "ltc-card active" : "ltc-card"; });
             calculate();
         }
 
-        function clearAllData() {
-            if (confirm(dict[currentLang].btn_reset + "?")) {
-                ['client_name', 'client_phone', 'client_email', 'notes', 'mortgage', 'other_debt', 'annual_income', 'edu_per_child', 'medical_oop', 'recovery_fund'].forEach(f => document.getElementById(f).value = "");
-                document.getElementById('master_child_count').value = "1"; generateChildRows(); calculate();
-            }
-        }
+        function clearAllData() { if (confirm(dict[currentLang].btn_reset + "?")) { ['client_name', 'client_phone', 'client_email', 'notes', 'mortgage', 'other_debt', 'annual_income', 'edu_per_child', 'medical_oop', 'recovery_fund'].forEach(f => document.getElementById(f).value = ""); document.getElementById('master_child_count').value = "1"; generateChildRows(); calculate(); } }
 
         window.onload = function() {
             document.getElementById('display_date').innerText = new Date().toLocaleDateString();
             document.getElementById('year-display').innerText = new Date().getFullYear();
-            initChart(); generateChildRows(); calculate();
+            updateLangButtonUI(); initChart(); generateChildRows(); calculate();
             fetch(SCRIPT_URL).then(res => res.json()).then(data => {
                 if (data.TW_LTC_Monthly) document.getElementById('tw_monthly').value = formatUSD(data.TW_LTC_Monthly);
                 if (data.US_InHome) document.getElementById('us_inhome').value = formatUSD(data.US_InHome);
                 if (data.US_Assisted) document.getElementById('us_assisted').value = formatUSD(data.US_Assisted);
+                if (data.US_Nursing) document.getElementById('us_nursing').value = formatUSD(data.US_Nursing);
                 calculate();
             }).catch(e => calculate());
         };
@@ -384,6 +341,26 @@
                     email: document.getElementById('client_email').value,
                     childCount: document.getElementById('master_child_count').value,
                     childDetails: childDetailsStr,
+                    isFV: document.getElementById('fv_toggle').checked ? "Yes" : "No",
+                    inflationRate: document.getElementById('inflation_rate').value + "%",
+                    mortgage: document.getElementById('mortgage').value,
+                    otherDebt: document.getElementById('other_debt').value,
+                    annualIncome: document.getElementById('annual_income').value,
+                    incomeYears: document.getElementById('income_years').options[document.getElementById('income_years').selectedIndex].text,
+                    eduPerChild: document.getElementById('edu_per_child').value,
+                    medicalOop: document.getElementById('medical_oop').value,
+                    recoveryFund: document.getElementById('recovery_fund').value,
+                    ltcPath: currentLTCPath,
+                    ltcType: currentLTCPath === 'US' ? document.querySelector('input[name="ltc_type"]:checked').value : 'TW_LTC',
+                    ltcMonthly: currentLTCPath === 'US' ? document.getElementById('us_' + document.querySelector('input[name="ltc_type"]:checked').value).value : document.getElementById('tw_monthly').value,
+                    ltcDuration: document.getElementById('ltc_duration').options[document.getElementById('ltc_duration').selectedIndex].text,
+                    ltcStartAge: document.getElementById('ltc_start_age').value,
+                    currentIns: document.getElementById('current_insurance').value,
+                    currentAssets: document.getElementById('current_assets').value,
+                    lifeNeed: document.getElementById('life_need_display').innerText,
+                    medNeed: document.getElementById('medical_need_display').innerText,
+                    ltcNeed: document.getElementById('ltc_need_display').innerText,
+                    assets: document.getElementById('assets_display').innerText,
                     totalGap: document.getElementById('total_gap_val').innerText,
                     notes: document.getElementById('notes').value
                 };
