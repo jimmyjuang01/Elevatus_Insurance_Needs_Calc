@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elevatus 財務需求分析系統 v4.2 | Jimmy Chuang</title>
+    <title>Elevatus 財務需求分析系統 v4.3 | Jimmy Chuang</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
@@ -11,39 +11,18 @@
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
         body { font-family: 'Noto Sans TC', sans-serif; background-color: #f8fafc; }
         
-        .card-box { 
-            background-color: white; padding: 2rem; border-radius: 2rem; 
-            box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1); border: 1px solid #f1f5f9; margin-bottom: 2rem; 
-        }
+        .card-box { background-color: white; padding: 2rem; border-radius: 2rem; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1); border: 1px solid #f1f5f9; margin-bottom: 2rem; }
         @media (max-width: 640px) { .card-box { padding: 1.5rem; border-radius: 1.5rem; } }
         
-        .section-title { 
-            font-size: 1.25rem; font-weight: 900; margin-bottom: 1.5rem; 
-            display: flex; align-items: center; border-left: 5px solid; padding-left: 1rem; 
-        }
-        
+        .section-title { font-size: 1.25rem; font-weight: 900; margin-bottom: 1.5rem; display: flex; align-items: center; border-left: 5px solid; padding-left: 1rem; }
         .input-label { display: block; font-size: 11px; font-weight: 700; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; transition: color 0.3s; }
-        
-        .input-field { 
-            width: 100%; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem; 
-            padding: 0.875rem 1rem; color: #1e293b; font-weight: 700; font-size: 16px; outline: none; 
-            transition: all 0.2s ease-in-out; -webkit-appearance: none;
-        }
+        .input-field { width: 100%; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 0.875rem 1rem; color: #1e293b; font-weight: 700; font-size: 16px; outline: none; transition: all 0.2s ease-in-out; -webkit-appearance: none; }
         .input-field:focus { background-color: white; border-color: #3b82f6; box-shadow: 0 0 0 4px #eff6ff; }
         input.input-field:read-only { background-color: #f1f5f9; cursor: not-allowed; color: #64748b; }
-        
-        .consultant-input {
-            background: transparent; border-bottom: 2px solid #e2e8f0; padding: 2px 4px;
-            font-weight: 800; color: #1e293b; outline: none; transition: border-color 0.2s;
-        }
+        .consultant-input { background: transparent; border-bottom: 2px solid #e2e8f0; padding: 2px 4px; font-weight: 800; color: #1e293b; outline: none; transition: border-color 0.2s; }
         .consultant-input:focus { border-color: #3b82f6; }
-
-        .ltc-card { 
-            display: flex; align-items: center; padding: 1rem; border-radius: 0.75rem; 
-            border: 2px solid #f1f5f9; background-color: white; cursor: pointer; transition: all 0.2s; margin-bottom: 0.75rem; 
-        }
+        .ltc-card { display: flex; align-items: center; padding: 1rem; border-radius: 0.75rem; border: 2px solid #f1f5f9; background-color: white; cursor: pointer; transition: all 0.2s; margin-bottom: 0.75rem; }
         .ltc-card.active { border-color: #a855f7; background-color: #faf5ff; }
-
         .toggle-checkbox:checked { right: 0; border-color: #10b981; }
         .toggle-checkbox:checked + .toggle-label { background-color: #10b981; }
 
@@ -70,8 +49,8 @@
                     <img src="./logo.png" alt="Elevatus Logo" class="h-10 sm:h-14 object-contain">
                     <div class="border-l-2 border-slate-200 pl-4">
                         <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-baseline gap-3">
-                            <span data-i18n="app_title">保障需求分析</span>
-                            <span class="text-blue-600 text-sm sm:text-base bg-blue-100 px-3 py-1 rounded-lg no-print">v4.2</span>
+                            <span data-i18n="app_title">Coverage Needs Analysis</span>
+                            <span class="text-blue-600 text-sm sm:text-base bg-blue-100 px-3 py-1 rounded-lg no-print">v4.3</span>
                         </h1>
                         <p class="text-slate-400 font-bold text-[10px] uppercase tracking-widest mt-1">Cross-Border Financial Consulting</p>
                     </div>
@@ -327,7 +306,7 @@
     <script>
         const dict = {
             zh: {
-                app_title: "保障需求分析", advisor: "顧問:", sec0_title: "00. 客戶基本資料", client_name: "客戶姓名", gender: "性別",
+                app_title: "Coverage Needs Analysis", advisor: "顧問:", sec0_title: "00. 客戶基本資料", client_name: "客戶姓名", gender: "性別",
                 male: "男", female: "女", age: "目前年齡", phone: "聯絡電話", email: "E-mail", child_count: "子女數量", notes: "諮詢備註",
                 sec1_title: "01. 家庭責任與身故保障", mortgage: "房屋貸款餘額 (USD)", other_debt: "其他個人/商業貸款",
                 annual_income: "目前年收入 (USD)", income_years: "預計替代年數", yr_5: "5 年 (過渡緩衝)", yr_10: "10 年 (標準責任)", yr_15: "15 年 (長期守護)",
@@ -596,25 +575,69 @@
             myChart.update();
         }
 
+        // 🚀 V4.3 更新：將所有細部欄位完整封裝進 Payload
         async function saveToSheet() {
             const btn = document.getElementById('saveBtn');
             const originalText = btn.innerText;
             btn.innerText = 'Syncing...'; btn.disabled = true;
             try {
+                // 將子女資料打包成一個字串
+                const childRows = document.querySelectorAll('#child_rows_container > div');
+                let childDetailsArr = [];
+                childRows.forEach(row => {
+                    const n = row.querySelector('.child-name').value;
+                    const g = row.querySelector('.child-gender').value;
+                    const a = row.querySelector('.child-age-input').value;
+                    childDetailsArr.push(`${n}(${g},${a}歲)`);
+                });
+                const childDetailsStr = childDetailsArr.join('; ');
+                
+                // 抓取下拉選單的文字
+                const incomeDropdown = document.getElementById('income_years');
+                const durationDropdown = document.getElementById('ltc_duration');
+
                 const payload = {
                     consultant: document.getElementById('consultant_name').value,
                     name: document.getElementById('client_name').value || "Unnamed",
+                    gender: document.getElementById('client_gender').value,
+                    age: document.getElementById('client_age').value,
                     phone: document.getElementById('client_phone').value,
                     email: document.getElementById('client_email').value,
-                    totalGap: document.getElementById('total_gap_val').innerText,
+                    childCount: document.getElementById('master_child_count').value,
+                    childDetails: childDetailsStr,
+
+                    isFV: document.getElementById('fv_toggle').checked ? "Yes" : "No",
+                    inflationRate: document.getElementById('inflation_rate').value + "%",
+
+                    mortgage: document.getElementById('mortgage').value,
+                    otherDebt: document.getElementById('other_debt').value,
+                    annualIncome: document.getElementById('annual_income').value,
+                    incomeYears: incomeDropdown.options[incomeDropdown.selectedIndex].text,
+                    eduPerChild: document.getElementById('edu_per_child').value,
+
+                    medicalOop: document.getElementById('medical_oop').value,
+                    recoveryFund: document.getElementById('recovery_fund').value,
+
+                    ltcPath: currentLTCPath,
+                    ltcType: currentLTCPath === 'US' ? document.querySelector('input[name="ltc_type"]:checked').value : 'TW_LTC',
+                    ltcMonthly: currentLTCPath === 'US' ? document.getElementById('us_' + document.querySelector('input[name="ltc_type"]:checked').value).value : document.getElementById('tw_monthly').value,
+                    ltcDuration: durationDropdown.options[durationDropdown.selectedIndex].text,
+                    ltcStartAge: document.getElementById('ltc_start_age').value,
+
+                    currentIns: document.getElementById('current_insurance').value,
+                    currentAssets: document.getElementById('current_assets').value,
+
                     lifeNeed: document.getElementById('life_need_display').innerText,
                     medNeed: document.getElementById('medical_need_display').innerText,
                     ltcNeed: document.getElementById('ltc_need_display').innerText,
                     assets: document.getElementById('assets_display').innerText,
+                    totalGap: document.getElementById('total_gap_val').innerText,
+                    
                     notes: document.getElementById('notes').value
                 };
+
                 await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-                alert(currentLang === 'zh' ? '✅ 諮詢紀錄已成功同步。' : '✅ Record synced successfully.');
+                alert(currentLang === 'zh' ? '✅ 諮詢紀錄已成功完整儲存。' : '✅ Detailed record saved successfully.');
             } catch (e) { alert('Error saving data.'); }
             finally { btn.innerText = originalText; btn.disabled = false; }
         }
