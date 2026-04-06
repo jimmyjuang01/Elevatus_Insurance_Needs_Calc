@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elevatus 財務需求分析系統 v4.1 | Jimmy Chuang</title>
+    <title>Elevatus 財務需求分析系統 v4.2 | Jimmy Chuang</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
@@ -30,7 +30,6 @@
             transition: all 0.2s ease-in-out; -webkit-appearance: none;
         }
         .input-field:focus { background-color: white; border-color: #3b82f6; box-shadow: 0 0 0 4px #eff6ff; }
-        /* 🐛 修正點：嚴格限定只有 input 標籤在 readonly 時才變色，放過 select 下拉選單 */
         input.input-field:read-only { background-color: #f1f5f9; cursor: not-allowed; color: #64748b; }
         
         .consultant-input {
@@ -45,7 +44,6 @@
         }
         .ltc-card.active { border-color: #a855f7; background-color: #faf5ff; }
 
-        /* FV Toggle Switch */
         .toggle-checkbox:checked { right: 0; border-color: #10b981; }
         .toggle-checkbox:checked + .toggle-label { background-color: #10b981; }
 
@@ -73,16 +71,16 @@
                     <div class="border-l-2 border-slate-200 pl-4">
                         <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-baseline gap-3">
                             <span data-i18n="app_title">保障需求分析</span>
-                            <span class="text-blue-600 text-sm sm:text-base bg-blue-100 px-3 py-1 rounded-lg no-print">v4.1</span>
+                            <span class="text-blue-600 text-sm sm:text-base bg-blue-100 px-3 py-1 rounded-lg no-print">v4.2</span>
                         </h1>
                         <p class="text-slate-400 font-bold text-[10px] uppercase tracking-widest mt-1">Cross-Border Financial Consulting</p>
                     </div>
                 </div>
-                <button onclick="toggleLang()" class="no-print bg-slate-100 hover:bg-slate-200 text-slate-600 font-black text-xs px-3 py-1.5 rounded-lg transition-colors shadow-sm border border-slate-200 ml-auto md:hidden">EN / 中</button>
+                <button id="langBtnMobile" onclick="toggleLang()" class="no-print bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs px-3 py-1.5 rounded-lg transition-colors shadow-sm border border-slate-200 ml-auto md:hidden"></button>
             </div>
 
             <div class="flex items-center gap-4 w-full md:w-auto">
-                <button onclick="toggleLang()" class="no-print hidden md:block bg-slate-100 hover:bg-slate-200 text-slate-600 font-black text-xs px-3 py-2 rounded-lg transition-colors shadow-sm border border-slate-200">EN / 中</button>
+                <button id="langBtnDesktop" onclick="toggleLang()" class="no-print hidden md:block bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs px-3 py-2 rounded-lg transition-colors shadow-sm border border-slate-200"></button>
                 <div class="bg-white px-6 py-4 rounded-2xl border border-slate-200 shadow-sm flex-grow md:flex-grow-0">
                     <div class="flex items-center gap-2">
                         <span class="text-xs font-bold text-slate-400 uppercase" data-i18n="advisor">顧問:</span>
@@ -102,7 +100,6 @@
         <div class="flex flex-col lg:flex-row gap-8 items-start">
             
             <div class="w-full lg:w-7/12 xl:w-2/3">
-                
                 <section class="card-box">
                     <h2 class="section-title border-blue-500 text-blue-600" data-i18n="sec0_title">00. 客戶基本資料</h2>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
@@ -122,7 +119,7 @@
                         </div>
                         <div>
                             <label class="input-label text-blue-600" data-i18n="phone">聯絡電話</label>
-                            <input type="text" id="client_phone" class="input-field" placeholder="09XX-XXX-XXX">
+                            <input type="text" id="client_phone" class="input-field" placeholder="(XXX) XXX-XXXX">
                         </div>
                         <div class="sm:col-span-2">
                             <label class="input-label text-blue-600" data-i18n="email">E-mail</label>
@@ -131,7 +128,7 @@
                         
                         <div class="sm:col-span-2 border-t border-slate-100 pt-5 mt-2">
                             <label class="input-label text-blue-600" data-i18n="child_count">子女數量</label>
-                            <input type="number" id="master_child_count" value="2" min="0" class="input-field w-1/2 sm:w-1/3" oninput="generateChildRows()">
+                            <input type="number" id="master_child_count" value="1" min="0" class="input-field w-1/2 sm:w-1/3" oninput="generateChildRows()">
                             <div id="child_rows_container" class="mt-4 space-y-3"></div>
                         </div>
 
@@ -172,7 +169,7 @@
                         </div>
                         <div>
                             <label class="input-label text-emerald-500" data-i18n="child_sync">子女數量 (自動同步)</label>
-                            <input type="text" id="child_count" value="2" class="input-field" readonly>
+                            <input type="text" id="child_count" value="1" class="input-field" readonly>
                         </div>
                     </div>
                 </section>
@@ -267,7 +264,7 @@
                 <div class="bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-slate-100 flex flex-col">
                     
                     <div class="bg-blue-600 p-8 text-center text-white">
-                        <h3 class="text-xs font-bold opacity-80 uppercase tracking-[0.2em] mb-2" data-i18n="summary_title">保障缺口分析總覽</h3>
+                        <h3 class="text-sm font-black opacity-90 uppercase tracking-[0.2em] mb-2" data-i18n="summary_title">保障缺口分析總覽</h3>
                         <div id="total_gap_val" class="text-4xl sm:text-5xl font-black tracking-tighter">$0</div>
                     </div>
                     
@@ -328,7 +325,6 @@
     </div>
 
     <script>
-        // --- 🌐 i18n 雙語字典設定 ---
         const dict = {
             zh: {
                 app_title: "保障需求分析", advisor: "顧問:", sec0_title: "00. 客戶基本資料", client_name: "客戶姓名", gender: "性別",
@@ -347,7 +343,7 @@
                 child_name_lb: "姓名", child_gender_lb: "性別", child_age_lb: "目前年齡", chart_gap: "家庭保障缺口"
             },
             en: {
-                app_title: "Needs Analysis", advisor: "Advisor:", sec0_title: "00. Client Information", client_name: "Client Name", gender: "Gender",
+                app_title: "Coverage Needs Analysis", advisor: "Advisor:", sec0_title: "00. Client Information", client_name: "Client Name", gender: "Gender",
                 male: "Male", female: "Female", age: "Current Age", phone: "Phone Number", email: "E-mail", child_count: "No. of Children", notes: "Notes",
                 sec1_title: "01. Family Obligations & Life Need", mortgage: "Mortgage Balance (USD)", other_debt: "Other Debts (USD)",
                 annual_income: "Annual Income (USD)", income_years: "Income Replacement", yr_5: "5 Years (Buffer)", yr_10: "10 Years (Standard)", yr_15: "15 Years (Long-Term)",
@@ -363,16 +359,26 @@
                 child_name_lb: "Name", child_gender_lb: "Gender", child_age_lb: "Age", chart_gap: "Total Protection Gap"
             }
         };
+        
         let currentLang = 'zh';
+
+        function updateLangButtonUI() {
+            const zhHTML = currentLang === 'zh' 
+                ? '<span class="text-slate-400">EN</span> <span class="mx-1">/</span> <span class="text-blue-600 font-black">中</span>'
+                : '<span class="text-blue-600 font-black">EN</span> <span class="mx-1">/</span> <span class="text-slate-400">中</span>';
+            document.getElementById('langBtnMobile').innerHTML = zhHTML;
+            document.getElementById('langBtnDesktop').innerHTML = zhHTML;
+        }
 
         function toggleLang() {
             currentLang = currentLang === 'zh' ? 'en' : 'zh';
+            updateLangButtonUI();
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
-                if (dict[currentLang][key]) el.innerHTML = dict[currentLang][key]; // 用 innerHTML 保留 icon
+                if (dict[currentLang][key]) el.innerHTML = dict[currentLang][key];
             });
-            generateChildRows(); // 重繪子女列以更新語言
-            calculate(); // 重繪圖表文字
+            generateChildRows();
+            calculate();
         }
 
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxEsNTWhldPnUc1xxnUHJcaH14Wbd0J1CMSOnhI9r_5ckZ-jRwHEhPR1lZdptHe3H6o/exec";
@@ -411,7 +417,7 @@
             }
 
             container.innerHTML = '';
-            const t = dict[currentLang]; // 取得當前語言
+            const t = dict[currentLang];
             for (let i = 0; i < count; i++) {
                 const data = savedData[i] || { name: `${t.child_name_lb} ${i+1}`, gender: t.male, age: '0' };
                 const row = document.createElement('div');
@@ -455,7 +461,7 @@
                 document.getElementById('ltc_duration').value = "36";
                 document.getElementById('client_age').value = "35";
                 document.getElementById('ltc_start_age').value = "75";
-                document.getElementById('master_child_count').value = "0";
+                document.getElementById('master_child_count').value = "1";
                 document.getElementById('fv_toggle').checked = false;
                 toggleFV(); generateChildRows(); calculate();
             }
@@ -463,6 +469,7 @@
 
         window.onload = function() {
             document.getElementById('display_date').innerText = new Date().toLocaleDateString();
+            updateLangButtonUI();
             initChart(); generateChildRows(); calculate();
             fetch(SCRIPT_URL).then(res => res.json()).then(data => {
                 globalRates = data; document.getElementById('tw_monthly').value = formatUSD(data.TW_LTC_Monthly); calculate();
@@ -526,7 +533,6 @@
             const totalAssets = ins + asset;
             const gap = Math.max(0, (lifeTotalNeed + med + ltcTotalNeed) - totalAssets);
 
-            // 動態 Tooltips 內容生成
             window.chartBreakdown = {
                 life: [
                     `${t.mortgage.split(' ')[0]}: ${formatUSD(mortgage)}`,
@@ -595,7 +601,6 @@
             const originalText = btn.innerText;
             btn.innerText = 'Syncing...'; btn.disabled = true;
             try {
-                // 將所有需要建檔的變數送入後端
                 const payload = {
                     consultant: document.getElementById('consultant_name').value,
                     name: document.getElementById('client_name').value || "Unnamed",
