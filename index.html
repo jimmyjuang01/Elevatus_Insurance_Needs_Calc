@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elevatus 保障需求分析系統 v3.6 | Jimmy Chuang</title>
+    <title>Elevatus 保障需求分析系統 v3.7 | Jimmy Chuang</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
@@ -43,16 +43,13 @@
         }
         .ltc-card.active { border-color: #a855f7; background-color: #faf5ff; }
 
-        /* 第 4 點：專屬列印排版 (Print Stylesheet) */
+        /* 列印排版設定 */
         @media print {
             @page { size: letter portrait; margin: 10mm; }
             body { background-color: white !important; margin: 0; padding: 0; }
             .max-w-7xl { max-width: 100% !important; padding: 0 !important; }
-            /* 隱藏不要印出來的元素 */
             .no-print { display: none !important; }
-            /* 防止卡片被腰斬 */
             .card-box, .print-card { page-break-inside: avoid; break-inside: avoid; border: 1px solid #e2e8f0; box-shadow: none; }
-            /* 強制印出背景色 */
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             .input-field { border: none; border-bottom: 1px solid #cbd5e1; background: transparent; padding: 0.5rem 0; border-radius: 0; }
             .ltc-card { border: none; }
@@ -70,7 +67,7 @@
                 <div class="border-l-2 border-slate-200 pl-4">
                     <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-baseline gap-3">
                         保障需求分析
-                        <span class="text-blue-600 text-sm sm:text-base bg-blue-100 px-3 py-1 rounded-lg no-print">v3.6</span>
+                        <span class="text-blue-600 text-sm sm:text-base bg-blue-100 px-3 py-1 rounded-lg no-print">v3.7</span>
                     </h1>
                     <p class="text-slate-400 font-bold text-[10px] uppercase tracking-widest mt-1">Cross-Border Financial Consulting</p>
                 </div>
@@ -266,7 +263,10 @@
         let globalRates = { US_LTC_Monthly: 8500, TW_LTC_Monthly: 3200 };
         let currentLTCPath = 'US';
         let myChart = null;
-        let previousTotalGap = 0; // 用於儲存上一次的數字，做動畫用
+        let previousTotalGap = 0; 
+        
+        // 全域變數，用於儲存 Tooltips 的明細資料
+        window.chartBreakdown = { life: [], med: [], ltc: [] };
 
         function formatUSD(val) {
             return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(val);
@@ -289,7 +289,6 @@
             calculate();
         }
 
-        // 第 1b 點：數字滾動特效函式
         function animateValue(id, start, end, duration) {
             const obj = document.getElementById(id);
             if(!obj) return;
@@ -299,7 +298,6 @@
             const step = (timestamp) => {
                 if (!startTimestamp) startTimestamp = timestamp;
                 const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                // 使用 easeOutExpo 讓動畫有「快速啟動、平滑減速」的高級感
                 const easeProgress = 1 - Math.pow(1 - progress, 3);
                 const current = Math.floor(easeProgress * (end - start) + start);
                 obj.innerText = formatUSD(current);
@@ -357,12 +355,18 @@
             const other_debt = parseCurrency(document.getElementById('other_debt').value);
             const annual = parseCurrency(document.getElementById('annual_income').value);
             const years = parseInt(document.getElementById('income_years').value) || 10;
-            const edu = parseCurrency(document.getElementById('edu_per_child').value) * (parseFloat(document.getElementById('child_count').value) || 0);
-            const lifeTotalNeed = mortgage + other_debt + (annual * years) + edu + 20000;
+            const eduPerChild = parseCurrency(document.getElementById('edu_per_child').value);
+            const childCount = parseFloat(document.getElementById('child_count').value) || 0;
+            const edu = eduPerChild * childCount;
             
-            const med = parseCurrency(document.getElementById('medical_oop').value) + parseCurrency(document.getElementById('recovery_fund').value);
+            // 【修正 1】移除硬編碼的 + 20000 幽靈常數，確保計算精確
+            const lifeTotalNeed = mortgage + other_debt + (annual * years) + edu;
+            
+            const medical_oop = parseCurrency(document.getElementById('medical_oop').value);
+            const recovery_fund = parseCurrency(document.getElementById('recovery_fund').value);
+            const med = medical_oop + recovery_fund;
+            
             const duration = parseInt(document.getElementById('ltc_duration').value) || 36;
-            
             let monthlyRate = 0;
             if(currentLTCPath === 'US') {
                 const selectedType = document.querySelector('input[name="ltc_type"]:checked').value;
@@ -375,27 +379,41 @@
             const ins = parseCurrency(document.getElementById('current_insurance').value);
             const asset = parseCurrency(document.getElementById('current_assets').value);
             
-            // 計算總缺口
             const gap = Math.max(0, (lifeTotalNeed + med + ltcTotalNeed) - (ins + asset));
+
+            // 【升級 2】準備 Tooltips 的細項陣列
+            window.chartBreakdown = {
+                life: [
+                    `房屋貸款餘額: ${formatUSD(mortgage)}`,
+                    `其他個人/商業貸款: ${formatUSD(other_debt)}`,
+                    `${years}年收入替代: ${formatUSD(annual * years)}`,
+                    `子女教育預算: ${formatUSD(edu)}`
+                ],
+                med: [
+                    `醫療自付上限預留: ${formatUSD(medical_oop)}`,
+                    `重大疾病應急金: ${formatUSD(recovery_fund)}`
+                ],
+                ltc: [
+                    `長照月費估算 (${duration}個月): ${formatUSD(ltcTotalNeed)}`
+                ]
+            };
 
             document.getElementById('life_need_display').innerText = formatUSD(lifeTotalNeed);
             document.getElementById('medical_need_display').innerText = formatUSD(med);
             document.getElementById('ltc_need_display').innerText = formatUSD(ltcTotalNeed);
             
-            // 觸發數字滾動特效
             animateValue('total_gap_val', previousTotalGap, gap, 600);
-            previousTotalGap = gap; // 紀錄為下次的起點
+            previousTotalGap = gap; 
             
             updateChart(lifeTotalNeed, med, ltcTotalNeed, ins, asset);
         }
 
-        // 第 1a 點：初始化圖表並加入 Tooltips
         function initChart() {
             const ctx = document.getElementById('gapChart').getContext('2d');
             myChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['身故保障需求', '生前福利需求', '長期照護預備'], // 這些標籤會顯示在提示框
+                    labels: ['身故保障需求', '生前福利需求', '長期照護預備'], 
                     datasets: [
                         { data: [1, 1, 1], backgroundColor: ['#ef4444', '#f97316', '#a855f7'], borderWidth: 0, weight: 1.5 },
                         { data: [1, 1, 1], backgroundColor: ['#10b981', '#6ee7b7', '#f1f5f9'], borderWidth: 0, weight: 1 }
@@ -406,17 +424,19 @@
                     plugins: { 
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: 'rgba(15, 23, 42, 0.9)', // 深色專業背景
+                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
                             titleFont: { size: 14, family: 'Noto Sans TC' },
-                            bodyFont: { size: 14, weight: 'bold', family: 'Noto Sans TC' },
-                            padding: 12,
-                            cornerRadius: 8,
+                            bodyFont: { size: 13, family: 'Noto Sans TC' },
+                            bodySpacing: 6,
+                            padding: 16,
+                            cornerRadius: 12,
+                            // 【升級 2】動態渲染多行 Tooltip 內容
                             callbacks: {
                                 label: function(context) {
-                                    // 自定義提示框內容： 類別名稱: $金額
-                                    let label = context.chart.data.labels[context.dataIndex] || '';
-                                    if (label && context.datasetIndex === 0) { // 只在外環顯示詳細標籤
-                                        return label + ': ' + formatUSD(context.parsed);
+                                    if (context.datasetIndex === 0) { 
+                                        if (context.dataIndex === 0) return ['【身故保障總額: ' + formatUSD(context.parsed) + '】', ...window.chartBreakdown.life];
+                                        if (context.dataIndex === 1) return ['【生前福利總額: ' + formatUSD(context.parsed) + '】', ...window.chartBreakdown.med];
+                                        if (context.dataIndex === 2) return ['【長期照護總額: ' + formatUSD(context.parsed) + '】', ...window.chartBreakdown.ltc];
                                     } else if (context.datasetIndex === 1) {
                                         const innerLabels = ['已有保險', '已有資產', '資金缺口'];
                                         return innerLabels[context.dataIndex] + ': ' + formatUSD(context.parsed);
