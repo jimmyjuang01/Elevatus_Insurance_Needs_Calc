@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elevatus 財務需求分析系統 v4.7 | Jimmy Chuang</title>
+    <title>Elevatus 保障需求分析系統 v4.9 | Jimmy Chuang</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
@@ -21,23 +21,40 @@
         .toggle-checkbox:checked { right: 0; border-color: #10b981; }
         .toggle-checkbox:checked + .toggle-label { background-color: #10b981; }
 
-        /* 🚀 v4.7 終極列印優化 (Independent Report Mode) */
+        /* 🚀 v4.9 終極列印與圓角修正 */
         @media print {
             @page { 
                 size: letter; 
-                margin: 15mm; /* 稍微加大邊距，讓瀏覽器自動產生的網址隱藏在可視區外 */
+                margin: 0 !important; /* 隱藏瀏覽器標註 */
             }
-            body { background-color: white !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            body { 
+                padding: 12mm 15mm !important; 
+                background-color: white !important; 
+                -webkit-print-color-adjust: exact !important; 
+                print-color-adjust: exact !important; 
+            }
             
-            /* 1. 隱藏應用程式內的標題與版本號，避免在 PDF 頁首重複出現 */
-            .app-title-print, .no-print, button, input[type="range"], #inflation_control, .flex.justify-end.mb-3 { display: none !important; }
+            /* 修正 1：恢復標題顯示，並賦予正式報告外觀 */
+            .app-title-print { display: block !important; margin-bottom: 15px !important; }
+            .no-print, button, input[type="range"], #inflation_control, .flex.justify-end.mb-3 { display: none !important; }
             
-            /* 2. 佈局重整：執行摘要優先 */
-            .max-w-7xl { display: flex !important; flex-direction: column !important; max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
-            .flex-col.lg\:flex-row { display: block !important; }
+            /* 修正 2：強化摘要面板圓角 (解決 Page 3 格式問題) */
             #report-summary-panel { order: -1 !important; margin-bottom: 30px !important; width: 100% !important; }
+            #report-summary-panel > div { 
+                border-radius: 2.5rem !important; 
+                overflow: hidden !important; 
+                border: 1px solid #e2e8f0 !important;
+                box-shadow: none !important;
+                background-color: white !important;
+            }
+            /* 強制藍色區塊圓角裁剪 */
+            #report-summary-panel .bg-blue-600 {
+                border-top-left-radius: 2.5rem !important;
+                border-top-right-radius: 2.5rem !important;
+                -webkit-mask-image: -webkit-radial-gradient(white, black); /* 修正 Safari/Chrome 圓角溢出 */
+            }
             
-            /* 3. 極簡底線風格 */
+            /* 極簡底線風格 */
             .input-field, select, .consultant-input, .child-age-input, .child-name { 
                 border: none !important; border-bottom: 1.5px solid #000 !important; 
                 background: transparent !important; padding: 2px 0 !important; 
@@ -45,13 +62,13 @@
                 appearance: none !important; color: black !important; 
                 font-weight: 700 !important; box-shadow: none !important;
             }
-            .input-label { color: #64748b !important; margin-bottom: 1px !important; font-size: 10px !important; }
+            .input-label { color: #64748b !important; font-size: 10px !important; }
             
-            /* 4. 強制雙欄並排 */
+            /* 強制雙欄並排 */
             .grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 20px !important; }
             .sm\:col-span-2, .lg\:w-7\/12, .lg\:w-5\/12 { width: 100% !important; grid-column: span 2 / span 2 !important; }
             
-            /* 5. 防斷頁處理 */
+            /* 防斷頁 */
             .card-box { page-break-inside: avoid !important; break-inside: avoid !important; border: 1px solid #e2e8f0 !important; border-radius: 12px !important; padding: 20px !important; margin-bottom: 25px !important; }
             .ltc-card:not(.active) { display: none !important; }
             .ltc-card.active { border: 1px solid #a855f7 !important; background: transparent !important; padding: 10px !important; }
@@ -59,7 +76,7 @@
 
         #print-footer { display: none; }
         @media print {
-            #print-footer { display: block; position: fixed; bottom: 0; width: 100%; text-align: center; font-size: 8px; color: #94a3b8; padding: 5px 0; }
+            #print-footer { display: block; position: fixed; bottom: 8mm; left: 0; right: 0; text-align: center; font-size: 8px; color: #94a3b8; padding: 5px 0; }
         }
     </style>
 </head>
@@ -72,7 +89,7 @@
                 <div class="border-l-2 border-slate-200 pl-4">
                     <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight app-title-print">
                         <span data-i18n="app_title">Coverage Needs Analysis</span>
-                        <span class="text-blue-600 text-sm no-print">v4.7</span>
+                        <span class="text-blue-600 text-sm no-print">v4.9</span>
                     </h1>
                     <p class="text-slate-400 font-bold text-[10px] uppercase tracking-widest mt-1">Cross-Border Financial Consulting</p>
                 </div>
@@ -194,7 +211,6 @@
     </footer>
 
     <script>
-        // 核心字典
         const dict = {
             zh: { app_title: "保障需求分析", advisor: "顧問:", sec0_title: "00. 客戶基本資料", client_name: "客戶姓名", gender: "性別", male: "男", female: "女", age: "目前年齡", phone: "聯絡電話", email: "E-mail", child_count: "子女數量", notes: "諮詢備註", sec1_title: "01. 家庭責任與身故保障", mortgage: "房屋貸款餘額 (USD)", other_debt: "其他個人/商業貸款", annual_income: "目前年收入 (USD)", income_years: "預計替代年數", yr_5: "5 年", yr_10: "10 年", yr_15: "15 年", edu_budget: "每位子女教育預算", child_sync: "子女數量 (同步)", sec2_title: "02. 醫療與重疾應急金", oop_max: "醫療自付上限預留", recovery_fund: "重大疾病應急金", sec3_title: "03. 長期照護路徑與方案選取", us_care: "美國在地照護 (US)", tw_care: "返回台灣照護 (TW)", carescout_link: "查詢 CareScout 最新費率", ltc_duration: "選擇預計照護時間長度", mo_12: "12 個月", mo_24: "24 個月", mo_36: "36 個月", mo_48: "48 個月", mo_60: "60 個月", ltc_start_age: "預計啟動長照年齡", us_inhome: "In-Home Care", us_assisted: "Assisted Living", us_nursing: "Nursing Home", tw_monthly: "台灣照護月費估算", sec4_title: "04. 現有資產與保障", cur_ins: "目前已有總保額 (USD)", cur_assets: "流動性存款/投資 (USD)", summary_title: "保障缺口分析總覽", fv_toggle: "啟用通膨精算 (FV)", inflation_rate: "年通膨率", disp_life: "身故保障需求", disp_med: "生前福利需求", disp_ltc: "長期照護預備", disp_assets: "現有資產與保障", btn_save: "儲存諮詢紀錄", btn_print: "列印 PDF 報告", btn_reset: "↺ 重置所有資料", child_name_lb: "姓名", child_gender_lb: "性別", child_age_lb: "目前年齡", chart_gap: "家庭保障缺口", filename_pref: "保障需求分析" },
             en: { app_title: "Coverage Needs Analysis", advisor: "Advisor:", sec0_title: "00. Client Information", client_name: "Client Name", gender: "Gender", male: "Male", female: "Female", age: "Current Age", phone: "Phone", email: "E-mail", child_count: "No. of Children", notes: "Notes", sec1_title: "01. Family Obligations & Life Need", mortgage: "Mortgage Balance (USD)", other_debt: "Other Debts (USD)", annual_income: "Annual Income (USD)", income_years: "Income Replacement", yr_5: "5 Years", yr_10: "10 Years", yr_15: "15 Years", edu_budget: "Edu Budget / Child", child_sync: "No. of Children (Synced)", sec2_title: "02. Living Benefits & Critical Illness", oop_max: "Medical OOP Max", recovery_fund: "Recovery Fund", sec3_title: "03. Long-Term Care Strategy", us_care: "U.S. Care (US)", tw_care: "Return to Taiwan (TW)", carescout_link: "Check Rates on CareScout", ltc_duration: "Care Duration", mo_12: "12 Months", mo_24: "24 Months", mo_36: "36 Months", mo_48: "48 Months", mo_60: "60 Months", ltc_start_age: "Exp. LTC Start Age", us_inhome: "In-Home Care", us_assisted: "Assisted Living", us_nursing: "Nursing Home", tw_monthly: "Taiwan LTC Est.", sec4_title: "04. Current Assets & Coverage", cur_ins: "Total Coverage (USD)", cur_assets: "Liquid Assets (USD)", summary_title: "Total Protection Gap", fv_toggle: "Enable Inflation (FV)", inflation_rate: "Inflation Rate", disp_life: "Life Insurance Need", disp_med: "Living Benefits Need", disp_ltc: "LTC Preparation", disp_assets: "Current Assets", btn_save: "Save Record", btn_print: "Print PDF Report", btn_reset: "↺ Reset All Data", child_name_lb: "Name", child_gender_lb: "Gender", child_age_lb: "Age", chart_gap: "Total Protection Gap", filename_pref: "Coverage_Needs_Analysis" }
@@ -219,23 +235,16 @@
             document.getElementById('langBtnDesktop').innerHTML = zhHTML;
         }
 
-        // 🚀 核心優化：自定義列印處理器，自動更換檔名
         function handlePrint() {
             const originalTitle = document.title;
             const advisor = document.getElementById('consultant_name').value || "No_Name";
-            const dateStr = new Date().toISOString().split('T')[0].replace(/-/g, ''); // YYYYMMDD
+            const dateStr = new Date().toISOString().split('T')[0].replace(/-/g, '');
             const prefix = dict[currentLang].filename_pref;
-            
-            // 設定 PDF 預設存檔名稱 (對應需求 2)
             document.title = `${prefix}_${dateStr}_${advisor}`;
-            
             window.print();
-            
-            // 列印完成後切換回原本的網頁標題
             setTimeout(() => { document.title = originalTitle; }, 1000);
         }
 
-        // --- 其餘 V4.6 邏輯保持不變 ---
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxEsNTWhldPnUc1xxnUHJcaH14Wbd0J1CMSOnhI9r_5ckZ-jRwHEhPR1lZdptHe3H6o/exec";
         let currentLTCPath = 'US';
         let myChart = null;
@@ -292,16 +301,14 @@
             const years = parseInt(document.getElementById('income_years').value) || 10;
             let incomeReplacement = r > 0 ? annual * (Math.pow(1 + r, years) - 1) / r : annual * years;
             let eduTotal = 0; const eduDetails = [];
-            const eduPerChild = parseCurrency(document.getElementById('edu_per_child').value);
             document.querySelectorAll('.child-age-input').forEach((input, i) => {
-                const cost = eduPerChild * Math.pow(1 + r, Math.max(0, 18 - (parseInt(input.value) || 0)));
+                const cost = parseCurrency(document.getElementById('edu_per_child').value) * Math.pow(1 + r, Math.max(0, 18 - (parseInt(input.value) || 0)));
                 eduTotal += cost;
                 eduDetails.push(`${document.querySelectorAll('.child-name')[i].value}: ${formatUSD(cost)}`);
             });
             const lifeNeed = mortgage + otherDebt + incomeReplacement + eduTotal;
             const medNeed = (parseCurrency(document.getElementById('medical_oop').value) + parseCurrency(document.getElementById('recovery_fund').value)) * Math.pow(1 + r, Math.max(0, 65 - clientAge));
-            const monthlyRate = parseCurrency(document.getElementById(currentLTCPath === 'US' ? 'us_' + document.querySelector('input[name="ltc_type"]:checked').value : 'tw_monthly').value);
-            const ltcNeed = (monthlyRate * (parseInt(document.getElementById('ltc_duration').value) || 36)) * Math.pow(1 + r, Math.max(0, (parseInt(document.getElementById('ltc_start_age').value) || 75) - clientAge));
+            const ltcNeed = (parseCurrency(document.getElementById(currentLTCPath === 'US' ? 'us_' + document.querySelector('input[name="ltc_type"]:checked').value : 'tw_monthly').value) * (parseInt(document.getElementById('ltc_duration').value) || 36)) * Math.pow(1 + r, Math.max(0, (parseInt(document.getElementById('ltc_start_age').value) || 75) - clientAge));
             const assets = parseCurrency(document.getElementById('current_insurance').value) + parseCurrency(document.getElementById('current_assets').value);
             const gap = Math.max(0, (lifeNeed + medNeed + ltcNeed) - assets);
 
