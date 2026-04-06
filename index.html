@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elevatus 保障需求分析系統 v6.8 | Jimmy Chuang</title>
+    <title>Elevatus 保障需求分析系統 v6.9 | Jimmy Chuang</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
@@ -47,12 +47,13 @@
             #report-summary-panel .bg-blue-600 { background-color: #f8fafc !important; color: black !important; padding: 15px !important; border-bottom: 1px solid #e2e8f0 !important; }
             #total_gap_val { color: #2563eb !important; font-size: 2.8rem !important; }
             
-            .child-data-row { display: flex !important; flex-direction: row !important; gap: 8px !important; border-bottom: 1px solid #e2e8f0 !important; padding-bottom: 4px !important; margin-top: 4px !important; }
-            .child-name-col { width: 45% !important; }
-            .child-gender-col { width: 30% !important; }
-            .child-age-col { width: 25% !important; }
+            /* 🚀 終極修復：PDF 子女資料並排 (Table Layout for robustness) */
+            .child-data-row { display: table !important; width: 100% !important; border-bottom: 1px solid #e2e8f0 !important; padding-bottom: 4px !important; margin-top: 4px !important; }
+            .child-name-col { display: table-cell !important; width: 50% !important; padding-right: 10px !important; }
+            .child-gender-col { display: table-cell !important; width: 25% !important; padding-right: 10px !important; }
+            .child-age-col { display: table-cell !important; width: 25% !important; }
             
-            .input-field, select, .consultant-input, .child-age-input, .child-name { border: none !important; border-bottom: 1.2px solid black !important; background: transparent !important; padding: 0 !important; border-radius: 0 !important; -webkit-appearance: none !important; color: black !important; font-weight: 700 !important; }
+            .input-field, select, .consultant-input, .child-age-input, .child-name { border: none !important; border-bottom: 1.2px solid black !important; background: transparent !important; padding: 0 !important; border-radius: 0 !important; -webkit-appearance: none !important; color: black !important; font-weight: 700 !important; width: 100% !important; }
             .grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 15px !important; }
             .sm\:col-span-2, .lg\:w-7\/12, .lg\:w-5\/12 { width: 100% !important; grid-column: span 2 / span 2 !important; }
             .ltc-card:not(.active) { display: none !important; }
@@ -70,7 +71,7 @@
                 <div class="border-l-2 border-slate-200 pl-4">
                     <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight app-title-print">
                         <span data-i18n="app_title">保障需求分析</span>
-                        <span class="text-blue-600 text-xs no-print ml-1">v6.8</span>
+                        <span class="text-blue-600 text-xs no-print ml-1">v6.9</span>
                     </h1>
                     <p class="text-slate-400 font-bold text-[8px] sm:text-[10px] uppercase tracking-widest mt-1">Cross-Border Financial Consulting</p>
                 </div>
@@ -122,7 +123,7 @@
                         <div><label class="input-label text-blue-500" data-i18n="annual_income">Annual Income (USD)</label><input type="text" id="annual_income" value="$80,000" oninput="handleCurrencyInput(this)" class="input-field"></div>
                         <div><label class="input-label text-blue-500" data-i18n="income_years">Income Replacement Years</label><select id="income_years" onchange="calculate()" class="input-field cursor-pointer bg-white"></select></div>
                         <div><label class="input-label text-emerald-500" data-i18n="edu_budget">Education Budget / Child</label><input type="text" id="edu_per_child" value="$150,000" oninput="handleCurrencyInput(this)" class="input-field"></div>
-                        <div class="flex justify-between items-center"><label class="input-label text-emerald-500" data-i18n="child_sync">No. of Children (Synced)</label><input type="text" id="child_count" value="1" class="input-field w-20 text-center bg-slate-50 font-bold" readonly></div>
+                        <div class="flex justify-between items-center"><label class="input-label text-emerald-500" data-i18n="child_sync">No. of Children (Synced)</label><input type="text" id="child_count" value="1" class="input-field text-center bg-slate-50 font-bold" readonly></div>
                     </div>
                 </section>
 
@@ -168,7 +169,7 @@
                     <div class="p-6 text-center text-white">
                         <h3 class="text-sm font-black uppercase tracking-widest opacity-80 mb-1" data-i18n="summary_title">保障缺口分析總覽</h3>
                         <div id="total_gap_val" class="text-3xl sm:text-4xl font-black tracking-tight">$0</div>
-                        <p id="inflation_note_print" class="mt-2 text-blue-200 text-[10px] hidden"></p>
+                        <p id="inflation_note_print" class="mt-2 text-blue-200 text-[10px] hidden print:block"></p>
                     </div>
                     <div class="bg-slate-800 px-6 py-4 border-b border-slate-700 no-print flex justify-between items-center">
                         <span class="text-[11px] font-bold text-emerald-400 uppercase" data-i18n="fv_toggle">通膨精算 (FV)</span>
@@ -179,7 +180,8 @@
                         <input type="range" id="inflation_rate" min="0" max="10" step="0.5" value="3" class="w-full accent-emerald-500 cursor-pointer" oninput="updateInflationLabel(); calculate();">
                     </div>
                     <div class="p-6 bg-white flex-grow">
-                        <div class="relative h-44 sm:h-52 w-full mb-6"><canvas id="gapChart"></canvas></div>
+                        <div class="relative w-full mb-6" style="height: 220px;"><canvas id="gapChart"></canvas></div>
+                        
                         <div class="space-y-4 mb-6">
                             <div class="flex justify-between items-center border-b border-slate-50 pb-1"><p class="text-sm font-black text-slate-600 uppercase" data-i18n="disp_life">身故保障需求</p><p id="life_need_display" class="text-lg font-black text-red-500">$0</p></div>
                             <div class="flex justify-between items-center border-b border-slate-50 pb-1"><p class="text-sm font-black text-slate-600 uppercase" data-i18n="disp_med">重疾醫療需求</p><p id="medical_need_display" class="text-lg font-black text-orange-500">$0</p></div>
@@ -199,8 +201,8 @@
 
     <script>
         const dict = {
-            zh: { app_title: "保障需求分析", advisor: "顧問:", sec0_title: "00. 客戶基本資料", client_name: "客戶姓名", gender: "性別", male: "男", female: "女", age: "目前年齡", phone: "聯絡電話", child_count: "No. of Children", notes: "諮詢備註", sec1_title: "01. 家庭責任與身故保障", mortgage: "房貸餘額 (USD)", other_debt: "其他個人/商業貸款", annual_income: "年收入 (USD)", income_years: "替代年數", edu_budget: "教育預算/人", child_sync: "子女數量 (同步)", sec2_title: "02. 醫療與重疾應急金", medical_oop: "醫療自付上限預留", recovery_fund: "重大疾病應急金", sec3_title: "03. 長期照護準備", ltc_duration: "預計月數", ltc_start_age: "啟動年齡", us_inhome: "In-Home Care", us_assisted: "Assisted Living", us_nursing: "Nursing Home", tw_monthly: "台灣照護月費估算", sec4_title: "04. 現有資產與保障", cur_ins_full: "現有總保額 (USD)", cur_assets_full: "流動性存款/投資", summary_title: "保障缺口分析總覽", fv_toggle: "通膨精算 (FV)", inflation_rate: "年通膨率", disp_life: "身故保障需求", disp_med: "重疾醫療需求", disp_ltc: "長期照護準備", disp_assets: "現有資產與保障", cur_ins_short: "現有總保額", cur_assets_short: "流動性存款/投資", gap_short: "家庭保障缺口", btn_save: "儲存諮詢紀錄", btn_print: "列印 PDF 報告", filename_pref: "保障需求分析", yr_opts: ["5 年 (過渡緩衝)", "10 年 (標準責任)", "15 年 (長期守護)"], ltc_opts: ["12", "24", "36 (3年-平均值)", "48", "60"], us_btn: "美國", tw_btn: "台灣", inf_note: "採用通膨率 (FV): ", child_name_lb: "姓名", inc_rep_label: "年收入替代" },
-            en: { app_title: "Coverage Needs Analysis", advisor: "Advisor:", sec0_title: "00. CLIENT INFORMATION", client_name: "Client Name", gender: "Gender", male: "Male", female: "Female", age: "Age", phone: "Phone", child_count: "No. of Children", notes: "Notes", sec1_title: "01. OBLIGATIONS & LIFE NEED", mortgage: "Mortgage Balance (USD)", other_debt: "Other Personal/Business Debt", annual_income: "Annual Income (USD)", income_years: "Income Replacement Years", edu_budget: "Education Budget / Child", child_sync: "No. of Children (Synced)", sec2_title: "02. LIVING BENEFITS & CRITICAL ILLNESS", medical_oop: "Medical Out-of-Pocket Max", recovery_fund: "Recovery Fund for Critical Illness", sec3_title: "03. LONG-TERM CARE PREPARATION", ltc_duration: "Expected Duration (Months)", ltc_start_age: "Start Age", us_inhome: "In-Home Care", us_assisted: "Assisted Living", us_nursing: "Nursing Home", tw_monthly: "Estimated Taiwan LTC Monthly Cost", sec4_title: "04. CURRENT ASSETS", cur_ins_full: "Total Coverage (USD)", cur_assets_full: "Liquid Assets/Investments", summary_title: "GAP SUMMARY", fv_toggle: "Inflation (FV)", inflation_rate: "Inflation Rate", disp_life: "Life Insurance Need", disp_med: "Critical Illness Need", disp_ltc: "LTC Preparation", disp_assets: "Existing Assets & Protection", cur_ins_short: "Total Coverage", cur_assets_short: "Liquid Assets", gap_short: "Gap", btn_save: "Save Record", btn_print: "Print PDF", filename_pref: "Needs_Analysis", yr_opts: ["5 Years (Buffer)", "10 Years (Standard)", "15 Years (Long-term)"], ltc_opts: ["12", "24", "36 (Avg - 3 Yrs)", "48", "60"], us_btn: "U.S.", tw_btn: "Taiwan", inf_note: "Applied Inflation Rate (FV): ", child_name_lb: "Name", inc_rep_label: " Yrs Replacement" }
+            zh: { app_title: "保障需求分析", advisor: "顧問:", sec0_title: "00. 客戶基本資料", client_name: "客戶姓名", gender: "性別", male: "男", female: "女", age: "目前年齡", phone: "聯絡電話", child_count: "No. of Children", notes: "諮詢備註", sec1_title: "01. 家庭責任與身故保障", mortgage: "房貸餘額 (USD)", other_debt: "其他個人/商業貸款", annual_income: "年收入 (USD)", income_years: "替代年數", edu_budget: "教育預算/人", child_sync: "子女數量 (同步)", sec2_title: "02. 醫療與重疾應急金", medical_oop: "醫療自付上限預留", recovery_fund: "重大疾病應急金", sec3_title: "03. 長期照護準備", ltc_duration: "預計月數", ltc_start_age: "啟動年齡", us_inhome: "In-Home Care", us_assisted: "Assisted Living", us_nursing: "Nursing Home", tw_monthly: "台灣照護月費估算", sec4_title: "04. 現有資產與保障", cur_ins_full: "現有總保額 (USD)", cur_assets_full: "流動性存款/投資", summary_title: "保障缺口分析總覽", fv_toggle: "通膨精算 (FV)", inflation_rate: "年通膨率", disp_life: "身故保障需求", disp_med: "重疾醫療需求", disp_ltc: "長期照護準備", disp_assets: "現有資產與保障", cur_ins_short: "現有總保額", cur_assets_short: "流動性存款/投資", gap_short: "家庭保障缺口", btn_save: "儲存諮詢紀錄", btn_print: "列印 PDF 報告", filename_pref: "保障需求分析", yr_opts: ["5", "10", "15"], yr_labels: ["5 年 (過渡緩衝)", "10 年 (標準責任)", "15 年 (長期守護)"], ltc_opts: ["12", "24", "36", "48", "60"], ltc_labels: ["12", "24", "36 (3年-平均值)", "48", "60"], us_btn: "美國", tw_btn: "台灣", inf_note: "採用通膨率 (FV): ", child_name_lb: "姓名" },
+            en: { app_title: "Coverage Needs Analysis", advisor: "Advisor:", sec0_title: "00. CLIENT INFORMATION", client_name: "Client Name", gender: "Gender", male: "Male", female: "Female", age: "Age", phone: "Phone", child_count: "No. of Children", notes: "Notes", sec1_title: "01. OBLIGATIONS & LIFE NEED", mortgage: "Mortgage Balance (USD)", other_debt: "Other Personal/Business Debt", annual_income: "Annual Income (USD)", income_years: "Income Replacement Years", edu_budget: "Education Budget / Child", child_sync: "No. of Children (Synced)", sec2_title: "02. LIVING BENEFITS & CRITICAL ILLNESS", medical_oop: "Medical Out-of-Pocket Max", recovery_fund: "Recovery Fund for Critical Illness", sec3_title: "03. LONG-TERM CARE PREPARATION", ltc_duration: "Expected Duration (Months)", ltc_start_age: "Start Age", us_inhome: "In-Home Care", us_assisted: "Assisted Living", us_nursing: "Nursing Home", tw_monthly: "Estimated Taiwan LTC Monthly Cost", sec4_title: "04. CURRENT ASSETS", cur_ins_full: "Total Coverage (USD)", cur_assets_full: "Liquid Assets/Investments", summary_title: "GAP SUMMARY", fv_toggle: "Inflation (FV)", inflation_rate: "Inflation Rate", disp_life: "Life Insurance Need", disp_med: "Critical Illness Need", disp_ltc: "LTC Preparation", disp_assets: "Existing Assets & Protection", cur_ins_short: "Total Coverage", cur_assets_short: "Liquid Assets", gap_short: "Gap", btn_save: "Save Record", btn_print: "Print PDF", filename_pref: "Needs_Analysis", yr_opts: ["5", "10", "15"], yr_labels: ["5 Years (Buffer)", "10 Years (Standard)", "15 Years (Long-term)"], ltc_opts: ["12", "24", "36", "48", "60"], ltc_labels: ["12", "24", "36 (Avg - 3 Yrs)", "48", "60"], us_btn: "U.S.", tw_btn: "Taiwan", inf_note: "Applied Inflation Rate (FV): ", child_name_lb: "Name" }
         };
         let currentLang = 'zh'; let myChart = null; let currentLTCPath = 'US'; 
         window.chartBreakdown = { life: [], med: [], ltc: [] }; 
@@ -219,14 +221,21 @@
             else { en.className = "text-blue-600 font-black"; zh.className = "text-slate-400"; }
             document.querySelectorAll('[data-i18n]').forEach(el => { const key = el.getAttribute('data-i18n'); if (dict[currentLang][key]) el.innerHTML = dict[currentLang][key]; });
             document.getElementById('btn_us').innerText = dict[currentLang].us_btn; document.getElementById('btn_tw').innerText = dict[currentLang].tw_btn;
-            generateChildRows();
+            generateChildRows(); // Re-render child rows for translation
         }
 
+        // 🚀 終極修復：確保下拉選單值在語系切換時不丟失
         function syncDropdowns() {
-            const yr_sel = document.getElementById('income_years'); const ltc_sel = document.getElementById('ltc_duration');
-            const yr_idx = yr_sel.selectedIndex === -1 ? 1 : yr_sel.selectedIndex; const ltc_idx = ltc_sel.selectedIndex === -1 ? 2 : ltc_sel.selectedIndex;
-            yr_sel.innerHTML = dict[currentLang].yr_opts.map((o,i) => `<option value="${[5,10,15][i]}" ${i===yr_idx?'selected':''}>${o}</option>`).join('');
-            ltc_sel.innerHTML = dict[currentLang].ltc_opts.map((o,i) => `<option value="${[12,24,36,48,60][i]}" ${i===ltc_idx?'selected':''}>${o}</option>`).join('');
+            const yr_sel = document.getElementById('income_years'); 
+            const ltc_sel = document.getElementById('ltc_duration');
+            const current_yr_val = yr_sel.value || "10"; 
+            const current_ltc_val = ltc_sel.value || "36";
+
+            yr_sel.innerHTML = dict[currentLang].yr_opts.map((val, i) => `<option value="${val}">${dict[currentLang].yr_labels[i]}</option>`).join('');
+            ltc_sel.innerHTML = dict[currentLang].ltc_opts.map((val, i) => `<option value="${val}">${dict[currentLang].ltc_labels[i]}</option>`).join('');
+
+            yr_sel.value = current_yr_val;
+            ltc_sel.value = current_ltc_val;
         }
 
         function formatUSD(v) { return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(v); }
@@ -272,9 +281,8 @@
             const t = dict[currentLang];
             const yrLabel = document.getElementById('income_years').options[document.getElementById('income_years').selectedIndex]?.text || `${yrs}`;
             
-            // Tooltip 內容國際化綁定
             window.chartBreakdown = {
-                life: [`【${t.disp_life}: ${formatUSD(lifeT)}】`, `${t.mortgage}: ${formatUSD(mort)}`, `${t.other_debt}: ${formatUSD(debt)}`, `${currentLang==='zh'?yrs+t.inc_rep_label:yrLabel+t.inc_rep_label}: ${formatUSD(replacement)}`, `${t.edu_budget}: ${formatUSD(eduT)}`],
+                life: [`【${t.disp_life}: ${formatUSD(lifeT)}】`, `${t.mortgage}: ${formatUSD(mort)}`, `${t.other_debt}: ${formatUSD(debt)}`, `${currentLang==='zh'?yrs+'年收入替代':yrLabel+' Replacement'}: ${formatUSD(replacement)}`, `${t.edu_budget}: ${formatUSD(eduT)}`],
                 med: [`【${t.disp_med}: ${formatUSD(medT)}】`, `${t.medical_oop}: ${formatUSD(medOOP_FV)}`, `${t.recovery_fund}: ${formatUSD(medRec_FV)}`],
                 ltc: [`【${t.disp_ltc}: ${formatUSD(ltcT)}】`, `${currentLang==='zh'?'預計月費':'Monthly Rate'}: ${formatUSD(ltcRate)}`, `${t.ltc_duration}: ${document.getElementById('ltc_duration').options[document.getElementById('ltc_duration').selectedIndex]?.text || ""}`, `${t.ltc_start_age}: ${document.getElementById('ltc_start_age').value}`]
             };
@@ -330,11 +338,11 @@
             for (let i = 0; i < count; i++) { 
                 const data = savedData[i] || { name: `${dict[currentLang].child_name_lb} ${i+1}`, gender: '男', age: '0' }; 
                 const row = document.createElement('div'); 
-                row.className = 'grid grid-cols-3 gap-2 bg-slate-50 p-2 rounded-xl border border-slate-100 child-data-row'; 
+                row.className = 'bg-slate-50 p-2 rounded-xl border border-slate-100 child-data-row'; 
                 row.innerHTML = `
-                    <div class="child-name-col"><label class="text-[8px] font-bold text-slate-400 block">${dict[currentLang].child_name_lb}</label><input type="text" class="child-name w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-bold" value="${data.name}"></div>
-                    <div class="child-gender-col"><label class="text-[8px] font-bold text-slate-400 block">${dict[currentLang].gender}</label><select class="child-gender w-full bg-white border border-slate-200 rounded-lg px-1 py-1.5 text-xs font-bold"><option value="男" ${data.gender==='男'?'selected':''}>${dict[currentLang].male}</option><option value="女" ${data.gender==='女'?'selected':''}>${dict[currentLang].female}</option></select></div>
-                    <div class="child-age-col"><label class="text-[8px] font-bold text-slate-400 block">${dict[currentLang].age}</label><input type="number" class="child-age-input w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-bold" value="${data.age}" oninput="calculate()"></div>`; 
+                    <div class="child-name-col inline-block w-1/3 align-top mr-2"><label class="text-[8px] font-bold text-slate-400 block">${dict[currentLang].child_name_lb}</label><input type="text" class="child-name w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-bold" value="${data.name}"></div>
+                    <div class="child-gender-col inline-block w-1/4 align-top mr-2"><label class="text-[8px] font-bold text-slate-400 block">${dict[currentLang].gender}</label><select class="child-gender w-full bg-white border border-slate-200 rounded-lg px-1 py-1.5 text-xs font-bold"><option value="男" ${data.gender==='男'?'selected':''}>${dict[currentLang].male}</option><option value="女" ${data.gender==='女'?'selected':''}>${dict[currentLang].female}</option></select></div>
+                    <div class="child-age-col inline-block w-1/4 align-top"><label class="text-[8px] font-bold text-slate-400 block">${dict[currentLang].age}</label><input type="number" class="child-age-input w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-bold" value="${data.age}" oninput="calculate()"></div>`; 
                 container.appendChild(row); 
             } 
             calculate(); 
