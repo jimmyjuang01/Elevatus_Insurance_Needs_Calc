@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elevatus 保障需求分析系統 v3.7 | Jimmy Chuang</title>
+    <title>Elevatus 保障需求分析系統 v3.8 | Jimmy Chuang</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
@@ -43,7 +43,6 @@
         }
         .ltc-card.active { border-color: #a855f7; background-color: #faf5ff; }
 
-        /* 列印排版設定 */
         @media print {
             @page { size: letter portrait; margin: 10mm; }
             body { background-color: white !important; margin: 0; padding: 0; }
@@ -67,7 +66,7 @@
                 <div class="border-l-2 border-slate-200 pl-4">
                     <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-baseline gap-3">
                         保障需求分析
-                        <span class="text-blue-600 text-sm sm:text-base bg-blue-100 px-3 py-1 rounded-lg no-print">v3.7</span>
+                        <span class="text-blue-600 text-sm sm:text-base bg-blue-100 px-3 py-1 rounded-lg no-print">v3.8</span>
                     </h1>
                     <p class="text-slate-400 font-bold text-[10px] uppercase tracking-widest mt-1">Cross-Border Financial Consulting</p>
                 </div>
@@ -265,7 +264,6 @@
         let myChart = null;
         let previousTotalGap = 0; 
         
-        // 全域變數，用於儲存 Tooltips 的明細資料
         window.chartBreakdown = { life: [], med: [], ltc: [] };
 
         function formatUSD(val) {
@@ -359,7 +357,6 @@
             const childCount = parseFloat(document.getElementById('child_count').value) || 0;
             const edu = eduPerChild * childCount;
             
-            // 【修正 1】移除硬編碼的 + 20000 幽靈常數，確保計算精確
             const lifeTotalNeed = mortgage + other_debt + (annual * years) + edu;
             
             const medical_oop = parseCurrency(document.getElementById('medical_oop').value);
@@ -381,7 +378,6 @@
             
             const gap = Math.max(0, (lifeTotalNeed + med + ltcTotalNeed) - (ins + asset));
 
-            // 【升級 2】準備 Tooltips 的細項陣列
             window.chartBreakdown = {
                 life: [
                     `房屋貸款餘額: ${formatUSD(mortgage)}`,
@@ -430,15 +426,24 @@
                             bodySpacing: 6,
                             padding: 16,
                             cornerRadius: 12,
-                            // 【升級 2】動態渲染多行 Tooltip 內容
                             callbacks: {
+                                // 修正 3：強制覆寫 Title，讓內環能顯示正確的標題
+                                title: function(tooltipItems) {
+                                    const item = tooltipItems[0];
+                                    if (item.datasetIndex === 0) {
+                                        return item.chart.data.labels[item.dataIndex]; // 外環標題
+                                    } else {
+                                        const innerTitles = ['已有保險', '已有資產', '家庭保障缺口'];
+                                        return innerTitles[item.dataIndex]; // 內環標題
+                                    }
+                                },
                                 label: function(context) {
                                     if (context.datasetIndex === 0) { 
                                         if (context.dataIndex === 0) return ['【身故保障總額: ' + formatUSD(context.parsed) + '】', ...window.chartBreakdown.life];
                                         if (context.dataIndex === 1) return ['【生前福利總額: ' + formatUSD(context.parsed) + '】', ...window.chartBreakdown.med];
                                         if (context.dataIndex === 2) return ['【長期照護總額: ' + formatUSD(context.parsed) + '】', ...window.chartBreakdown.ltc];
                                     } else if (context.datasetIndex === 1) {
-                                        const innerLabels = ['已有保險', '已有資產', '資金缺口'];
+                                        const innerLabels = ['目前已有保額', '流動性存款/投資', '家庭保障缺口'];
                                         return innerLabels[context.dataIndex] + ': ' + formatUSD(context.parsed);
                                     }
                                     return '';
