@@ -272,12 +272,14 @@
         function toggleFV() { document.getElementById('inflation_control').classList.toggle('hidden', !document.getElementById('fv_toggle').checked); calculate(); }
         function updateInflationLabel() { document.getElementById('inflation_display').innerText = document.getElementById('inflation_rate').value + '%'; }
 
+        // 🚀 修改：點擊清空後，不僅清空 value，連 placeholder 也設為空字串，實現徹底空白
         function clearAllData() {
             if(confirm(currentLang==='zh' ? '確定要清空所有輸入的資料嗎？(重新整理網頁可回復預設)' : 'Are you sure you want to clear all data? (Refresh page to restore defaults)')) {
                 isCleared = true; 
                 document.querySelectorAll('input').forEach(el => {
                     if(el.type === 'text' || el.type === 'number' || el.type === 'email') {
                         el.value = '';
+                        el.placeholder = ''; // 把淺灰提示字也清空
                     }
                 });
                 generateChildRows(); 
@@ -285,12 +287,14 @@
             }
         }
 
-        function getInputValue(id, type = 'currency') {
+        // 修改：讀取值時，如果已經被清空，就不去抓原本寫死的預設值，直接當作 0 或空白
+        function getInputValue(id, type = 'currency', originalPlaceholder = '') {
             const el = document.getElementById(id);
             if (!el) return type === 'text' ? '' : 0;
             let valStr = el.value;
             if (valStr === '') {
-                valStr = isCleared ? (type === 'text' ? '' : '0') : (el.placeholder || (type === 'text' ? '' : '0'));
+                // 若已經被清空，就不用原本的預設值
+                valStr = isCleared ? (type === 'text' ? '' : '0') : (el.placeholder || originalPlaceholder || (type === 'text' ? '' : '0'));
             }
             if (type === 'currency') return parseCurrency(valStr);
             if (type === 'number') return parseFloat(valStr) || 0;
@@ -321,16 +325,17 @@
 
         function calculate() {
             const isFV = document.getElementById('fv_toggle').checked; const r = isFV ? (parseFloat(document.getElementById('inflation_rate').value)/100) : 0;
-            const age = getInputValue('client_age', 'number');
             
-            const mort = getInputValue('mortgage', 'currency'); 
-            const debt = getInputValue('other_debt', 'currency');
-            const ann = getInputValue('annual_income', 'currency'); 
+            // 在這裡傳入原始的 placeholder 預設值，確保剛載入網頁時能正確計算
+            const age = getInputValue('client_age', 'number', '35');
+            const mort = getInputValue('mortgage', 'currency', '$350,000'); 
+            const debt = getInputValue('other_debt', 'currency', '$100,000');
+            const ann = getInputValue('annual_income', 'currency', '$80,000'); 
             const yrs = parseInt(document.getElementById('income_years').value) || 10;
             
             let replacement = r > 0 ? ann * (Math.pow(1 + r, yrs) - 1) / r : ann * yrs;
             let eduT = 0; 
-            const eduP = getInputValue('edu_per_child', 'currency');
+            const eduP = getInputValue('edu_per_child', 'currency', '$150,000');
             
             document.querySelectorAll('.child-age-input').forEach(i => { 
                 let cAgeStr = i.value;
@@ -341,18 +346,27 @@
             
             const lifeT = mort + debt + replacement + eduT;
             
-            const medOOP_FV = getInputValue('medical_oop', 'currency') * Math.pow(1+r, Math.max(0, 65-age));
-            const medRec_FV = getInputValue('recovery_fund', 'currency') * Math.pow(1+r, Math.max(0, 65-age));
+            const medOOP_FV = getInputValue('medical_oop', 'currency', '$18,000') * Math.pow(1+r, Math.max(0, 65-age));
+            const medRec_FV = getInputValue('recovery_fund', 'currency', '$160,000') * Math.pow(1+r, Math.max(0, 65-age));
             const medT = medOOP_FV + medRec_FV;
             
             const ltcBaseId = currentLTCPath==='US' ? 'us_'+document.querySelector('input[name="ltc_type"]:checked').value : 'tw_monthly';
-            const ltcRate = getInputValue(ltcBaseId, 'currency');
+            // 根據選中的長照類型，決定原始預設金額
+            let ltcOrig = '$3,200';
+            if (currentLTCPath==='US') {
+                const usType = document.querySelector('input[name="ltc_type"]:checked').value;
+                if(usType === 'inhome') ltcOrig = '$5,529';
+                if(usType === 'assisted') ltcOrig = '$6,350';
+                if(usType === 'nursing') ltcOrig = '$8,015';
+            }
+
+            const ltcRate = getInputValue(ltcBaseId, 'currency', ltcOrig);
             const ltcDur = parseInt(document.getElementById('ltc_duration').value) || 36;
-            const ltcStart = getInputValue('ltc_start_age', 'number');
+            const ltcStart = getInputValue('ltc_start_age', 'number', '75');
             const ltcT = (ltcRate * ltcDur) * Math.pow(1+r, Math.max(0, ltcStart-age));
             
-            const ins = getInputValue('current_insurance', 'currency'); 
-            const cash = getInputValue('current_assets', 'currency');
+            const ins = getInputValue('current_insurance', 'currency', '$300,000'); 
+            const cash = getInputValue('current_assets', 'currency', '$100,000');
             const gap = Math.max(0, (lifeT + medT + ltcT) - (ins + cash));
 
             const t = dict[currentLang];
@@ -410,27 +424,34 @@
         }
         
         function generateChildRows() { 
+            // 重新產生時，如果是清空狀態，子女數量預設為空(0)
             const masterEl = document.getElementById('master_child_count');
-            const count = getInputValue('master_child_count', 'number'); 
+            const countStr = masterEl.value === '' ? (isCleared ? '0' : '1') : masterEl.value;
+            const count = parseInt(countStr) || 0; 
             
             const syncEl = document.getElementById('child_count');
             syncEl.value = masterEl.value; 
-            syncEl.placeholder = masterEl.placeholder;
+            if(isCleared) syncEl.placeholder = '';
 
             const container = document.getElementById('child_rows_container'); 
             const savedData = Array.from(container.children).map(r => ({ name: r.querySelector('.child-name').value, gender: r.querySelector('.child-gender')?.value, age: r.querySelector('.child-age-input').value })); 
             container.innerHTML = ''; 
             for (let i = 0; i < count; i++) { 
                 const data = savedData[i] || { name: '', gender: '男', age: '' }; 
+                // 若清空狀態，不顯示 placeholder
+                const namePlaceholder = isCleared ? "" : `${dict[currentLang].child_name_lb} ${i+1}`;
+                const agePlaceholder = isCleared ? "" : "0";
+
                 const row = document.createElement('div'); 
                 row.className = 'bg-slate-50 p-2 rounded-xl border border-slate-100 child-data-row'; 
                 row.innerHTML = `
-                    <div class="child-name-col inline-block w-1/3 align-top mr-2"><label class="text-[8px] font-bold text-slate-400 block">${dict[currentLang].child_name_lb}</label><input type="text" class="child-name w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-bold" placeholder="${dict[currentLang].child_name_lb} ${i+1}" value="${data.name}"></div>
+                    <div class="child-name-col inline-block w-1/3 align-top mr-2"><label class="text-[8px] font-bold text-slate-400 block">${dict[currentLang].child_name_lb}</label><input type="text" class="child-name w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-bold" placeholder="${namePlaceholder}" value="${data.name}"></div>
                     <div class="child-gender-col inline-block w-1/4 align-top mr-2"><label class="text-[8px] font-bold text-slate-400 block">${dict[currentLang].gender}</label><select class="child-gender w-full bg-white border border-slate-200 rounded-lg px-1 py-1.5 text-xs font-bold"><option value="男" ${data.gender==='男'?'selected':''}>${dict[currentLang].male}</option><option value="女" ${data.gender==='女'?'selected':''}>${dict[currentLang].female}</option></select></div>
-                    <div class="child-age-col inline-block w-1/4 align-top"><label class="text-[8px] font-bold text-slate-400 block">${dict[currentLang].age}</label><input type="number" class="child-age-input w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-bold" placeholder="0" value="${data.age}" oninput="calculate()"></div>`; 
+                    <div class="child-age-col inline-block w-1/4 align-top"><label class="text-[8px] font-bold text-slate-400 block">${dict[currentLang].age}</label><input type="number" class="child-age-input w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-bold" placeholder="${agePlaceholder}" value="${data.age}" oninput="calculate()"></div>`; 
                 container.appendChild(row); 
             } 
-            calculate(); 
+            // 避免在剛按下清空時重複呼叫 calculate，交由 clearAllData 統一呼叫
+            if(!isCleared) calculate(); 
         }
 
         function handlePrint() { 
