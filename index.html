@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elevatus 保障需求分析系統 v3.9 | Jimmy Chuang</title>
+    <title>Elevatus 保障需求分析系統 v4.0 | Jimmy Chuang</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
@@ -30,6 +30,7 @@
             transition: all 0.2s ease-in-out; -webkit-appearance: none;
         }
         .input-field:focus { background-color: white; border-color: #3b82f6; box-shadow: 0 0 0 4px #eff6ff; }
+        .input-field:read-only { background-color: #f1f5f9; cursor: not-allowed; color: #64748b; }
         
         .consultant-input {
             background: transparent; border-bottom: 2px solid #e2e8f0; padding: 2px 4px;
@@ -42,6 +43,10 @@
             border: 2px solid #f1f5f9; background-color: white; cursor: pointer; transition: all 0.2s; margin-bottom: 0.75rem; 
         }
         .ltc-card.active { border-color: #a855f7; background-color: #faf5ff; }
+
+        /* FV Toggle Switch */
+        .toggle-checkbox:checked { right: 0; border-color: #10b981; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #10b981; }
 
         @media print {
             @page { size: letter portrait; margin: 10mm; }
@@ -66,7 +71,7 @@
                 <div class="border-l-2 border-slate-200 pl-4">
                     <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-baseline gap-3">
                         保障需求分析
-                        <span class="text-blue-600 text-sm sm:text-base bg-blue-100 px-3 py-1 rounded-lg no-print">v3.9</span>
+                        <span class="text-blue-600 text-sm sm:text-base bg-blue-100 px-3 py-1 rounded-lg no-print">v4.0</span>
                     </h1>
                     <p class="text-slate-400 font-bold text-[10px] uppercase tracking-widest mt-1">Cross-Border Financial Consulting</p>
                 </div>
@@ -90,15 +95,42 @@
         <div class="flex flex-col lg:flex-row gap-8 items-start">
             
             <div class="w-full lg:w-7/12 xl:w-2/3">
+                
                 <section class="card-box">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <h2 class="section-title border-blue-500 text-blue-600">00. 客戶基本資料</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
                         <div>
-                            <label class="input-label text-slate-500">客戶姓名 / 案件代號</label>
+                            <label class="input-label text-blue-600">客戶姓名</label>
                             <input type="text" id="client_name" value="王先生" class="input-field">
                         </div>
                         <div>
-                            <label class="input-label text-slate-500">諮詢備註</label>
-                            <input type="text" id="notes" value="一家四口" class="input-field">
+                            <label class="input-label text-blue-600">性別</label>
+                            <select id="client_gender" class="input-field bg-white cursor-pointer">
+                                <option>男</option><option>女</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="input-label text-blue-600">目前年齡</label>
+                            <input type="number" id="client_age" value="35" class="input-field" oninput="calculate()">
+                        </div>
+                        <div>
+                            <label class="input-label text-blue-600">聯絡電話</label>
+                            <input type="text" id="client_phone" class="input-field" placeholder="09XX-XXX-XXX">
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="input-label text-blue-600">E-mail</label>
+                            <input type="email" id="client_email" class="input-field" placeholder="example@email.com">
+                        </div>
+                        
+                        <div class="sm:col-span-2 border-t border-slate-100 pt-5 mt-2">
+                            <label class="input-label text-blue-600">子女數量</label>
+                            <input type="number" id="master_child_count" value="2" min="0" class="input-field w-1/2 sm:w-1/3" oninput="generateChildRows()">
+                            <div id="child_rows_container" class="mt-4 space-y-3"></div>
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <label class="input-label text-slate-400">諮詢備註</label>
+                            <input type="text" id="notes" value="一家四口" class="input-field text-sm">
                         </div>
                     </div>
                 </section>
@@ -129,10 +161,11 @@
                         <div>
                             <label class="input-label text-emerald-500">每位子女教育預算 (USD)</label>
                             <input type="text" id="edu_per_child" value="$150,000" oninput="handleCurrencyInput(this)" class="input-field">
+                            <p class="text-[10px] text-slate-400 mt-1.5 font-bold">※ 系統預設大學入學年齡為 18 歲，據此計算各別通膨期數。</p>
                         </div>
                         <div>
-                            <label class="input-label text-emerald-500">子女數量</label>
-                            <input type="text" id="child_count" value="2" oninput="calculate()" class="input-field">
+                            <label class="input-label text-emerald-500">子女數量 (自 00 區塊同步)</label>
+                            <input type="text" id="child_count" value="2" class="input-field" readonly>
                         </div>
                     </div>
                 </section>
@@ -157,16 +190,24 @@
                         <button id="btn_us" onclick="setLTCPath('US')" class="flex-1 py-3 rounded-lg font-black text-sm bg-white shadow text-purple-600 transition-all">美國在地照護 (US)</button>
                         <button id="btn_tw" onclick="setLTCPath('TW')" class="flex-1 py-3 rounded-lg font-bold text-sm text-slate-500 transition-all">返回台灣照護 (TW)</button>
                     </div>
-                    <div class="mb-6">
-                        <label class="input-label text-purple-600">選擇預計照護時間長度 (月數)</label>
-                        <select id="ltc_duration" onchange="calculate()" class="input-field cursor-pointer bg-white">
-                            <option value="12">12 個月</option>
-                            <option value="24">24 個月</option>
-                            <option value="36" selected>36 個月 (3 年 - 平均值)</option>
-                            <option value="48">48 個月</option>
-                            <option value="60">60 個月 (5 年)</option>
-                        </select>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="input-label text-purple-600">選擇預計照護時間長度</label>
+                            <select id="ltc_duration" onchange="calculate()" class="input-field cursor-pointer bg-white">
+                                <option value="12">12 個月</option>
+                                <option value="24">24 個月</option>
+                                <option value="36" selected>36 個月 (3 年 - 平均值)</option>
+                                <option value="48">48 個月</option>
+                                <option value="60">60 個月 (5 年)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="input-label text-purple-600">預計啟動長照年齡</label>
+                            <input type="number" id="ltc_start_age" value="75" class="input-field bg-white" oninput="calculate()">
+                        </div>
                     </div>
+
                     <div id="us_ltc_details">
                         <div class="ltc-card active" id="card_inhome" onclick="selectLtcType('inhome')">
                             <input type="radio" name="ltc_type" id="radio_inhome" value="inhome" checked class="w-5 h-5 ml-2 cursor-pointer accent-purple-600 no-print">
@@ -217,10 +258,33 @@
 
             <div class="w-full lg:w-5/12 xl:w-1/3 lg:sticky lg:top-10 print-card">
                 <div class="bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-slate-100 flex flex-col">
+                    
                     <div class="bg-blue-600 p-8 text-center text-white">
                         <h3 class="text-xs font-bold opacity-80 uppercase tracking-[0.2em] mb-2">保障缺口分析總覽</h3>
                         <div id="total_gap_val" class="text-4xl sm:text-5xl font-black tracking-tighter">$0</div>
                     </div>
+                    
+                    <div class="bg-slate-800 px-8 py-5 border-b border-slate-700 no-print">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest flex items-center gap-1.5">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                                啟用通膨精算 (FV)
+                            </span>
+                            <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+                                <input type="checkbox" id="fv_toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 border-slate-600 appearance-none cursor-pointer" onchange="toggleFV()"/>
+                                <label for="fv_toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-slate-600 cursor-pointer"></label>
+                            </div>
+                        </div>
+                        
+                        <div id="inflation_control" class="hidden transition-all duration-300">
+                            <div class="flex justify-between text-slate-300 text-xs font-bold mb-2">
+                                <span>設定年通膨率</span>
+                                <span id="inflation_display" class="text-white font-black">3.0%</span>
+                            </div>
+                            <input type="range" id="inflation_rate" min="0" max="10" step="0.5" value="3" class="w-full accent-emerald-500" oninput="updateInflationLabel(); calculate();">
+                        </div>
+                    </div>
+
                     <div class="p-8 bg-white flex-grow">
                         <div class="relative h-48 sm:h-56 w-full mb-8">
                             <canvas id="gapChart"></canvas>
@@ -239,7 +303,6 @@
                                 <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">長期照護預備</p>
                                 <p id="ltc_need_display" class="text-lg font-black text-purple-600">$0</p>
                             </div>
-                            
                             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
                                 <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">現有資產與保障</p>
                                 <p id="assets_display" class="text-lg font-black text-emerald-500">$0</p>
@@ -272,13 +335,8 @@
         
         window.chartBreakdown = { life: [], med: [], ltc: [] };
 
-        function formatUSD(val) {
-            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(val);
-        }
-
-        function parseCurrency(str) {
-            return parseFloat(String(str).replace(/[$,]/g, '')) || 0;
-        }
+        function formatUSD(val) { return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(val); }
+        function parseCurrency(str) { return parseFloat(String(str).replace(/[$,]/g, '')) || 0; }
 
         function handleCurrencyInput(el) {
             let cursorPosition = el.selectionStart;
@@ -293,11 +351,60 @@
             calculate();
         }
 
+        // 動態生成子女列
+        function generateChildRows() {
+            const count = parseInt(document.getElementById('master_child_count').value) || 0;
+            const container = document.getElementById('child_rows_container');
+            
+            // 同步至 01 區塊
+            document.getElementById('child_count').value = count;
+            
+            // 保留現有輸入數據
+            const existingRows = container.children;
+            const savedData = [];
+            for(let i=0; i<existingRows.length; i++) {
+                savedData.push({
+                    name: existingRows[i].querySelector('.child-name').value,
+                    gender: existingRows[i].querySelector('.child-gender').value,
+                    age: existingRows[i].querySelector('.child-age-input').value
+                });
+            }
+
+            container.innerHTML = '';
+            for (let i = 0; i < count; i++) {
+                const data = savedData[i] || { name: `子女 ${i+1}`, gender: '男', age: '0' };
+                const row = document.createElement('div');
+                row.className = 'flex flex-wrap sm:flex-nowrap gap-3 items-center bg-blue-50/50 p-3 rounded-xl border border-blue-100 transition-all';
+                row.innerHTML = `
+                    <div class="w-full sm:flex-1"><label class="text-[10px] text-blue-500 font-bold uppercase block mb-1">姓名</label><input type="text" class="child-name w-full bg-white border border-blue-200 rounded-lg px-3 py-2 text-sm font-bold text-slate-700 outline-none focus:border-blue-500" value="${data.name}"></div>
+                    <div class="w-full sm:w-24"><label class="text-[10px] text-blue-500 font-bold uppercase block mb-1">性別</label><select class="child-gender w-full bg-white border border-blue-200 rounded-lg px-2 py-2 text-sm font-bold text-slate-700 outline-none focus:border-blue-500"><option ${data.gender==='男'?'selected':''}>男</option><option ${data.gender==='女'?'selected':''}>女</option></select></div>
+                    <div class="w-full sm:w-24"><label class="text-[10px] text-blue-500 font-bold uppercase block mb-1">目前年齡</label><input type="number" min="0" class="child-age-input w-full bg-white border border-blue-200 rounded-lg px-3 py-2 text-sm font-bold text-slate-700 outline-none focus:border-blue-500" value="${data.age}" oninput="calculate()"></div>
+                `;
+                container.appendChild(row);
+            }
+            calculate();
+        }
+
+        // FV 控制
+        function toggleFV() {
+            const isChecked = document.getElementById('fv_toggle').checked;
+            const controlDiv = document.getElementById('inflation_control');
+            if (isChecked) {
+                controlDiv.classList.remove('hidden');
+            } else {
+                controlDiv.classList.add('hidden');
+            }
+            calculate();
+        }
+
+        function updateInflationLabel() {
+            document.getElementById('inflation_display').innerText = document.getElementById('inflation_rate').value + '%';
+        }
+
         function animateValue(id, start, end, duration) {
             const obj = document.getElementById(id);
             if(!obj) return;
             if (obj.animationFrame) cancelAnimationFrame(obj.animationFrame);
-
             let startTimestamp = null;
             const step = (timestamp) => {
                 if (!startTimestamp) startTimestamp = timestamp;
@@ -305,21 +412,24 @@
                 const easeProgress = 1 - Math.pow(1 - progress, 3);
                 const current = Math.floor(easeProgress * (end - start) + start);
                 obj.innerText = formatUSD(current);
-                if (progress < 1) {
-                    obj.animationFrame = window.requestAnimationFrame(step);
-                } else {
-                    obj.innerText = formatUSD(end);
-                }
+                if (progress < 1) { obj.animationFrame = window.requestAnimationFrame(step); } 
+                else { obj.innerText = formatUSD(end); }
             };
             window.requestAnimationFrame(step);
         }
 
         function clearAllData() {
             if (confirm("確定要清除所有已輸入的資料嗎？此動作無法復原。")) {
-                const fields = ['client_name', 'notes', 'mortgage', 'other_debt', 'annual_income', 'edu_per_child', 'child_count', 'medical_oop', 'recovery_fund', 'us_inhome', 'us_assisted', 'us_nursing', 'tw_monthly', 'current_insurance', 'current_assets'];
+                const fields = ['client_name', 'client_phone', 'client_email', 'notes', 'mortgage', 'other_debt', 'annual_income', 'edu_per_child', 'medical_oop', 'recovery_fund', 'us_inhome', 'us_assisted', 'us_nursing', 'tw_monthly', 'current_insurance', 'current_assets'];
                 fields.forEach(f => { const el = document.getElementById(f); if(el) el.value = ""; });
                 document.getElementById('income_years').value = "10";
                 document.getElementById('ltc_duration').value = "36";
+                document.getElementById('client_age').value = "35";
+                document.getElementById('ltc_start_age').value = "75";
+                document.getElementById('master_child_count').value = "0";
+                document.getElementById('fv_toggle').checked = false;
+                toggleFV();
+                generateChildRows(); // 清空子女人數
                 calculate();
             }
         }
@@ -327,6 +437,7 @@
         window.onload = function() {
             document.getElementById('display_date').innerText = "報告日期：" + new Date().toLocaleDateString();
             initChart();
+            generateChildRows(); // 初始化子女列
             calculate();
             fetch(SCRIPT_URL).then(res => res.json()).then(data => {
                 globalRates = data;
@@ -354,21 +465,57 @@
             calculate();
         }
 
+        // --- 核心通膨精算引擎 ---
         function calculate() {
+            const isFV = document.getElementById('fv_toggle').checked;
+            const r = isFV ? (parseFloat(document.getElementById('inflation_rate').value) / 100) || 0 : 0;
+            const fvTag = isFV ? " (FV)" : "";
+            
+            const clientAge = parseInt(document.getElementById('client_age').value) || 35;
+
+            // 1. 身故保障
             const mortgage = parseCurrency(document.getElementById('mortgage').value);
             const other_debt = parseCurrency(document.getElementById('other_debt').value);
+            
             const annual = parseCurrency(document.getElementById('annual_income').value);
             const years = parseInt(document.getElementById('income_years').value) || 10;
+            let incomeReplacement = 0;
+            if (r > 0) {
+                // 等比級數求和: A * ((1+r)^n - 1) / r
+                incomeReplacement = annual * (Math.pow(1 + r, years) - 1) / r;
+            } else {
+                incomeReplacement = annual * years;
+            }
+
             const eduPerChild = parseCurrency(document.getElementById('edu_per_child').value);
-            const childCount = parseFloat(document.getElementById('child_count').value) || 0;
-            const edu = eduPerChild * childCount;
+            let eduTotal = 0;
+            const childAgeInputs = document.querySelectorAll('.child-age-input');
+            const eduDetails = [];
             
-            const lifeTotalNeed = mortgage + other_debt + (annual * years) + edu;
+            if (childAgeInputs.length > 0) {
+                childAgeInputs.forEach((input, index) => {
+                    const age = parseInt(input.value) || 0;
+                    const n = Math.max(0, 18 - age); // 算到 18 歲
+                    const cost = eduPerChild * Math.pow(1 + r, n);
+                    eduTotal += cost;
+                    eduDetails.push(`子女${index+1}教育金: ${formatUSD(cost)}`);
+                });
+            } else {
+                // 防呆：如果刪光了動態列，但母數量還有值（理論上不該發生）
+                const fallbackCount = parseFloat(document.getElementById('master_child_count').value) || 0;
+                eduTotal = eduPerChild * fallbackCount;
+                eduDetails.push(`總教育金預算: ${formatUSD(eduTotal)}`);
+            }
             
+            const lifeTotalNeed = mortgage + other_debt + incomeReplacement + eduTotal;
+            
+            // 2. 醫療與重疾
             const medical_oop = parseCurrency(document.getElementById('medical_oop').value);
             const recovery_fund = parseCurrency(document.getElementById('recovery_fund').value);
-            const med = medical_oop + recovery_fund;
+            const n_med = Math.max(0, 65 - clientAge); // 算到 65 歲退休
+            const med = (medical_oop + recovery_fund) * Math.pow(1 + r, n_med);
             
+            // 3. 長期照護
             const duration = parseInt(document.getElementById('ltc_duration').value) || 36;
             let monthlyRate = 0;
             if(currentLTCPath === 'US') {
@@ -377,27 +524,31 @@
             } else {
                 monthlyRate = parseCurrency(document.getElementById('tw_monthly').value);
             }
-            const ltcTotalNeed = monthlyRate * duration;
+            const ltcStartAge = parseInt(document.getElementById('ltc_start_age').value) || 75;
+            const n_ltc = Math.max(0, ltcStartAge - clientAge); // 算到預計長照年齡
+            const ltcTotalNeed = (monthlyRate * duration) * Math.pow(1 + r, n_ltc);
             
+            // 4. 資產扣除
             const ins = parseCurrency(document.getElementById('current_insurance').value);
             const asset = parseCurrency(document.getElementById('current_assets').value);
             const totalAssets = ins + asset;
             
             const gap = Math.max(0, (lifeTotalNeed + med + ltcTotalNeed) - totalAssets);
 
+            // 更新 Tooltips 明細 (加上 FV 標籤讓顧問好辨識)
             window.chartBreakdown = {
                 life: [
                     `房屋貸款餘額: ${formatUSD(mortgage)}`,
-                    `其他個人/商業貸款: ${formatUSD(other_debt)}`,
-                    `${years}年收入替代: ${formatUSD(annual * years)}`,
-                    `子女教育預算: ${formatUSD(edu)}`
+                    `其他貸款: ${formatUSD(other_debt)}`,
+                    `${years}年收入替代${fvTag}: ${formatUSD(incomeReplacement)}`,
+                    ...eduDetails
                 ],
                 med: [
-                    `醫療自付上限預留: ${formatUSD(medical_oop)}`,
-                    `重大疾病應急金: ${formatUSD(recovery_fund)}`
+                    `醫療自付上限預留${fvTag}: ${formatUSD(medical_oop * Math.pow(1+r, n_med))}`,
+                    `重大疾病應急金${fvTag}: ${formatUSD(recovery_fund * Math.pow(1+r, n_med))}`
                 ],
                 ltc: [
-                    `長照月費估算 (${duration}個月): ${formatUSD(ltcTotalNeed)}`
+                    `長照總額估算${fvTag}: ${formatUSD(ltcTotalNeed)}`
                 ]
             };
 
@@ -405,11 +556,8 @@
             document.getElementById('medical_need_display').innerText = formatUSD(med);
             document.getElementById('ltc_need_display').innerText = formatUSD(ltcTotalNeed);
             
-            // 安全更新資產顯示
             const assetsDisplayEl = document.getElementById('assets_display');
-            if (assetsDisplayEl) {
-                assetsDisplayEl.innerText = formatUSD(totalAssets);
-            }
+            if (assetsDisplayEl) assetsDisplayEl.innerText = formatUSD(totalAssets);
             
             animateValue('total_gap_val', previousTotalGap, gap, 600);
             previousTotalGap = gap; 
@@ -442,21 +590,18 @@
                             callbacks: {
                                 title: function(tooltipItems) {
                                     const item = tooltipItems[0];
-                                    if (item.datasetIndex === 0) {
-                                        return item.chart.data.labels[item.dataIndex]; 
-                                    } else {
-                                        const innerTitles = ['已有保險', '已有資產', '家庭保障缺口'];
-                                        return innerTitles[item.dataIndex]; 
-                                    }
+                                    if (item.datasetIndex === 0) return item.chart.data.labels[item.dataIndex]; 
+                                    else return ['已有保險', '已有資產', '家庭保障缺口'][item.dataIndex]; 
                                 },
                                 label: function(context) {
+                                    const isFV = document.getElementById('fv_toggle').checked;
+                                    const tag = isFV ? " (FV)" : "";
                                     if (context.datasetIndex === 0) { 
-                                        if (context.dataIndex === 0) return ['【身故保障總額: ' + formatUSD(context.parsed) + '】', ...window.chartBreakdown.life];
-                                        if (context.dataIndex === 1) return ['【生前福利總額: ' + formatUSD(context.parsed) + '】', ...window.chartBreakdown.med];
-                                        if (context.dataIndex === 2) return ['【長期照護總額: ' + formatUSD(context.parsed) + '】', ...window.chartBreakdown.ltc];
+                                        if (context.dataIndex === 0) return ['【總額' + tag + ': ' + formatUSD(context.parsed) + '】', ...window.chartBreakdown.life];
+                                        if (context.dataIndex === 1) return ['【總額' + tag + ': ' + formatUSD(context.parsed) + '】', ...window.chartBreakdown.med];
+                                        if (context.dataIndex === 2) return ['【總額' + tag + ': ' + formatUSD(context.parsed) + '】', ...window.chartBreakdown.ltc];
                                     } else if (context.datasetIndex === 1) {
-                                        const innerLabels = ['目前已有保額', '流動性存款/投資', '家庭保障缺口'];
-                                        return innerLabels[context.dataIndex] + ': ' + formatUSD(context.parsed);
+                                        return ['目前已有保額', '流動性存款/投資', '家庭保障缺口'][context.dataIndex] + ': ' + formatUSD(context.parsed);
                                     }
                                     return '';
                                 }
@@ -476,6 +621,7 @@
         }
 
         async function saveToSheet() {
+            // 這個區塊未來可擴充寫入 Sheet 的變數
             const btn = document.getElementById('saveBtn');
             btn.innerText = '同步中...'; btn.disabled = true;
             try {
