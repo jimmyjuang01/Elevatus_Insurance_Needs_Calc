@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elevatus 保障需求分析系統 v5.0 | Jimmy Chuang</title>
+    <title>Elevatus 保障需求分析系統 v5.1 | Jimmy Chuang</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
@@ -15,83 +15,74 @@
         .card-box { background-color: white; padding: 2rem; border-radius: 2rem; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1); border: 1px solid #f1f5f9; margin-bottom: 2rem; }
         .section-title { font-size: 1.25rem; font-weight: 900; margin-bottom: 1.5rem; display: flex; align-items: center; border-left: 5px solid; padding-left: 1rem; }
         .input-label { display: block; font-size: 11px; font-weight: 700; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
-        .input-field { width: 100%; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 0.875rem 1rem; color: #1e293b; font-weight: 700; outline: none; transition: all 0.2s; }
+        .input-field { width: 100%; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 0.875rem 1rem; color: #1e293b; font-weight: 700; outline: none; }
         .ltc-card { display: flex; align-items: center; padding: 1rem; border-radius: 0.75rem; border: 2px solid #f1f5f9; background-color: white; transition: all 0.2s; margin-bottom: 0.75rem; }
         .ltc-card.active { border-color: #a855f7; background-color: #faf5ff; }
         .toggle-checkbox:checked { right: 0; border-color: #10b981; }
         .toggle-checkbox:checked + .toggle-label { background-color: #10b981; }
 
-        /* 🚀 V5.0 深度列印優化 (Independent Report Mode) */
+        /* 🚀 V5.1 終極列印優化：移除背景框，直接列印內容 */
         @media print {
             @page { 
                 size: letter; 
-                margin: 18mm 15mm !important; /* 🌟 核心修正：保留適當邊距，避免內容太靠頁首頁尾 */
+                margin: 15mm !important; 
             }
-            body { 
-                background-color: white !important; 
-                -webkit-print-color-adjust: exact !important; 
-                print-color-adjust: exact !important;
-                padding: 0 !important;
-            }
+            body { background-color: white !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; padding: 0 !important; }
             
-            /* 1. 恢復標題與顧問資訊，確保第一頁完整 */
-            .app-title-print { display: block !important; margin-bottom: 20px !important; }
-            .no-print, button, input[type="range"], #inflation_control, .flex.justify-end.mb-3 { display: none !important; }
-            
-            /* 2. 修正摘要面板：圓角強化與背景裁切 */
-            #report-summary-panel { order: -1 !important; margin-bottom: 40px !important; width: 100% !important; }
-            #report-summary-panel > div { 
-                border-radius: 2rem !important; 
-                overflow: hidden !important; 
-                border: 1.5px solid #e2e8f0 !important;
-                background-color: white !important;
-                box-shadow: none !important;
-            }
-            #report-summary-panel .bg-blue-600 {
-                background-color: #2563eb !important;
-                border-top-left-radius: 2rem !important;
-                border-top-right-radius: 2rem !important;
-                padding: 30px !important;
-                /* 確保列印時圓角不溢出 */
-                -webkit-clip-path: inset(0 0 0 0 round 2rem 2rem 0 0);
-                clip-path: inset(0 0 0 0 round 2rem 2rem 0 0);
-            }
-            
-            /* 3. 欄位美化：移除表單感，保留正式底線 */
-            .input-field, select, .consultant-input, .child-age-input, .child-name { 
-                border: none !important; 
-                border-bottom: 1.2px solid #1e293b !important; 
+            /* 1. 移除卡片感：取消所有背景、圓角與邊框 */
+            .card-box, #report-summary-panel > div { 
                 background: transparent !important; 
-                padding: 2px 0 !important; 
-                border-radius: 0 !important; 
-                -webkit-appearance: none !important; 
-                appearance: none !important; 
+                border: none !important; 
+                box-shadow: none !important; 
+                padding: 0 !important; 
+                margin-bottom: 25px !important; 
+                border-radius: 0 !important;
+                page-break-inside: avoid !important;
+            }
+            
+            /* 2. 重新設計標題樣式，適合文檔閱讀 */
+            .section-title { 
+                border-left: 4px solid #1e293b !important; 
+                border-bottom: 1px solid #e2e8f0 !important;
+                padding-bottom: 5px !important;
+                margin-top: 20px !important;
+                color: black !important;
+            }
+            
+            /* 3. 摘要面板扁平化：去除圓角藍框 */
+            #report-summary-panel { order: -1 !important; width: 100% !important; margin-bottom: 30px !important; }
+            #report-summary-panel .bg-blue-600 { 
+                background-color: #f1f5f9 !important; /* 改為淺灰背景增加質感 */
                 color: black !important; 
-                font-weight: 700 !important;
+                border: 1px solid #1e293b !important;
+                border-radius: 0 !important;
+                padding: 15px !important;
+                clip-path: none !important;
             }
-            .input-label { color: #475569 !important; font-size: 10px !important; margin-bottom: 2px !important; }
-            
-            /* 4. 分頁控制與區塊間距 */
-            .card-box { 
-                page-break-inside: avoid !important; 
-                break-inside: avoid !important; 
-                margin-bottom: 35px !important; /* 區塊間留白 */
-                padding: 20px !important;
-                border: 1px solid #f1f5f9 !important;
-                border-radius: 1.5rem !important;
-            }
-            
-            /* 5. 強制雙欄：不受手機響應式影響 */
-            .grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 25px !important; }
-            .sm\:col-span-2, .lg\:w-7\/12, .lg\:w-5\/12 { width: 100% !important; grid-column: span 2 / span 2 !important; }
+            #report-summary-panel .text-white { color: black !important; }
+            #total_gap_val { color: #2563eb !important; text-decoration: underline; }
 
+            /* 4. 底線化數值欄位 */
+            .input-field, select, .consultant-input, .child-age-input, .child-name { 
+                border: none !important; border-bottom: 1px solid black !important; 
+                background: transparent !important; padding: 0 !important; 
+                border-radius: 0 !important; -webkit-appearance: none !important; 
+                color: black !important; font-weight: 700 !important;
+            }
+            .input-label { color: #64748b !important; font-size: 9px !important; margin-bottom: 2px !important; }
+            
+            /* 5. 強制雙欄佈局 */
+            .grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 15px !important; }
+            .sm\:col-span-2, .lg\:w-7\/12, .lg\:w-5\/12 { width: 100% !important; grid-column: span 2 / span 2 !important; }
+            
+            /* 隱藏無關元素 */
+            .no-print, button, input[type="range"], #inflation_control, .flex.justify-end.mb-3 { display: none !important; }
             .ltc-card:not(.active) { display: none !important; }
-            .ltc-card.active { border: 1px solid #a855f7 !important; background: transparent !important; padding: 15px !important; }
         }
 
         #print-footer { display: none; }
         @media print {
-            #print-footer { display: block; position: fixed; bottom: 0; left: 0; right: 0; text-align: center; font-size: 8px; color: #94a3b8; padding: 10px 0; border-top: 0.5px solid #f1f5f9; }
+            #print-footer { display: block; position: fixed; bottom: 0; left: 0; right: 0; text-align: center; font-size: 8px; color: #94a3b8; padding: 5px 0; border-top: 0.5px solid #f1f5f9; }
         }
     </style>
 </head>
@@ -104,7 +95,7 @@
                 <div class="border-l-2 border-slate-200 pl-4">
                     <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight app-title-print">
                         <span data-i18n="app_title">保障需求分析</span>
-                        <span class="text-blue-600 text-sm no-print">v5.0</span>
+                        <span class="text-blue-600 text-sm no-print">v5.1</span>
                     </h1>
                     <p class="text-slate-400 font-bold text-[10px] uppercase tracking-widest mt-1">Cross-Border Financial Consulting</p>
                 </div>
@@ -166,8 +157,8 @@
                         <button id="btn_tw" onclick="setLTCPath('TW')" class="flex-1 py-3 rounded-lg font-bold text-sm text-slate-500">返回台灣照護 (TW)</button>
                     </div>
                     <div class="grid grid-cols-2 gap-6 mb-6">
-                        <div><label class="input-label" data-i18n="ltc_duration">選擇預計照護時間長度</label><select id="ltc_duration" onchange="calculate()" class="input-field cursor-pointer bg-white"><option value="12" data-i18n="mo_12">12 個月</option><option value="24" data-i18n="mo_24">24 個月</option><option value="36" selected data-i18n="mo_36">36 個月</option><option value="48" data-i18n="mo_48">48 個月</option><option value="60" data-i18n="mo_60">60 個月</option></select></div>
-                        <div><label class="input-label" data-i18n="ltc_start_age">預計啟動長照年齡</label><input type="number" id="ltc_start_age" value="75" class="input-field bg-white" oninput="calculate()"></div>
+                        <div><label class="input-label text-purple-600" data-i18n="ltc_duration">選擇預計照護時間長度</label><select id="ltc_duration" onchange="calculate()" class="input-field cursor-pointer bg-white"><option value="12" data-i18n="mo_12">12 個月</option><option value="24" data-i18n="mo_24">24 個月</option><option value="36" selected data-i18n="mo_36">36 個月</option><option value="48" data-i18n="mo_48">48 個月</option><option value="60" data-i18n="mo_60">60 個月</option></select></div>
+                        <div><label class="input-label text-purple-600" data-i18n="ltc_start_age">預計啟動長照年齡</label><input type="number" id="ltc_start_age" value="75" class="input-field bg-white" oninput="calculate()"></div>
                     </div>
                     <div id="us_ltc_details">
                         <div class="flex justify-end mb-3 no-print"><a href="https://www.carescout.com/cost-of-care" target="_blank" class="text-xs font-bold text-blue-500 flex items-center gap-1" data-i18n="carescout_link">查詢 CareScout 最新費率</a></div>
