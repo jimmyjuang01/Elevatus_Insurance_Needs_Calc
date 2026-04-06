@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elevatus 保障需求分析系統 V7.2 | Jimmy Chuang</title>
+    <title>Elevatus 保障需求分析系統 | Jimmy Chuang</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
@@ -20,6 +20,9 @@
         .input-field { width: 100%; background-color: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 0.75rem; padding: 0.75rem; color: #1e293b; font-weight: 700; font-size: 16px; outline: none; transition: all 0.2s; -webkit-appearance: none; }
         .input-field:focus { border-color: #3b82f6; background-color: white; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
         input.input-field:read-only { background-color: #f1f5f9; cursor: default; color: #94a3b8; }
+        
+        /* 統一淺灰色 Placeholder 樣式 */
+        input::placeholder { color: #94a3b8; font-weight: 500; opacity: 1; }
         
         .toggle-label { width: 44px; height: 22px; background-color: #475569; border-radius: 99px; position: relative; cursor: pointer; transition: background 0.3s; display: block; }
         .toggle-label:after { content: ''; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; background: white; border-radius: 90px; transition: 0.3s; }
@@ -47,16 +50,17 @@
             #report-summary-panel .bg-blue-600 { background-color: #f8fafc !important; color: black !important; padding: 15px !important; border-bottom: 1px solid #e2e8f0 !important; }
             #total_gap_val { color: #2563eb !important; font-size: 2.8rem !important; }
             
-            /* 🚀 PDF 通膨註記顏色與粗體設定 */
             #inflation_note_print { color: #2563eb !important; font-weight: 700 !important; font-size: 11px !important; }
             
-            /* PDF 子女資料單行 Table Layout */
             .child-data-row { display: table !important; width: 100% !important; border-bottom: 1px solid #e2e8f0 !important; padding-bottom: 4px !important; margin-top: 4px !important; }
             .child-name-col { display: table-cell !important; width: 50% !important; padding-right: 10px !important; }
             .child-gender-col { display: table-cell !important; width: 25% !important; padding-right: 10px !important; }
             .child-age-col { display: table-cell !important; width: 25% !important; }
             
+            /* 列印時強制顯示 Placeholder 的值以便閱讀 */
             .input-field, select, .consultant-input, .child-age-input, .child-name { border: none !important; border-bottom: 1.2px solid black !important; background: transparent !important; padding: 0 !important; border-radius: 0 !important; -webkit-appearance: none !important; color: black !important; font-weight: 700 !important; width: 100% !important; }
+            input::placeholder { color: black !important; opacity: 1 !important; font-weight: 700 !important; }
+            
             .grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 15px !important; }
             .sm\:col-span-2, .lg\:w-7\/12, .lg\:w-5\/12 { width: 100% !important; grid-column: span 2 / span 2 !important; }
             .ltc-card:not(.active) { display: none !important; }
@@ -104,36 +108,36 @@
                 <section class="card-box">
                     <h2 class="section-title border-blue-500 text-blue-600" data-i18n="sec0_title">00. 客戶基本資料</h2>
                     <div class="grid grid-cols-2 gap-4">
-                        <div><label class="input-label" data-i18n="client_name">Client Name</label><input type="text" id="client_name" value="王先生" class="input-field"></div>
+                        <div><label class="input-label" data-i18n="client_name">Client Name</label><input type="text" id="client_name" placeholder="王先生" value="" class="input-field"></div>
                         <div><label class="input-label" data-i18n="gender">Sex</label><select id="client_gender" class="input-field cursor-pointer"><option data-i18n="male">男</option><option data-i18n="female">女</option></select></div>
-                        <div><label class="input-label" data-i18n="age">Age</label><input type="number" id="client_age" value="35" class="input-field" oninput="calculate()"></div>
-                        <div><label class="input-label" data-i18n="phone">Phone</label><input type="text" id="client_phone" class="input-field" placeholder="(XXX) XXX-XXXX"></div>
+                        <div><label class="input-label" data-i18n="age">Age</label><input type="number" id="client_age" placeholder="35" value="" class="input-field" oninput="calculate()"></div>
+                        <div><label class="input-label" data-i18n="phone">Phone</label><input type="text" id="client_phone" placeholder="(XXX) XXX-XXXX" value="" class="input-field"></div>
                         <div class="col-span-2 border-t border-slate-100 pt-4 mt-1 flex justify-between items-center">
                             <label class="input-label text-blue-600" data-i18n="child_count">No. of Children</label>
-                            <input type="number" id="master_child_count" value="1" min="0" class="input-field w-20 py-2 text-center" oninput="generateChildRows()">
+                            <input type="number" id="master_child_count" placeholder="1" value="" min="0" class="input-field w-20 py-2 text-center" oninput="generateChildRows()">
                         </div>
                         <div id="child_rows_container" class="col-span-2 space-y-3"></div>
-                        <div class="col-span-2"><label class="input-label text-slate-400" data-i18n="notes">Notes</label><input type="text" id="notes" value="一家四口" class="input-field text-sm"></div>
+                        <div class="col-span-2"><label class="input-label text-slate-400" data-i18n="notes">Notes</label><input type="text" id="notes" placeholder="一家四口" value="" class="input-field text-sm"></div>
                     </div>
                 </section>
 
                 <section class="card-box">
                     <h2 class="section-title border-red-500 text-red-600" data-i18n="sec1_title">01. 家庭責任與身故保障</h2>
                     <div class="grid grid-cols-2 gap-4">
-                        <div><label class="input-label text-red-500" data-i18n="mortgage">Mortgage Balance (USD)</label><input type="text" id="mortgage" value="$350,000" oninput="handleCurrencyInput(this)" class="input-field"></div>
-                        <div><label class="input-label text-red-500" data-i18n="other_debt">Other Personal/Business Debt</label><input type="text" id="other_debt" value="$100,000" oninput="handleCurrencyInput(this)" class="input-field"></div>
-                        <div><label class="input-label text-blue-500" data-i18n="annual_income">Annual Income (USD)</label><input type="text" id="annual_income" value="$80,000" oninput="handleCurrencyInput(this)" class="input-field"></div>
+                        <div><label class="input-label text-red-500" data-i18n="mortgage">Mortgage Balance (USD)</label><input type="text" id="mortgage" placeholder="$350,000" value="" oninput="handleCurrencyInput(this)" class="input-field"></div>
+                        <div><label class="input-label text-red-500" data-i18n="other_debt">Other Personal/Business Debt</label><input type="text" id="other_debt" placeholder="$100,000" value="" oninput="handleCurrencyInput(this)" class="input-field"></div>
+                        <div><label class="input-label text-blue-500" data-i18n="annual_income">Annual Income (USD)</label><input type="text" id="annual_income" placeholder="$80,000" value="" oninput="handleCurrencyInput(this)" class="input-field"></div>
                         <div><label class="input-label text-blue-500" data-i18n="income_years">Income Replacement Years</label><select id="income_years" onchange="calculate()" class="input-field cursor-pointer bg-white"></select></div>
-                        <div><label class="input-label text-emerald-500" data-i18n="edu_budget">Education Budget / Child</label><input type="text" id="edu_per_child" value="$150,000" oninput="handleCurrencyInput(this)" class="input-field"></div>
-                        <div class="flex justify-between items-center"><label class="input-label text-emerald-500" data-i18n="child_sync">No. of Children (Synced)</label><input type="text" id="child_count" value="1" class="input-field w-20 text-center bg-slate-50 font-bold" readonly></div>
+                        <div><label class="input-label text-emerald-500" data-i18n="edu_budget">Education Budget / Child</label><input type="text" id="edu_per_child" placeholder="$150,000" value="" oninput="handleCurrencyInput(this)" class="input-field"></div>
+                        <div class="flex justify-between items-center"><label class="input-label text-emerald-500" data-i18n="child_sync">No. of Children (Synced)</label><input type="text" id="child_count" placeholder="1" value="" class="input-field text-center bg-slate-50 font-bold w-20" readonly></div>
                     </div>
                 </section>
 
                 <section class="card-box">
                     <h2 class="section-title border-orange-400 text-orange-500" data-i18n="sec2_title">02. 醫療與重疾應急金</h2>
                     <div class="grid grid-cols-2 gap-4">
-                        <div><label class="input-label text-orange-500" data-i18n="medical_oop">Medical Out-of-Pocket Max</label><input type="text" id="medical_oop" value="$18,000" oninput="handleCurrencyInput(this)" class="input-field"></div>
-                        <div><label class="input-label text-orange-500" data-i18n="recovery_fund">Recovery Fund for Critical Illness</label><input type="text" id="recovery_fund" value="$160,000" oninput="handleCurrencyInput(this)" class="input-field"></div>
+                        <div><label class="input-label text-orange-500" data-i18n="medical_oop">Medical Out-of-Pocket Max</label><input type="text" id="medical_oop" placeholder="$18,000" value="" oninput="handleCurrencyInput(this)" class="input-field"></div>
+                        <div><label class="input-label text-orange-500" data-i18n="recovery_fund">Recovery Fund for Critical Illness</label><input type="text" id="recovery_fund" placeholder="$160,000" value="" oninput="handleCurrencyInput(this)" class="input-field"></div>
                     </div>
                 </section>
 
@@ -145,23 +149,23 @@
                     </div>
                     <div class="grid grid-cols-2 gap-4 mb-4">
                         <div><label class="input-label text-purple-600" data-i18n="ltc_duration">Expected Duration (Months)</label><select id="ltc_duration" onchange="calculate()" class="input-field cursor-pointer bg-white"></select></div>
-                        <div><label class="input-label text-purple-600" data-i18n="ltc_start_age">Start Age</label><input type="number" id="ltc_start_age" value="75" class="input-field text-center" oninput="calculate()"></div>
+                        <div><label class="input-label text-purple-600" data-i18n="ltc_start_age">Start Age</label><input type="number" id="ltc_start_age" placeholder="75" value="" class="input-field text-center" oninput="calculate()"></div>
                     </div>
                     <div id="us_ltc_details">
-                        <div class="ltc-card active" id="card_inhome" onclick="selectLtcType('inhome')"><input type="radio" name="ltc_type" id="radio_inhome" value="inhome" checked class="no-print mr-3"><div class="flex-grow"><label class="text-[9px] font-bold text-slate-400 block" data-i18n="us_inhome">In-Home Care</label><input type="text" id="us_inhome" value="$5,529" class="w-full bg-transparent py-1 font-black text-slate-800 outline-none" oninput="handleCurrencyInput(this)"></div></div>
-                        <div class="ltc-card" id="card_assisted" onclick="selectLtcType('assisted')"><input type="radio" name="ltc_type" id="radio_assisted" value="assisted" class="no-print mr-3"><div class="flex-grow"><label class="text-[9px] font-bold text-slate-400 block" data-i18n="us_assisted">Assisted Living</label><input type="text" id="us_assisted" value="$6,350" class="w-full bg-transparent py-1 font-black text-slate-800 outline-none" oninput="handleCurrencyInput(this)"></div></div>
-                        <div class="ltc-card" id="card_nursing" onclick="selectLtcType('nursing')"><input type="radio" name="ltc_type" id="radio_nursing" value="nursing" class="no-print mr-3"><div class="flex-grow"><label class="text-[9px] font-bold text-slate-400 block" data-i18n="us_nursing">Nursing Home</label><input type="text" id="us_nursing" value="$8,015" class="w-full bg-transparent py-1 font-black text-slate-800 outline-none" oninput="handleCurrencyInput(this)"></div></div>
+                        <div class="ltc-card active" id="card_inhome" onclick="selectLtcType('inhome')"><input type="radio" name="ltc_type" id="radio_inhome" value="inhome" checked class="no-print mr-3"><div class="flex-grow"><label class="text-[9px] font-bold text-slate-400 block" data-i18n="us_inhome">In-Home Care</label><input type="text" id="us_inhome" placeholder="$5,529" value="" class="w-full bg-transparent py-1 font-black text-slate-800 outline-none" oninput="handleCurrencyInput(this)"></div></div>
+                        <div class="ltc-card" id="card_assisted" onclick="selectLtcType('assisted')"><input type="radio" name="ltc_type" id="radio_assisted" value="assisted" class="no-print mr-3"><div class="flex-grow"><label class="text-[9px] font-bold text-slate-400 block" data-i18n="us_assisted">Assisted Living</label><input type="text" id="us_assisted" placeholder="$6,350" value="" class="w-full bg-transparent py-1 font-black text-slate-800 outline-none" oninput="handleCurrencyInput(this)"></div></div>
+                        <div class="ltc-card" id="card_nursing" onclick="selectLtcType('nursing')"><input type="radio" name="ltc_type" id="radio_nursing" value="nursing" class="no-print mr-3"><div class="flex-grow"><label class="text-[9px] font-bold text-slate-400 block" data-i18n="us_nursing">Nursing Home</label><input type="text" id="us_nursing" placeholder="$8,015" value="" class="w-full bg-transparent py-1 font-black text-slate-800 outline-none" oninput="handleCurrencyInput(this)"></div></div>
                     </div>
                     <div id="tw_ltc_details" class="hidden">
-                        <div class="ltc-card active border-purple-500 bg-purple-50/50"><div class="flex-grow px-3"><label class="text-[11px] font-bold text-purple-600 block mb-1" data-i18n="tw_monthly">Estimated Taiwan LTC Monthly Cost</label><input type="text" id="tw_monthly" value="$3,200" class="w-full bg-transparent py-1 font-black text-slate-900 outline-none" oninput="handleCurrencyInput(this)"></div></div>
+                        <div class="ltc-card active border-purple-500 bg-purple-50/50"><div class="flex-grow px-3"><label class="text-[11px] font-bold text-purple-600 block mb-1" data-i18n="tw_monthly">Estimated Taiwan LTC Monthly Cost</label><input type="text" id="tw_monthly" placeholder="$3,200" value="" class="w-full bg-transparent py-1 font-black text-slate-900 outline-none" oninput="handleCurrencyInput(this)"></div></div>
                     </div>
                 </section>
 
                 <section class="card-box">
                     <h2 class="section-title border-emerald-500 text-emerald-600" data-i18n="sec4_title">04. 現有資產與保障</h2>
                     <div class="grid grid-cols-2 gap-4">
-                        <div><label class="input-label text-emerald-600" data-i18n="cur_ins_full">Total Coverage (USD)</label><input type="text" id="current_insurance" value="$300,000" oninput="handleCurrencyInput(this)" class="input-field"></div>
-                        <div><label class="input-label text-emerald-600" data-i18n="cur_assets_full">Liquid Assets/Investments</label><input type="text" id="current_assets" value="$100,000" oninput="handleCurrencyInput(this)" class="input-field"></div>
+                        <div><label class="input-label text-emerald-600" data-i18n="cur_ins_full">Total Coverage (USD)</label><input type="text" id="current_insurance" placeholder="$300,000" value="" oninput="handleCurrencyInput(this)" class="input-field"></div>
+                        <div><label class="input-label text-emerald-600" data-i18n="cur_assets_full">Liquid Assets/Investments</label><input type="text" id="current_assets" placeholder="$100,000" value="" oninput="handleCurrencyInput(this)" class="input-field"></div>
                     </div>
                 </section>
             </div>
@@ -171,7 +175,7 @@
                     <div class="p-6 text-center text-white">
                         <h3 class="text-sm font-black uppercase tracking-widest opacity-80 mb-1" data-i18n="summary_title">保障缺口分析總覽</h3>
                         <div id="total_gap_val" class="text-3xl sm:text-4xl font-black tracking-tight">$0</div>
-                        <p id="inflation_note_print" class="mt-2 text-blue-200 text-[10px] hidden"></p>
+                        <p id="inflation_note_print" class="mt-2 text-blue-200 text-[10px] hidden print:block"></p>
                     </div>
                     <div class="bg-slate-800 px-6 py-4 border-b border-slate-700 no-print flex justify-between items-center">
                         <span class="text-[11px] font-bold text-emerald-400 uppercase" data-i18n="fv_toggle">通膨精算 (FV)</span>
@@ -192,6 +196,7 @@
                         <div class="space-y-2 no-print">
                             <button id="saveBtn" onclick="saveToSheet()" class="w-full bg-slate-900 text-white font-black py-4 rounded-xl shadow-lg active:scale-95 text-sm tracking-widest" data-i18n="btn_save">儲存諮詢紀錄</button>
                             <button onclick="handlePrint()" class="w-full bg-white text-slate-600 font-bold py-3.5 rounded-xl text-sm border border-slate-200" data-i18n="btn_print">列印 PDF 報告</button>
+                            <button onclick="clearAllData()" class="w-full bg-transparent text-slate-400 font-bold py-3 mt-2 rounded-xl text-xs border border-slate-200 hover:bg-slate-50 transition-colors" data-i18n="btn_clear">⟲ 清空所有資料</button>
                         </div>
                     </div>
                 </div>
@@ -202,11 +207,12 @@
 
     <script>
         const dict = {
-            zh: { app_title: "保障需求分析", advisor: "顧問:", sec0_title: "00. 客戶基本資料", client_name: "客戶姓名", gender: "性別", male: "男", female: "女", age: "目前年齡", phone: "聯絡電話", child_count: "No. of Children", notes: "諮詢備註", sec1_title: "01. 家庭責任與身故保障", mortgage: "房貸餘額 (USD)", other_debt: "其他個人/商業貸款", annual_income: "年收入 (USD)", income_years: "替代年數", edu_budget: "教育預算/人", child_sync: "子女數量 (同步)", sec2_title: "02. 醫療與重疾應急金", medical_oop: "醫療自付上限預留", recovery_fund: "重大疾病應急金", sec3_title: "03. 長期照護準備", ltc_duration: "預計月數", ltc_start_age: "啟動年齡", us_inhome: "In-Home Care", us_assisted: "Assisted Living", us_nursing: "Nursing Home", tw_monthly: "台灣照護月費估算", sec4_title: "04. 現有資產與保障", cur_ins_full: "現有總保額 (USD)", cur_assets_full: "流動性存款/投資", summary_title: "保障缺口分析總覽", fv_toggle: "通膨精算 (FV)", inflation_rate: "年通膨率", disp_life: "身故保障需求", disp_med: "重疾醫療需求", disp_ltc: "長期照護準備", disp_assets: "現有資產與保障", cur_ins_short: "現有總保額", cur_assets_short: "流動性存款/投資", gap_short: "家庭保障缺口", btn_save: "儲存諮詢紀錄", btn_print: "列印 PDF 報告", filename_pref: "保障需求分析", yr_opts: ["5", "10", "15"], yr_labels: ["5 年 (過渡緩衝)", "10 年 (標準責任)", "15 年 (長期守護)"], ltc_opts: ["12", "24", "36", "48", "60"], ltc_labels: ["12", "24", "36 (3年-平均值)", "48", "60"], us_btn: "美國", tw_btn: "台灣", inf_note: "採用通膨率 (FV): ", child_name_lb: "姓名" },
-            en: { app_title: "Coverage Needs Analysis", advisor: "Advisor:", sec0_title: "00. CLIENT INFORMATION", client_name: "Client Name", gender: "Gender", male: "Male", female: "Female", age: "Age", phone: "Phone", child_count: "NO. OF CHILDREN", notes: "Notes", sec1_title: "01. OBLIGATIONS & LIFE NEED", mortgage: "Mortgage Balance (USD)", other_debt: "Other Personal/Business Debt", annual_income: "Annual Income (USD)", income_years: "Income Replacement Years", edu_budget: "Education Budget / Child", child_sync: "NO. OF CHILDREN (SYNCED)", sec2_title: "02. LIVING BENEFITS & CRITICAL ILLNESS", medical_oop: "Medical Out-of-Pocket Max", recovery_fund: "Recovery Fund for Critical Illness", sec3_title: "03. LONG-TERM CARE PREPARATION", ltc_duration: "Expected Duration (Months)", ltc_start_age: "Start Age", us_inhome: "In-Home Care", us_assisted: "Assisted Living", us_nursing: "Nursing Home", tw_monthly: "Estimated Taiwan LTC Monthly Cost", sec4_title: "04. CURRENT ASSETS", cur_ins_full: "Total Coverage (USD)", cur_assets_full: "Liquid Assets/Investments", summary_title: "GAP SUMMARY", fv_toggle: "Inflation (FV)", inflation_rate: "Inflation Rate", disp_life: "Life Insurance Need", disp_med: "Critical Illness Need", disp_ltc: "LTC Preparation", disp_assets: "Existing Assets & Protection", cur_ins_short: "Total Coverage", cur_assets_short: "Liquid Assets", gap_short: "Gap", btn_save: "Save Record", btn_print: "Print PDF", filename_pref: "Needs_Analysis", yr_opts: ["5", "10", "15"], yr_labels: ["5 Years (Buffer)", "10 Years (Standard)", "15 Years (Long-term)"], ltc_opts: ["12", "24", "36", "48", "60"], ltc_labels: ["12", "24", "36 (Avg - 3 Yrs)", "48", "60"], us_btn: "U.S.", tw_btn: "Taiwan", inf_note: "Applied Inflation Rate (FV): ", child_name_lb: "Name" }
+            zh: { app_title: "保障需求分析", advisor: "顧問:", sec0_title: "00. 客戶基本資料", client_name: "客戶姓名", gender: "性別", male: "男", female: "女", age: "目前年齡", phone: "聯絡電話", child_count: "No. of Children", notes: "諮詢備註", sec1_title: "01. 家庭責任與身故保障", mortgage: "房貸餘額 (USD)", other_debt: "其他個人/商業貸款", annual_income: "年收入 (USD)", income_years: "替代年數", edu_budget: "教育預算/人", child_sync: "子女數量 (同步)", sec2_title: "02. 醫療與重疾應急金", medical_oop: "醫療自付上限預留", recovery_fund: "重大疾病應急金", sec3_title: "03. 長期照護準備", ltc_duration: "預計月數", ltc_start_age: "啟動年齡", us_inhome: "In-Home Care", us_assisted: "Assisted Living", us_nursing: "Nursing Home", tw_monthly: "台灣照護月費估算", sec4_title: "04. 現有資產與保障", cur_ins_full: "現有總保額 (USD)", cur_assets_full: "流動性存款/投資", summary_title: "保障缺口分析總覽", fv_toggle: "通膨精算 (FV)", inflation_rate: "年通膨率", disp_life: "身故保障需求", disp_med: "重疾醫療需求", disp_ltc: "長期照護準備", disp_assets: "現有資產與保障", cur_ins_short: "現有總保額", cur_assets_short: "流動性存款/投資", gap_short: "家庭保障缺口", btn_save: "儲存諮詢紀錄", btn_print: "列印 PDF 報告", btn_clear: "⟲ 清空所有資料", filename_pref: "保障需求分析", yr_opts: ["5", "10", "15"], yr_labels: ["5 年 (過渡緩衝)", "10 年 (標準責任)", "15 年 (長期守護)"], ltc_opts: ["12", "24", "36", "48", "60"], ltc_labels: ["12", "24", "36 (3年-平均值)", "48", "60"], us_btn: "美國", tw_btn: "台灣", inf_note: "採用通膨率 (FV): ", child_name_lb: "姓名", inc_rep_label: "年收入替代" },
+            en: { app_title: "Coverage Needs Analysis", advisor: "Advisor:", sec0_title: "00. CLIENT INFORMATION", client_name: "Client Name", gender: "Gender", male: "Male", female: "Female", age: "Age", phone: "Phone", child_count: "NO. OF CHILDREN", notes: "Notes", sec1_title: "01. OBLIGATIONS & LIFE NEED", mortgage: "Mortgage Balance (USD)", other_debt: "Other Personal/Business Debt", annual_income: "Annual Income (USD)", income_years: "Income Replacement Years", edu_budget: "Education Budget / Child", child_sync: "NO. OF CHILDREN (SYNCED)", sec2_title: "02. LIVING BENEFITS & CRITICAL ILLNESS", medical_oop: "Medical Out-of-Pocket Max", recovery_fund: "Recovery Fund for Critical Illness", sec3_title: "03. LONG-TERM CARE PREPARATION", ltc_duration: "Expected Duration (Months)", ltc_start_age: "Start Age", us_inhome: "In-Home Care", us_assisted: "Assisted Living", us_nursing: "Nursing Home", tw_monthly: "Estimated Taiwan LTC Monthly Cost", sec4_title: "04. CURRENT ASSETS", cur_ins_full: "Total Coverage (USD)", cur_assets_full: "Liquid Assets/Investments", summary_title: "GAP SUMMARY", fv_toggle: "Inflation (FV)", inflation_rate: "Inflation Rate", disp_life: "Life Insurance Need", disp_med: "Critical Illness Need", disp_ltc: "LTC Preparation", disp_assets: "Existing Assets & Protection", cur_ins_short: "Total Coverage", cur_assets_short: "Liquid Assets", gap_short: "Gap", btn_save: "Save Record", btn_print: "Print PDF", btn_clear: "⟲ Clear All Data", filename_pref: "Needs_Analysis", yr_opts: ["5", "10", "15"], yr_labels: ["5 Years (Buffer)", "10 Years (Standard)", "15 Years (Long-term)"], ltc_opts: ["12", "24", "36", "48", "60"], ltc_labels: ["12", "24", "36 (Avg - 3 Yrs)", "48", "60"], us_btn: "U.S.", tw_btn: "Taiwan", inf_note: "Applied Inflation Rate (FV): ", child_name_lb: "Name", inc_rep_label: " Yrs Replacement" }
         };
         
         let currentLang = 'zh'; let myChart = null; let currentLTCPath = 'US'; 
+        let isCleared = false; // 🚀 控制是否處於「清空狀態」的核心變數
         window.chartBreakdown = { life: [], med: [], ltc: [] }; 
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxEsNTWhldPnUc1xxnUHJcaH14Wbd0J1CMSOnhI9r_5ckZ-jRwHEhPR1lZdptHe3H6o/exec";
 
@@ -263,6 +269,34 @@
         function toggleFV() { document.getElementById('inflation_control').classList.toggle('hidden', !document.getElementById('fv_toggle').checked); calculate(); }
         function updateInflationLabel() { document.getElementById('inflation_display').innerText = document.getElementById('inflation_rate').value + '%'; }
 
+        // 🚀 一鍵清空邏輯
+        function clearAllData() {
+            if(confirm(currentLang==='zh' ? '確定要清空所有輸入的資料嗎？(重新整理網頁可回復預設)' : 'Are you sure you want to clear all data? (Refresh page to restore defaults)')) {
+                isCleared = true; // 開啟清空狀態
+                document.querySelectorAll('input').forEach(el => {
+                    if(el.type === 'text' || el.type === 'number') {
+                        el.value = '';
+                    }
+                });
+                generateChildRows(); 
+                calculate();
+            }
+        }
+
+        // 🚀 核心智慧取值邏輯：判斷要抓取實體輸入值、預設提示字，還是清空歸零
+        function getInputValue(id, type = 'currency') {
+            const el = document.getElementById(id);
+            if (!el) return type === 'text' ? '' : 0;
+            let valStr = el.value;
+            // 如果欄位是空的，檢查是否處於「清空狀態」
+            if (valStr === '') {
+                valStr = isCleared ? (type === 'text' ? '' : '0') : (el.placeholder || (type === 'text' ? '' : '0'));
+            }
+            if (type === 'currency') return parseCurrency(valStr);
+            if (type === 'number') return parseFloat(valStr) || 0;
+            return valStr;
+        }
+
         function animateValue(id, start, end, duration) {
             if (start === end) return;
             const obj = document.getElementById(id);
@@ -287,37 +321,47 @@
 
         function calculate() {
             const isFV = document.getElementById('fv_toggle').checked; const r = isFV ? (parseFloat(document.getElementById('inflation_rate').value)/100) : 0;
-            const age = parseInt(document.getElementById('client_age').value) || 35;
+            const age = getInputValue('client_age', 'number');
             
-            const mort = parseCurrency(document.getElementById('mortgage').value); 
-            const debt = parseCurrency(document.getElementById('other_debt').value);
-            const ann = parseCurrency(document.getElementById('annual_income').value); 
+            const mort = getInputValue('mortgage', 'currency'); 
+            const debt = getInputValue('other_debt', 'currency');
+            const ann = getInputValue('annual_income', 'currency'); 
             const yrs = parseInt(document.getElementById('income_years').value) || 10;
             
             let replacement = r > 0 ? ann * (Math.pow(1 + r, yrs) - 1) / r : ann * yrs;
             let eduT = 0; 
-            document.querySelectorAll('.child-age-input').forEach(i => { eduT += parseCurrency(document.getElementById('edu_per_child').value) * Math.pow(1 + r, Math.max(0, 18 - (parseInt(i.value) || 0))); });
+            const eduP = getInputValue('edu_per_child', 'currency');
+            
+            document.querySelectorAll('.child-age-input').forEach(i => { 
+                let cAgeStr = i.value;
+                if(cAgeStr === '') cAgeStr = isCleared ? '0' : (i.placeholder || '0');
+                let cAge = parseInt(cAgeStr) || 0;
+                eduT += eduP * Math.pow(1 + r, Math.max(0, 18 - cAge)); 
+            });
             
             const lifeT = mort + debt + replacement + eduT;
             
-            const medOOP_FV = parseCurrency(document.getElementById('medical_oop').value) * Math.pow(1+r, Math.max(0, 65-age));
-            const medRec_FV = parseCurrency(document.getElementById('recovery_fund').value) * Math.pow(1+r, Math.max(0, 65-age));
+            const medOOP_FV = getInputValue('medical_oop', 'currency') * Math.pow(1+r, Math.max(0, 65-age));
+            const medRec_FV = getInputValue('recovery_fund', 'currency') * Math.pow(1+r, Math.max(0, 65-age));
             const medT = medOOP_FV + medRec_FV;
             
-            const ltcRate = parseCurrency(document.getElementById(currentLTCPath==='US'?'us_'+document.querySelector('input[name="ltc_type"]:checked').value:'tw_monthly').value);
-            const ltcT = (ltcRate * (parseInt(document.getElementById('ltc_duration').value)||36)) * Math.pow(1+r, Math.max(0, (parseInt(document.getElementById('ltc_start_age').value)||75)-age));
+            const ltcBaseId = currentLTCPath==='US' ? 'us_'+document.querySelector('input[name="ltc_type"]:checked').value : 'tw_monthly';
+            const ltcRate = getInputValue(ltcBaseId, 'currency');
+            const ltcDur = parseInt(document.getElementById('ltc_duration').value) || 36;
+            const ltcStart = getInputValue('ltc_start_age', 'number');
+            const ltcT = (ltcRate * ltcDur) * Math.pow(1+r, Math.max(0, ltcStart-age));
             
-            const ins = parseCurrency(document.getElementById('current_insurance').value); 
-            const cash = parseCurrency(document.getElementById('current_assets').value);
+            const ins = getInputValue('current_insurance', 'currency'); 
+            const cash = getInputValue('current_assets', 'currency');
             const gap = Math.max(0, (lifeT + medT + ltcT) - (ins + cash));
 
             const t = dict[currentLang];
             const yrLabel = document.getElementById('income_years').options[document.getElementById('income_years').selectedIndex]?.text || `${yrs}`;
             
             window.chartBreakdown = {
-                life: [`【${t.disp_life}: ${formatUSD(lifeT)}】`, `${t.mortgage}: ${formatUSD(mort)}`, `${t.other_debt}: ${formatUSD(debt)}`, `${currentLang==='zh'?yrs+'年收入替代':yrLabel+' Replacement'}: ${formatUSD(replacement)}`, `${t.edu_budget}: ${formatUSD(eduT)}`],
+                life: [`【${t.disp_life}: ${formatUSD(lifeT)}】`, `${t.mortgage}: ${formatUSD(mort)}`, `${t.other_debt}: ${formatUSD(debt)}`, `${currentLang==='zh'?yrs+t.inc_rep_label:yrLabel+t.inc_rep_label}: ${formatUSD(replacement)}`, `${t.edu_budget}: ${formatUSD(eduT)}`],
                 med: [`【${t.disp_med}: ${formatUSD(medT)}】`, `${t.medical_oop}: ${formatUSD(medOOP_FV)}`, `${t.recovery_fund}: ${formatUSD(medRec_FV)}`],
-                ltc: [`【${t.disp_ltc}: ${formatUSD(ltcT)}】`, `${currentLang==='zh'?'預計月費':'Monthly Rate'}: ${formatUSD(ltcRate)}`, `${t.ltc_duration}: ${document.getElementById('ltc_duration').options[document.getElementById('ltc_duration').selectedIndex]?.text || ""}`, `${t.ltc_start_age}: ${document.getElementById('ltc_start_age').value}`]
+                ltc: [`【${t.disp_ltc}: ${formatUSD(ltcT)}】`, `${currentLang==='zh'?'預計月費':'Monthly Rate'}: ${formatUSD(ltcRate)}`, `${t.ltc_duration}: ${document.getElementById('ltc_duration').options[document.getElementById('ltc_duration').selectedIndex]?.text || ""}`, `${t.ltc_start_age}: ${ltcStart}`]
             };
 
             document.getElementById('life_need_display').innerText = formatUSD(lifeT); 
@@ -366,19 +410,24 @@
         }
         
         function generateChildRows() { 
-            const count = parseInt(document.getElementById('master_child_count').value) || 0; 
-            document.getElementById('child_count').value = count; 
+            const masterEl = document.getElementById('master_child_count');
+            const count = getInputValue('master_child_count', 'number'); 
+            
+            const syncEl = document.getElementById('child_count');
+            syncEl.value = masterEl.value; 
+            syncEl.placeholder = masterEl.placeholder;
+
             const container = document.getElementById('child_rows_container'); 
             const savedData = Array.from(container.children).map(r => ({ name: r.querySelector('.child-name').value, gender: r.querySelector('.child-gender')?.value, age: r.querySelector('.child-age-input').value })); 
             container.innerHTML = ''; 
             for (let i = 0; i < count; i++) { 
-                const data = savedData[i] || { name: `${dict[currentLang].child_name_lb} ${i+1}`, gender: '男', age: '0' }; 
+                const data = savedData[i] || { name: '', gender: '男', age: '' }; 
                 const row = document.createElement('div'); 
                 row.className = 'bg-slate-50 p-2 rounded-xl border border-slate-100 child-data-row'; 
                 row.innerHTML = `
-                    <div class="child-name-col inline-block w-1/3 align-top mr-2"><label class="text-[8px] font-bold text-slate-400 block">${dict[currentLang].child_name_lb}</label><input type="text" class="child-name w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-bold" value="${data.name}"></div>
+                    <div class="child-name-col inline-block w-1/3 align-top mr-2"><label class="text-[8px] font-bold text-slate-400 block">${dict[currentLang].child_name_lb}</label><input type="text" class="child-name w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-bold" placeholder="${dict[currentLang].child_name_lb} ${i+1}" value="${data.name}"></div>
                     <div class="child-gender-col inline-block w-1/4 align-top mr-2"><label class="text-[8px] font-bold text-slate-400 block">${dict[currentLang].gender}</label><select class="child-gender w-full bg-white border border-slate-200 rounded-lg px-1 py-1.5 text-xs font-bold"><option value="男" ${data.gender==='男'?'selected':''}>${dict[currentLang].male}</option><option value="女" ${data.gender==='女'?'selected':''}>${dict[currentLang].female}</option></select></div>
-                    <div class="child-age-col inline-block w-1/4 align-top"><label class="text-[8px] font-bold text-slate-400 block">${dict[currentLang].age}</label><input type="number" class="child-age-input w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-bold" value="${data.age}" oninput="calculate()"></div>`; 
+                    <div class="child-age-col inline-block w-1/4 align-top"><label class="text-[8px] font-bold text-slate-400 block">${dict[currentLang].age}</label><input type="number" class="child-age-input w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-bold" placeholder="0" value="${data.age}" oninput="calculate()"></div>`; 
                 container.appendChild(row); 
             } 
             calculate(); 
@@ -414,13 +463,36 @@
         async function saveToSheet() {
             const btn = document.getElementById('saveBtn'); const original = btn.innerText; btn.innerText = 'Syncing...'; btn.disabled = true;
             try {
-                const childDetailsStr = Array.from(document.querySelectorAll('#child_rows_container > div')).map(r => `${r.querySelector('.child-name').value}(${r.querySelector('.child-gender').value},${r.querySelector('.child-age-input').value}歲)`).join('; ');
+                const childDetailsStr = Array.from(document.querySelectorAll('#child_rows_container > div')).map(r => {
+                    let n = r.querySelector('.child-name').value;
+                    if(n === '') n = isCleared ? '' : r.querySelector('.child-name').placeholder;
+                    let g = r.querySelector('.child-gender').value;
+                    let a = r.querySelector('.child-age-input').value;
+                    if(a === '') a = isCleared ? '0' : r.querySelector('.child-age-input').placeholder;
+                    return `${n}(${g},${a}歲)`;
+                }).join('; ');
+                
                 const payload = {
-                    consultant: document.getElementById('consultant_name').value, name: document.getElementById('client_name').value, age: document.getElementById('client_age').value, phone: document.getElementById('client_phone').value,
-                    childCount: document.getElementById('master_child_count').value, childDetails: childDetailsStr, isFV: document.getElementById('fv_toggle').checked ? "Yes" : "No", inflationRate: document.getElementById('inflation_rate').value + "%",
-                    mortgage: document.getElementById('mortgage').value, otherDebt: document.getElementById('other_debt').value, annualIncome: document.getElementById('annual_income').value, incomeYears: document.getElementById('income_years').value, eduPerChild: document.getElementById('edu_per_child').value,
-                    medicalOop: document.getElementById('medical_oop').value, recoveryFund: document.getElementById('recovery_fund').value, ltcPath: currentLTCPath, ltcMonthly: currentLTCPath==='US'?document.getElementById('us_'+document.querySelector('input[name="ltc_type"]:checked').value).value:document.getElementById('tw_monthly').value,
-                    currentIns: document.getElementById('current_insurance').value, currentAssets: document.getElementById('current_assets').value, totalGap: document.getElementById('total_gap_val').innerText
+                    consultant: document.getElementById('consultant_name').value, 
+                    name: getInputValue('client_name', 'text'), 
+                    age: getInputValue('client_age', 'number'), 
+                    phone: getInputValue('client_phone', 'text'),
+                    childCount: getInputValue('master_child_count', 'number'), 
+                    childDetails: childDetailsStr, 
+                    isFV: document.getElementById('fv_toggle').checked ? "Yes" : "No", 
+                    inflationRate: document.getElementById('inflation_rate').value + "%",
+                    mortgage: formatUSD(getInputValue('mortgage', 'currency')), 
+                    otherDebt: formatUSD(getInputValue('other_debt', 'currency')), 
+                    annualIncome: formatUSD(getInputValue('annual_income', 'currency')), 
+                    incomeYears: document.getElementById('income_years').options[document.getElementById('income_years').selectedIndex]?.text, 
+                    eduPerChild: formatUSD(getInputValue('edu_per_child', 'currency')),
+                    medicalOop: formatUSD(getInputValue('medical_oop', 'currency')), 
+                    recoveryFund: formatUSD(getInputValue('recovery_fund', 'currency')), 
+                    ltcPath: currentLTCPath, 
+                    ltcMonthly: formatUSD(getInputValue(currentLTCPath==='US'?'us_'+document.querySelector('input[name="ltc_type"]:checked').value:'tw_monthly', 'currency')),
+                    currentIns: formatUSD(getInputValue('current_insurance', 'currency')), 
+                    currentAssets: formatUSD(getInputValue('current_assets', 'currency')), 
+                    totalGap: document.getElementById('total_gap_val').innerText
                 };
                 await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
                 alert('✅ 諮詢紀錄已成功儲存。');
