@@ -166,7 +166,11 @@
                         <button id="btn_tw" onclick="setLTCPath('TW')" class="flex-1 py-3 rounded-lg font-bold text-xs text-slate-500">台灣</button>
                     </div>
                     <div class="grid grid-cols-2 gap-4 mb-4">
-                        <div><label class="input-label text-purple-600" data-i18n="ltc_duration">Expected Duration (Months)</label><select id="ltc_duration" onchange="calculate()" class="input-field cursor-pointer bg-white"></select></div>
+                        <div>
+                            <label class="input-label text-purple-600" data-i18n="ltc_duration">Expected Duration (Months)</label>
+                            <input type="text" inputmode="numeric" pattern="[0-9]*" id="ltc_duration" list="ltc_duration_list" placeholder="36" class="input-field bg-white" oninput="calculate()">
+                            <datalist id="ltc_duration_list"></datalist>
+                        </div>
                         <div><label class="input-label text-purple-600" data-i18n="ltc_start_age">Start Age</label><input type="number" id="ltc_start_age" placeholder="75" value="" class="input-field text-center" oninput="calculate()"></div>
                     </div>
                     <div id="us_ltc_details">
@@ -262,15 +266,20 @@
 
         function syncDropdowns() {
             const yr_sel = document.getElementById('income_years'); 
-            const ltc_sel = document.getElementById('ltc_duration');
+            const ltc_input = document.getElementById('ltc_duration');
+            const ltc_list = document.getElementById('ltc_duration_list');
+            
             const current_yr_val = yr_sel.value || "10"; 
-            const current_ltc_val = ltc_sel.value || "36";
+            const current_ltc_val = ltc_input.value || (isCleared ? "" : "36");
 
             yr_sel.innerHTML = dict[currentLang].yr_opts.map((val, i) => `<option value="${val}">${dict[currentLang].yr_labels[i]}</option>`).join('');
-            ltc_sel.innerHTML = dict[currentLang].ltc_opts.map((val, i) => `<option value="${val}">${dict[currentLang].ltc_labels[i]}</option>`).join('');
+            
+            if(ltc_list) {
+                ltc_list.innerHTML = dict[currentLang].ltc_opts.map((val, i) => `<option value="${val}">${dict[currentLang].ltc_labels[i]}</option>`).join('');
+            }
 
             yr_sel.value = current_yr_val;
-            ltc_sel.value = current_ltc_val;
+            ltc_input.value = current_ltc_val;
         }
 
         function formatUSD(v) { return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(v); }
@@ -371,7 +380,11 @@
             }
 
             const ltcRate = getInputValue(ltcBaseId, 'currency', ltcOrig);
-            const ltcDur = parseInt(document.getElementById('ltc_duration').value) || 36;
+            
+            // 讀取長照預計月數 (可手動輸入或下拉選擇)
+            const ltcDurStr = document.getElementById('ltc_duration').value;
+            const ltcDur = ltcDurStr === '' ? (isCleared ? 0 : 36) : (parseInt(ltcDurStr) || 0);
+            
             const ltcStart = getInputValue('ltc_start_age', 'number', '75');
             const ltcT = (ltcRate * ltcDur) * Math.pow(1+r, Math.max(0, ltcStart-age));
             
@@ -381,11 +394,12 @@
 
             const t = dict[currentLang];
             const yrLabel = document.getElementById('income_years').options[document.getElementById('income_years').selectedIndex]?.text || `${yrs}`;
+            const displayLtcDur = document.getElementById('ltc_duration').value || (isCleared ? '0' : '36');
             
             window.chartBreakdown = {
                 life: [`【${t.disp_life}: ${formatUSD(lifeT)}】`, `${t.mortgage}: ${formatUSD(mort)}`, `${t.other_debt}: ${formatUSD(debt)}`, `${currentLang==='zh'?yrs+t.inc_rep_label:yrLabel+t.inc_rep_label}: ${formatUSD(replacement)}`, `${t.edu_budget}: ${formatUSD(eduT)}`],
                 med: [`【${t.disp_med}: ${formatUSD(medT)}】`, `${t.medical_oop}: ${formatUSD(medOOP_FV)}`, `${t.recovery_fund}: ${formatUSD(medRec_FV)}`],
-                ltc: [`【${t.disp_ltc}: ${formatUSD(ltcT)}】`, `${currentLang==='zh'?'預計月費':'Monthly Rate'}: ${formatUSD(ltcRate)}`, `${t.ltc_duration}: ${document.getElementById('ltc_duration').options[document.getElementById('ltc_duration').selectedIndex]?.text || ""}`, `${t.ltc_start_age}: ${ltcStart}`]
+                ltc: [`【${t.disp_ltc}: ${formatUSD(ltcT)}】`, `${currentLang==='zh'?'預計月費':'Monthly Rate'}: ${formatUSD(ltcRate)}`, `${t.ltc_duration}: ${displayLtcDur}`, `${t.ltc_start_age}: ${ltcStart}`]
             };
 
             document.getElementById('life_need_display').innerText = formatUSD(lifeT); 
@@ -521,7 +535,7 @@
                     ltcPath: currentLTCPath, 
                     ltcType: currentLTCPath === 'US' ? document.querySelector('input[name="ltc_type"]:checked').value : 'TW_Monthly',
                     ltcMonthly: formatUSD(getInputValue(currentLTCPath==='US'?'us_'+document.querySelector('input[name="ltc_type"]:checked').value:'tw_monthly', 'currency')),
-                    ltcDuration: document.getElementById('ltc_duration').options[document.getElementById('ltc_duration').selectedIndex]?.text || "",
+                    ltcDuration: document.getElementById('ltc_duration').value || (isCleared ? '0' : '36'),
                     ltcStartAge: getInputValue('ltc_start_age', 'number'),
                     currentIns: formatUSD(getInputValue('current_insurance', 'currency')), 
                     currentAssets: formatUSD(getInputValue('current_assets', 'currency')), 
