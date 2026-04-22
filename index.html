@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Elevatus 保障需求分析系統 V9.0</title>
+    <title>Elevatus 保障需求分析系統 V9.1</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -222,8 +222,27 @@
                         <p id="childcare_detail" class="text-[10px] text-amber-600 mt-2 font-medium"></p>
                     </div>
                     <!-- Education -->
-                    <div><label class="lbl" data-i18n="edu_budget">Education Budget/Child</label><input type="text" id="edu_per_child" placeholder="$150,000" oninput="handleCurrencyInput(this)" class="inp"></div>
-                    <div class="flex flex-col justify-end"><label class="lbl" data-i18n="child_sync">子女數 (同步)</label><input type="text" id="child_count" class="inp text-center" readonly></div>
+                    <div class="col-span-2 bg-blue-50 rounded-xl p-3 border border-blue-100">
+                        <span class="text-[10px] font-bold text-blue-700 uppercase tracking-wide block mb-2" data-i18n="edu_section_title">🎓 子女教育費用</span>
+                        <div class="grid grid-cols-3 gap-2 items-end">
+                            <div class="col-span-1">
+                                <label class="lbl" data-i18n="edu_annual">年度教育預算/人</label>
+                                <input type="text" id="edu_per_child" placeholder="$30,000" oninput="handleCurrencyInput(this)" class="inp">
+                            </div>
+                            <div class="col-span-1">
+                                <label class="lbl" data-i18n="edu_years">就讀年數</label>
+                                <input type="number" id="edu_years" placeholder="4" min="1" max="10" class="inp text-center" oninput="calculate()">
+                            </div>
+                            <div class="col-span-1 text-right">
+                                <label class="lbl" data-i18n="child_sync">子女數 (同步)</label>
+                                <input type="text" id="child_count" class="inp text-center" readonly>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center mt-2 pt-2 border-t border-blue-100">
+                            <p id="edu_detail" class="text-[10px] text-blue-600 font-medium flex-1"></p>
+                            <p id="edu_total_display" class="text-base font-black text-blue-700 font-mono ml-3">$0</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -444,7 +463,7 @@
 const dict = {
     zh: {
         app_title:"保障需求分析 V9.0", advisor:"顧問:", sec0_title:"00. 客戶基本資料", client_name:"客戶姓名", gender:"性別", male:"男", female:"女", age:"目前年齡", phone:"聯絡電話", email:"E-mail", child_count:"子女數量", notes:"諮詢備註",
-        sec1_title:"01. 身故保障需求", mortgage:"房貸餘額", other_debt:"其他負債", annual_income:"年收入", income_years:"收入替代年數", childcare_title:"👶 育兒年費 (至18歲)", childcare_annual:"每年育兒費用", childcare_total:"合計 (FV)", edu_budget:"教育預算/人", child_sync:"子女數 (同步)",
+        sec1_title:"01. 身故保障需求", mortgage:"房貸餘額", other_debt:"其他負債", annual_income:"年收入", income_years:"收入替代年數", childcare_title:"👶 育兒年費 (至18歲)", childcare_annual:"每年育兒費用", childcare_total:"合計 (FV)", edu_section_title:"🎓 子女教育費用", edu_annual:"年度教育預算/人", edu_years:"就讀年數", edu_budget:"年度教育預算/人", child_sync:"子女數 (同步)",
         sec2_title:"02. 醫療與重大疾病", ci_income:"CI 替代收入/年 (可手動覆蓋)", ci_years:"替代年限", ci_fv_age:"FV 計算至年齡 (預設65)",
         sec3_title:"03. 長期照護準備", cost_of_care_link:"查詢照護成本 ↗", ltc_duration:"預計月數", ltc_start_age:"啟動年齡", us_inhome:"In-Home Care", us_assisted:"Assisted Living", us_nursing:"Nursing Home", tw_monthly:"台灣照護月費",
         sec4_title:"04. 退休生活需求", retire_age:"退休年齡", life_exp:"預期壽命", monthly_exp_title:"月支出 (現值，系統計算通膨未來值)", ret_basic:"基本生活費", ret_medical:"醫療費", ret_leisure:"休閒旅遊", ret_other:"其他", ret_income_title:"退休收入來源 (現值)", ss_benefit:"Social Security (月)", ss_adj:"SS 調整率 (預設70%)", rental_income:"租金收入/月 (現值)", rental_adj:"租金成長率 (%/年)",
@@ -465,7 +484,7 @@ const dict = {
     },
     en: {
         app_title:"Coverage Needs Analysis V9.0", advisor:"Advisor:", sec0_title:"00. CLIENT INFO", client_name:"Client Name", gender:"Gender", male:"Male", female:"Female", age:"Age", phone:"Phone", email:"E-mail", child_count:"No. of Children", notes:"Notes",
-        sec1_title:"01. LIFE / DEATH BENEFIT", mortgage:"Mortgage Balance", other_debt:"Other Debt", annual_income:"Annual Income", income_years:"Income Replacement Years", childcare_title:"👶 Childcare (to Age 18)", childcare_annual:"Annual Childcare Cost", childcare_total:"Total (FV)", edu_budget:"Education Budget/Child", child_sync:"Children (Synced)",
+        sec1_title:"01. LIFE / DEATH BENEFIT", mortgage:"Mortgage Balance", other_debt:"Other Debt", annual_income:"Annual Income", income_years:"Income Replacement Years", childcare_title:"👶 Childcare (to Age 18)", childcare_annual:"Annual Childcare Cost", childcare_total:"Total (FV)", edu_section_title:"🎓 Education Costs", edu_annual:"Annual Education Budget/Child", edu_years:"Years of Study", edu_budget:"Annual Education Budget/Child", child_sync:"Children (Synced)",
         sec2_title:"02. CRITICAL ILLNESS", ci_income:"CI Income Replacement/Yr (Override)", ci_years:"Replacement Years", ci_fv_age:"FV Calc-to Age (default 65)",
         sec3_title:"03. LONG-TERM CARE", cost_of_care_link:"Cost of Care ↗", ltc_duration:"Duration (Months)", ltc_start_age:"Start Age", us_inhome:"In-Home Care", us_assisted:"Assisted Living", us_nursing:"Nursing Home", tw_monthly:"Taiwan LTC Monthly",
         sec4_title:"04. RETIREMENT NEEDS", retire_age:"Retire Age", life_exp:"Life Expectancy", monthly_exp_title:"Monthly Expenses (today's $, FV auto-calc)", ret_basic:"Basic Living", ret_medical:"Medical", ret_leisure:"Leisure/Travel", ret_other:"Other", ret_income_title:"Retirement Income (today's $)", ss_benefit:"Social Security (Monthly)", ss_adj:"SS Adj. Rate (default 70%)", rental_income:"Rental Income/Month", rental_adj:"Rental Growth (%/yr)",
@@ -781,15 +800,38 @@ function calculate() {
     document.getElementById('childcare_total_display').innerText = fmtUSD(childcareTotal);
     document.getElementById('childcare_detail').innerText = childcareDetail.join(' | ');
 
-    // Education
+    // Education: annual budget × study years per child, FV to age 18
     let eduTotal = 0;
-    const eduP = getVal('edu_per_child','currency','$150,000');
+    const eduAnnual = getVal('edu_per_child','currency','$30,000');
+    const eduYears = getVal('edu_years','number','4') || 4;
+    let eduDetailParts = [];
     document.querySelectorAll('.child-age-input').forEach(inp => {
         let cAgeStr = inp.value;
         if(cAgeStr==='') cAgeStr = isCleared?'0':(inp.placeholder||'0');
         const cAge = parseInt(cAgeStr)||0;
-        eduTotal += eduP * Math.pow(1+r, Math.max(0,18-cAge));
+        const yearsToCollege = Math.max(0, 18-cAge);
+        // FV of annual payments over eduYears, starting at age 18
+        let childEduFV;
+        if(r > 0) {
+            // Annuity FV at age 18, then discounted back to now (already at future value at start of college)
+            const annuityAtCollege = eduAnnual * ((Math.pow(1+r, eduYears)-1)/r);
+            childEduFV = annuityAtCollege * Math.pow(1+r, yearsToCollege);
+        } else {
+            childEduFV = eduAnnual * eduYears;
+        }
+        eduTotal += childEduFV;
+        eduDetailParts.push(`${fmtUSD(eduAnnual)}/yr × ${eduYears}yr = ${fmtUSD(childEduFV)}`);
     });
+    // If no children entered but field has value, show single-child estimate
+    if(eduDetailParts.length === 0 && eduAnnual > 0 && !isCleared) {
+        const childEduFV = r>0 ? eduAnnual*((Math.pow(1+r,eduYears)-1)/r) : eduAnnual*eduYears;
+        eduTotal = childEduFV;
+        eduDetailParts.push(`${fmtUSD(eduAnnual)}/yr × ${eduYears}yr = ${fmtUSD(childEduFV)}`);
+    }
+    const eduDetailEl = document.getElementById('edu_detail');
+    const eduTotalEl = document.getElementById('edu_total_display');
+    if(eduDetailEl) eduDetailEl.innerText = eduDetailParts.join(' | ');
+    if(eduTotalEl) eduTotalEl.innerText = fmtUSD(eduTotal);
 
     const lifeNeed = mort + debt + replacement + childcareTotal;
     const eduNeed = eduTotal;
@@ -939,7 +981,9 @@ function calculate() {
     window.chartBreakdowns[1] = {
         needLines: [
             `【${t2.chart_names[1]}: ${fmtUSD(eduNeed)}】`,
-            `${t2.edu_budget} × ${document.getElementById('master_child_count').value||0} ${currentLang==='zh'?'人':'children'}${fvTag}`,
+            `${t2.edu_annual}: ${fmtUSD(eduAnnual)}`,
+            `${t2.edu_years}: ${eduYears} ${currentLang==='zh'?'年':'yrs'}`,
+            `${currentLang==='zh'?'子女數':'Children'}: ${document.getElementById('master_child_count').value||0}${fvTag}`,
         ],
         assetLines: [
             `【${t2.asset_label}: ${fmtUSD(eduAssets)}】`,
