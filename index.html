@@ -3,635 +3,1285 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Elevatus 保障需求分析系統 V8.0</title>
-    
+    <title>Elevatus 保障需求分析系統 V9.0</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Elevatus">
     <link rel="apple-touch-icon" href="logo.png">
-    <meta name="theme-color" content="#f1f5f9">
-
+    <meta name="theme-color" content="#0f172a">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
-        body { font-family: 'Noto Sans TC', sans-serif; background-color: #f1f5f9; color: #1e293b; -webkit-tap-highlight-color: transparent; }
-        
-        .card-box { background-color: white; padding: 1.25rem; border-radius: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 1.25rem; border: 1px solid #e2e8f0; }
-        @media (min-width: 640px) { .card-box { padding: 2rem; border-radius: 2rem; margin-bottom: 2rem; } }
-        
-        .section-title { font-size: 1.125rem; font-weight: 900; margin-bottom: 1.25rem; display: flex; align-items: center; border-left: 5px solid; padding-left: 0.75rem; }
-        .input-label { display: block; font-size: 10px; font-weight: 700; margin-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; }
-        
-        .input-field { width: 100%; background-color: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 0.75rem; padding: 0.75rem; color: #1e293b; font-weight: 700; font-size: 16px; outline: none; transition: all 0.2s; -webkit-appearance: none; }
-        .input-field:focus { border-color: #3b82f6; background-color: white; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
-        input.input-field:read-only { background-color: #f1f5f9; cursor: default; color: #94a3b8; }
-        
-        /* 統一淺灰色 Placeholder 樣式 */
-        input::placeholder { color: #94a3b8; font-weight: 500; opacity: 1; }
-        
-        .toggle-label { width: 44px; height: 22px; background-color: #475569; border-radius: 99px; position: relative; cursor: pointer; transition: background 0.3s; display: block; }
-        .toggle-label:after { content: ''; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; background: white; border-radius: 90px; transition: 0.3s; }
-        .toggle-checkbox:checked + .toggle-label { background-color: #10b981; }
-        .toggle-checkbox:checked + .toggle-label:after { left: 24px; }
-
-        .ltc-card { display: flex; align-items: center; padding: 0.875rem; border-radius: 0.75rem; border: 2px solid #f1f5f9; background-color: white; cursor: pointer; transition: all 0.2s; margin-bottom: 0.5rem; }
-        .ltc-card.active { border-color: #a855f7; background-color: #faf5ff; }
-
-        @media print {
-            @page { size: letter; margin: 15mm 15mm !important; }
-            body { background-color: white !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; padding: 0 !important; }
-            .no-print, button, input[type="range"], #inflation_control { display: none !important; }
-            .card-box, #report-summary-panel > div { background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin-bottom: 18px !important; border-radius: 0 !important; page-break-inside: avoid !important; }
-            .app-title-print { display: block !important; margin-bottom: 12px !important; border-bottom: 2.5px solid #1e293b; padding-bottom: 8px; }
-            
-            .section-title { border-left-width: 5px !important; padding-bottom: 4px !important; margin-top: 15px !important; }
-            .section-title.border-blue-500 { border-left-color: #3b82f6 !important; color: #3b82f6 !important; }
-            .section-title.border-red-500 { border-left-color: #ef4444 !important; color: #ef4444 !important; }
-            .section-title.border-orange-400 { border-left-color: #fb923c !important; color: #fb923c !important; }
-            .section-title.border-purple-500 { border-left-color: #a855f7 !important; color: #a855f7 !important; }
-            .section-title.border-emerald-500 { border-left-color: #10b981 !important; color: #10b981 !important; }
-
-            #report-summary-panel { order: -1 !important; width: 100% !important; margin-bottom: 25px !important; border: 1px solid #e2e8f0 !important; border-radius: 1rem !important; overflow: hidden !important; }
-            #report-summary-panel .bg-blue-600 { background-color: #f8fafc !important; color: black !important; padding: 15px !important; border-bottom: 1px solid #e2e8f0 !important; }
-            #total_gap_val { color: #2563eb !important; font-size: 2.8rem !important; }
-            
-            #inflation_note_print { color: #2563eb !important; font-weight: 700 !important; font-size: 11px !important; }
-            
-            .child-data-row { display: table !important; width: 100% !important; border-bottom: 1px solid #e2e8f0 !important; padding-bottom: 4px !important; margin-top: 4px !important; }
-            .child-name-col { display: table-cell !important; width: 50% !important; padding-right: 10px !important; }
-            .child-gender-col { display: table-cell !important; width: 25% !important; padding-right: 10px !important; }
-            .child-age-col { display: table-cell !important; width: 25% !important; }
-            
-            /* 列印時強制顯示 Placeholder 的值以便閱讀 */
-            .input-field, select, .consultant-input, .child-age-input, .child-name { border: none !important; border-bottom: 1.2px solid black !important; background: transparent !important; padding: 0 !important; border-radius: 0 !important; -webkit-appearance: none !important; color: black !important; font-weight: 700 !important; width: 100% !important; }
-            input::placeholder { color: black !important; opacity: 1 !important; font-weight: 700 !important; }
-            
-            .grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 15px !important; }
-            .sm\:col-span-2, .lg\:w-7\/12, .lg\:w-5\/12 { width: 100% !important; grid-column: span 2 / span 2 !important; }
-            .ltc-card:not(.active) { display: none !important; }
+        :root {
+            --bg: #f0f4f8;
+            --card: #ffffff;
+            --border: #e2e8f0;
+            --text: #1e293b;
+            --muted: #64748b;
+            --subtle: #94a3b8;
+            /* Need colors (warning) */
+            --life-color: #ef4444;
+            --edu-color: #f59e0b;
+            --ci-color: #f97316;
+            --ltc-color: #a855f7;
+            --ret-color: #0ea5e9;
+            /* Asset colors (safe) */
+            --asset-green: #10b981;
+            --asset-teal: #14b8a6;
+            --asset-blue: #3b82f6;
+            --asset-indigo: #6366f1;
+            --asset-cyan: #06b6d4;
         }
-        #print-footer { display: none; }
-        @media print { #print-footer { display: block; position: fixed; bottom: 5mm; left: 0; right: 0; text-align: center; font-size: 8px; color: #94a3b8; padding: 8px 0; border-top: 0.5px solid #f1f5f9; } }
+        * { box-sizing: border-box; }
+        body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: var(--text); -webkit-tap-highlight-color: transparent; min-height: 100vh; }
+
+        .card { background: var(--card); border-radius: 1.25rem; border: 1px solid var(--border); box-shadow: 0 1px 4px rgba(0,0,0,0.04); padding: 1.5rem; margin-bottom: 1.25rem; }
+        @media(min-width:640px){ .card { padding: 1.75rem; border-radius: 1.5rem; margin-bottom: 1.5rem; } }
+
+        .sec-title { font-size: 0.9rem; font-weight: 900; display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border); letter-spacing: 0.02em; }
+        .sec-badge { display: inline-flex; align-items: center; justify-content: center; width: 1.6rem; height: 1.6rem; border-radius: 50%; font-size: 0.65rem; font-weight: 900; color: white; flex-shrink: 0; }
+
+        .lbl { display: block; font-size: 9px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.3rem; }
+        .inp { width: 100%; background: #f8fafc; border: 1.5px solid var(--border); border-radius: 0.625rem; padding: 0.625rem 0.75rem; font-size: 14px; font-weight: 700; color: var(--text); outline: none; transition: border-color 0.15s, box-shadow 0.15s; -webkit-appearance: none; font-family: 'Noto Sans TC', sans-serif; }
+        .inp:focus { border-color: #3b82f6; background: white; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+        .inp:read-only { background: #f1f5f9; color: var(--subtle); cursor: default; }
+        .inp::placeholder { color: var(--subtle); font-weight: 500; }
+        select.inp { cursor: pointer; }
+
+        .toggle-wrap { display: flex; align-items: center; gap: 0.5rem; }
+        .toggle-label { width: 40px; height: 22px; background: #cbd5e1; border-radius: 99px; position: relative; cursor: pointer; transition: background 0.25s; display: block; flex-shrink: 0; }
+        .toggle-label:after { content:''; position:absolute; top:3px; left:3px; width:16px; height:16px; background:white; border-radius:50%; transition:0.25s; box-shadow:0 1px 3px rgba(0,0,0,0.2); }
+        .toggle-cb:checked + .toggle-label { background: #10b981; }
+        .toggle-cb:checked + .toggle-label:after { left: 21px; }
+
+        .alloc-row { display:flex; align-items:center; gap:0.5rem; padding:0.5rem 0; border-bottom:1px solid #f1f5f9; }
+        .alloc-label { font-size:11px; font-weight:700; color:var(--muted); flex:1; }
+        .alloc-pct { width:56px; text-align:center; }
+        .alloc-mode-btn { font-size:9px; font-weight:700; padding:0.2rem 0.5rem; border-radius:0.4rem; border:1px solid var(--border); cursor:pointer; background:white; color:var(--muted); white-space:nowrap; }
+        .alloc-mode-btn.active { background: #1e293b; color:white; border-color:#1e293b; }
+
+        /* Gap cards */
+        .gap-card { border-radius:1rem; padding:1rem; margin-bottom:0.75rem; border:1px solid var(--border); }
+        .gap-ok { background:#f0fdf4; border-color:#bbf7d0; }
+        .gap-warn { background:#fff1f2; border-color:#fecdd3; }
+        .gap-label { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.25rem; }
+        .gap-val { font-size:1.4rem; font-weight:900; font-family:'DM Mono', monospace; line-height:1; }
+        .gap-ok .gap-val { color:#16a34a; }
+        .gap-warn .gap-val { color:#dc2626; }
+        .gap-bar-wrap { height:6px; border-radius:99px; background:#e2e8f0; margin-top:0.5rem; overflow:hidden; }
+        .gap-bar { height:100%; border-radius:99px; transition: width 0.6s cubic-bezier(.4,0,.2,1); }
+        .gap-ok .gap-bar { background: linear-gradient(90deg,#10b981,#34d399); }
+        .gap-warn .gap-bar { background: linear-gradient(90deg,#ef4444,#f97316); }
+
+        /* Charts scroll strip */
+        .charts-strip { display:flex; gap:1rem; overflow-x:auto; overflow-y:visible; padding-bottom:0.5rem; padding-top:0.25rem; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; }
+        .charts-strip::-webkit-scrollbar { height:4px; }
+        .charts-strip::-webkit-scrollbar-track { background:#f1f5f9; border-radius:2px; }
+        .charts-strip::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:2px; }
+        .chart-card { flex-shrink:0; width:200px; scroll-snap-align:start; background:white; border-radius:1rem; border:1px solid var(--border); padding:0.875rem; text-align:center; overflow:visible; position:relative; }
+        .chart-card-title { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); margin-bottom:0.5rem; }
+        .chart-wrap { position:relative; width:140px; height:140px; margin:0 auto 0.5rem; }
+        .chart-center-text { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none; }
+        .chart-center-pct { font-size:1.1rem; font-weight:900; font-family:'DM Mono',monospace; line-height:1; }
+        .chart-center-sub { font-size:7px; font-weight:700; color:var(--muted); margin-top:2px; }
+
+        .ltc-card { display:flex; align-items:center; padding:0.75rem; border-radius:0.75rem; border:2px solid #f1f5f9; cursor:pointer; transition:all 0.15s; margin-bottom:0.5rem; }
+        .ltc-card.active { border-color:#a855f7; background:#faf5ff; }
+
+        /* FV inflation banner */
+        .fv-banner { background:#0f172a; border-radius:0.875rem; padding:0.875rem 1rem; margin-bottom:1rem; display:flex; flex-wrap:wrap; align-items:center; gap:0.75rem; }
+        .fv-banner-label { font-size:10px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:0.06em; }
+
+        /* Warning badge */
+        .warn-badge { display:inline-flex; align-items:center; gap:0.3rem; background:#fef3c7; border:1px solid #fcd34d; border-radius:0.5rem; padding:0.25rem 0.6rem; font-size:10px; font-weight:700; color:#92400e; }
+
+        /* Print */
+        @page { size: letter; margin: 12mm 15mm; }
+        @media print {
+            body { background:white!important; }
+            .no-print { display:none!important; }
+            .card { box-shadow:none!important; border:1px solid #e2e8f0!important; page-break-inside:avoid; margin-bottom:12px!important; }
+            .charts-strip { overflow:visible!important; flex-wrap:wrap!important; }
+            .chart-card { width:160px!important; }
+            .inp { border:none!important; border-bottom:1px solid #333!important; background:transparent!important; border-radius:0!important; padding:2px 0!important; color:black!important; }
+            input::placeholder { color:black!important; opacity:1!important; }
+            #print-header { display:block!important; }
+            footer { display:block!important; }
+        }
+        #print-header { display:none; }
+        footer { display:none; }
     </style>
 </head>
-<body class="p-3 sm:p-6 lg:p-10">
+<body class="p-3 sm:p-5 lg:p-8">
 
-    <div class="max-w-7xl mx-auto">
-        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 px-2">
-            <div class="flex items-center gap-4">
-                <img src="./logo.png" alt="Elevatus Logo" class="h-10 sm:h-14 object-contain">
-                <div class="border-l-2 border-slate-200 pl-4">
-                    <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight app-title-print">
-                        <span data-i18n="app_title">保障需求分析</span>
-                    </h1>
-                    <p class="text-slate-400 font-bold text-[8px] sm:text-[10px] uppercase tracking-widest mt-1">Cross-Border Financial Consulting</p>
-                </div>
-            </div>
-            
-            <div class="flex items-center gap-3 w-full md:w-auto mt-4 md:mt-0">
-                <button id="langBtnDesktop" onclick="toggleLang()" class="no-print bg-white border border-slate-200 px-4 h-10 rounded-xl font-bold text-xs shadow-sm flex items-center transition-all">
-                    <span id="lang-en" class="text-slate-400">EN</span>&nbsp;/&nbsp;<span id="lang-zh" class="text-blue-600 font-black">中</span>
-                </button>
-                <div class="bg-white px-4 h-10 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3 w-full md:w-auto">
-                    <div class="flex items-center">
-                        <span class="text-[10px] font-bold text-slate-400 uppercase mr-2" data-i18n="advisor">顧問:</span>
-                        <input list="consultants" id="consultant_name" class="consultant-input text-sm font-bold outline-none w-32" value="Jimmy Chuang">
-                        <datalist id="consultants">
-                            <option value="Jimmy Chuang"></option>
-                            <option value="Wendy Yun"></option>
-                            <option value="Steve Yun"></option>
-                            <option value="Pablo Lin"></option>
-                        </datalist>
-                    </div>
-                    <p id="display_date" class="text-[9px] text-slate-300 font-bold border-l border-slate-100 pl-3"></p>
-                </div>
-            </div>
-        </header>
+<div id="print-header" class="mb-6 pb-4 border-b-2 border-slate-900">
+    <h1 class="text-xl font-black">Elevatus 保障需求分析報告</h1>
+    <p id="ph-date" class="text-xs text-slate-500 mt-1"></p>
+</div>
 
-        <div class="flex flex-col lg:flex-row gap-6 items-start">
-            <div class="w-full lg:w-7/12 xl:w-2/3">
-                <section class="card-box">
-                    <h2 class="section-title border-blue-500 text-blue-600" data-i18n="sec0_title">00. 客戶基本資料</h2>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div><label class="input-label" data-i18n="client_name">Client Name</label><input type="text" id="client_name" placeholder="王先生" value="" class="input-field"></div>
-                        <div><label class="input-label" data-i18n="gender">Sex</label><select id="client_gender" class="input-field cursor-pointer"><option data-i18n="male" value="男">男</option><option data-i18n="female" value="女">女</option></select></div>
-                        <div><label class="input-label" data-i18n="age">Age</label><input type="number" id="client_age" placeholder="35" value="" class="input-field" oninput="calculate()"></div>
-                        <div><label class="input-label" data-i18n="phone">Phone</label><input type="text" id="client_phone" placeholder="(XXX) XXX-XXXX" value="" class="input-field"></div>
-                        
-                        <div class="col-span-2"><label class="input-label" data-i18n="email">E-mail</label><input type="email" id="client_email" placeholder="example@email.com" value="" class="input-field"></div>
+<div class="max-w-7xl mx-auto">
 
-                        <div class="col-span-2 border-t border-slate-100 pt-4 mt-1 flex justify-between items-center">
-                            <label class="input-label text-blue-600" data-i18n="child_count">子女數量</label>
-                            <input type="number" id="master_child_count" placeholder="1" value="" min="0" class="input-field w-20 py-2 text-center" oninput="generateChildRows()">
-                        </div>
-                        <div id="child_rows_container" class="col-span-2 space-y-3"></div>
-                        <div class="col-span-2"><label class="input-label text-slate-400" data-i18n="notes">Notes</label><input type="text" id="notes" placeholder="一家四口" value="" class="input-field text-sm"></div>
-                    </div>
-                </section>
-
-                <section class="card-box">
-                    <h2 class="section-title border-red-500 text-red-600" data-i18n="sec1_title">01. 家庭責任與身故保障</h2>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div><label class="input-label text-red-500" data-i18n="mortgage">Mortgage Balance (USD)</label><input type="text" id="mortgage" placeholder="$350,000" value="" oninput="handleCurrencyInput(this)" class="input-field"></div>
-                        <div><label class="input-label text-red-500" data-i18n="other_debt">Other Personal/Business Debt</label><input type="text" id="other_debt" placeholder="$100,000" value="" oninput="handleCurrencyInput(this)" class="input-field"></div>
-                        <div class="col-span-2 sm:col-span-1"><label class="input-label text-blue-500" data-i18n="annual_income">Annual Income (USD)</label><input type="text" id="annual_income" placeholder="$80,000" value="" oninput="handleCurrencyInput(this)" class="input-field"></div>
-                        
-                        <div class="col-span-2 sm:col-span-1">
-                            <label class="input-label text-blue-500" data-i18n="income_years">Income Replacement Years</label>
-                            <div class="relative">
-                                <select id="income_years" onchange="checkCustom('income_years')" class="input-field cursor-pointer bg-white"></select>
-                                <div id="income_years_custom_wrapper" class="hidden relative">
-                                    <input type="number" id="income_years_custom" class="input-field pr-8" oninput="calculate()">
-                                    <button type="button" onclick="cancelCustom('income_years')" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 font-black px-2 py-1 bg-slate-100 rounded-lg no-print">✕</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-span-2 sm:col-span-1"><label class="input-label text-emerald-500" data-i18n="edu_budget">Education Budget / Child</label><input type="text" id="edu_per_child" placeholder="$150,000" value="" oninput="handleCurrencyInput(this)" class="input-field"></div>
-                        <div class="col-span-2 sm:col-span-1 flex justify-between items-center"><label class="input-label text-emerald-500" data-i18n="child_sync">子女數量 (同步)</label><input type="text" id="child_count" placeholder="1" value="" class="input-field text-center bg-slate-50 font-bold w-20" readonly></div>
-                    </div>
-                </section>
-
-                <section class="card-box">
-                    <h2 class="section-title border-orange-400 text-orange-500" data-i18n="sec2_title">02. 醫療與重疾應急金</h2>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div><label class="input-label text-orange-500" data-i18n="medical_oop">Medical Out-of-Pocket Max</label><input type="text" id="medical_oop" placeholder="$18,000" value="" oninput="handleCurrencyInput(this)" class="input-field"></div>
-                        <div><label class="input-label text-orange-500" data-i18n="recovery_fund">Recovery Fund for Critical Illness</label><input type="text" id="recovery_fund" placeholder="$160,000" value="" oninput="handleCurrencyInput(this)" class="input-field"></div>
-                    </div>
-                </section>
-
-                <section class="card-box">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="section-title border-purple-500 text-purple-600" style="margin-bottom: 0;" data-i18n="sec3_title">03. 長期照護準備</h2>
-                        <a href="https://www.genworth.com/aging-and-you/finances/cost-of-care.html" target="_blank" rel="noopener noreferrer" class="text-[10px] font-bold text-purple-500 hover:text-purple-700 underline no-print flex items-center gap-1">
-                            <span data-i18n="cost_of_care_link">查詢照護成本</span>
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                        </a>
-                    </div>
-
-                    <div class="flex bg-slate-100 p-1 rounded-xl mb-5 gap-1 no-print">
-                        <button id="btn_us" onclick="setLTCPath('US')" class="flex-1 py-3 rounded-lg font-black text-xs bg-white shadow text-purple-600">美國</button>
-                        <button id="btn_tw" onclick="setLTCPath('TW')" class="flex-1 py-3 rounded-lg font-bold text-xs text-slate-500">台灣</button>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4 mb-4">
-                        <div>
-                            <label class="input-label text-purple-600" data-i18n="ltc_duration">Expected Duration (Months)</label>
-                            <div class="relative">
-                                <select id="ltc_duration" onchange="checkCustom('ltc_duration')" class="input-field cursor-pointer bg-white"></select>
-                                <div id="ltc_duration_custom_wrapper" class="hidden relative">
-                                    <input type="number" id="ltc_duration_custom" class="input-field pr-8" oninput="calculate()">
-                                    <button type="button" onclick="cancelCustom('ltc_duration')" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 font-black px-2 py-1 bg-slate-100 rounded-lg no-print">✕</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div><label class="input-label text-purple-600" data-i18n="ltc_start_age">Start Age</label><input type="number" id="ltc_start_age" placeholder="75" value="" class="input-field text-center" oninput="calculate()"></div>
-                    </div>
-                    <div id="us_ltc_details">
-                        <div class="ltc-card active" id="card_inhome" onclick="selectLtcType('inhome')"><input type="radio" name="ltc_type" id="radio_inhome" value="inhome" checked class="no-print mr-3"><div class="flex-grow"><label class="text-[9px] font-bold text-slate-400 block" data-i18n="us_inhome">In-Home Care</label><input type="text" id="us_inhome" placeholder="$5,529" value="" class="w-full bg-transparent py-1 font-black text-slate-800 outline-none" oninput="handleCurrencyInput(this)"></div></div>
-                        <div class="ltc-card" id="card_assisted" onclick="selectLtcType('assisted')"><input type="radio" name="ltc_type" id="radio_assisted" value="assisted" class="no-print mr-3"><div class="flex-grow"><label class="text-[9px] font-bold text-slate-400 block" data-i18n="us_assisted">Assisted Living</label><input type="text" id="us_assisted" placeholder="$6,350" value="" class="w-full bg-transparent py-1 font-black text-slate-800 outline-none" oninput="handleCurrencyInput(this)"></div></div>
-                        <div class="ltc-card" id="card_nursing" onclick="selectLtcType('nursing')"><input type="radio" name="ltc_type" id="radio_nursing" value="nursing" class="no-print mr-3"><div class="flex-grow"><label class="text-[9px] font-bold text-slate-400 block" data-i18n="us_nursing">Nursing Home</label><input type="text" id="us_nursing" placeholder="$8,015" value="" class="w-full bg-transparent py-1 font-black text-slate-800 outline-none" oninput="handleCurrencyInput(this)"></div></div>
-                    </div>
-                    <div id="tw_ltc_details" class="hidden">
-                        <div class="ltc-card active border-purple-500 bg-purple-50/50"><div class="flex-grow px-3"><label class="text-[11px] font-bold text-purple-600 block mb-1" data-i18n="tw_monthly">Estimated Taiwan LTC Monthly Cost</label><input type="text" id="tw_monthly" placeholder="$3,200" value="" class="w-full bg-transparent py-1 font-black text-slate-900 outline-none" oninput="handleCurrencyInput(this)"></div></div>
-                    </div>
-                </section>
-
-                <section class="card-box">
-                    <h2 class="section-title border-emerald-500 text-emerald-600" data-i18n="sec4_title">04. 現有資產與保障</h2>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div><label class="input-label text-emerald-600" data-i18n="cur_ins_full">Total Coverage (USD)</label><input type="text" id="current_insurance" placeholder="$300,000" value="" oninput="handleCurrencyInput(this)" class="input-field"></div>
-                        <div><label class="input-label text-emerald-600" data-i18n="cur_assets_full">Liquid Assets/Investments</label><input type="text" id="current_assets" placeholder="$100,000" value="" oninput="handleCurrencyInput(this)" class="input-field"></div>
-                    </div>
-                </section>
-            </div>
-
-            <div id="report-summary-panel" class="w-full lg:w-5/12 xl:w-1/3 lg:sticky lg:top-10">
-                <div class="bg-blue-600 rounded-[2.5rem] shadow-xl overflow-hidden flex flex-col border border-blue-700">
-                    <div class="p-6 text-center text-white">
-                        <h3 class="text-sm font-black uppercase tracking-widest opacity-80 mb-1" data-i18n="summary_title">保障缺口分析總覽</h3>
-                        <div id="total_gap_val" class="text-3xl sm:text-4xl font-black tracking-tight">$0</div>
-                        <p id="inflation_note_print" class="mt-2 text-blue-200 text-[10px] hidden print:block"></p>
-                    </div>
-                    <div class="bg-slate-800 px-6 py-4 border-b border-slate-700 no-print flex justify-between items-center">
-                        <span class="text-[11px] font-bold text-emerald-400 uppercase" data-i18n="fv_toggle">通膨精算 (FV)</span>
-                        <div class="relative inline-block w-12"><input type="checkbox" id="fv_toggle" class="toggle-checkbox hidden" onchange="toggleFV()"/><label for="fv_toggle" class="toggle-label"></label></div>
-                    </div>
-                    <div id="inflation_control" class="bg-slate-800 px-6 pb-4 no-print hidden">
-                        <div class="flex justify-between text-slate-300 text-[10px] font-bold mb-1"><span data-i18n="inflation_rate">年通膨率</span><span id="inflation_display" class="text-white font-black">3.0%</span></div>
-                        <input type="range" id="inflation_rate" min="0" max="10" step="0.5" value="3" class="w-full accent-emerald-500 cursor-pointer" oninput="updateInflationLabel(); calculate();">
-                    </div>
-                    <div class="p-6 bg-white flex-grow">
-                        <div class="relative w-full mb-6" style="height: 220px;"><canvas id="gapChart"></canvas></div>
-                        <div class="space-y-4 mb-6">
-                            <div class="flex justify-between items-center border-b border-slate-50 pb-1"><p class="text-sm font-black text-slate-600 uppercase" data-i18n="disp_life">身故保障需求</p><p id="life_need_display" class="text-lg font-black text-red-500">$0</p></div>
-                            <div class="flex justify-between items-center border-b border-slate-50 pb-1"><p class="text-sm font-black text-slate-600 uppercase" data-i18n="disp_med">重疾醫療需求</p><p id="medical_need_display" class="text-lg font-black text-orange-500">$0</p></div>
-                            <div class="flex justify-between items-center border-b border-slate-50 pb-1"><p class="text-sm font-black text-slate-600 uppercase" data-i18n="disp_ltc">長期照護準備</p><p id="ltc_need_display" class="text-lg font-black text-purple-600">$0</p></div>
-                            <div class="flex justify-between items-center border-b border-slate-50 pb-1"><p class="text-sm font-black text-slate-600 uppercase" data-i18n="disp_assets">現有資產與保障</p><p id="merged_assets_display" class="text-lg font-black text-emerald-500">$0</p></div>
-                        </div>
-                        <div class="space-y-2 no-print">
-                            <button id="saveBtn" onclick="saveToSheet()" class="w-full bg-slate-900 text-white font-black py-4 rounded-xl shadow-lg active:scale-95 text-sm tracking-widest" data-i18n="btn_save">儲存諮詢紀錄</button>
-                            <button onclick="handlePrint()" class="w-full bg-white text-slate-600 font-bold py-3.5 rounded-xl text-sm border border-slate-200" data-i18n="btn_print">列印 PDF 報告</button>
-                            <button onclick="clearAllData()" class="w-full bg-transparent text-slate-400 font-bold py-3 mt-2 rounded-xl text-xs border border-slate-200 hover:bg-slate-50 transition-colors" data-i18n="btn_clear">⟲ 清空所有資料</button>
-                        </div>
-                    </div>
-                </div>
+    <!-- Header -->
+    <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
+        <div class="flex items-center gap-3">
+            <img src="./logo.png" alt="Elevatus" class="h-10 sm:h-12 object-contain" onerror="this.style.display='none'">
+            <div class="border-l-2 border-slate-200 pl-3">
+                <h1 class="text-lg sm:text-xl font-black text-slate-900 tracking-tight" data-i18n="app_title">保障需求分析 V9.0</h1>
+                <p class="text-slate-400 font-bold text-[9px] uppercase tracking-widest">Cross-Border Financial Consulting</p>
             </div>
         </div>
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+            <button onclick="toggleLang()" class="no-print bg-white border border-slate-200 px-3 h-9 rounded-xl font-bold text-xs shadow-sm">
+                <span id="lang-en" class="text-slate-400">EN</span>&nbsp;/&nbsp;<span id="lang-zh" class="text-blue-600 font-black">中</span>
+            </button>
+            <div class="bg-white px-3 h-9 rounded-xl border border-slate-200 shadow-sm flex items-center gap-2 flex-1 sm:flex-none">
+                <span class="text-[9px] font-bold text-slate-400 uppercase" data-i18n="advisor">顧問:</span>
+                <input list="consultants" id="consultant_name" class="text-xs font-bold outline-none w-28" value="Jimmy Chuang">
+                <datalist id="consultants">
+                    <option value="Jimmy Chuang"></option><option value="Wendy Yun"></option>
+                    <option value="Steve Yun"></option><option value="Pablo Lin"></option>
+                </datalist>
+                <p id="display_date" class="text-[9px] text-slate-300 font-bold border-l border-slate-100 pl-2 hidden sm:block"></p>
+            </div>
+        </div>
+    </header>
+
+    <!-- FV Control Banner -->
+    <div class="fv-banner no-print mb-5">
+        <span class="fv-banner-label" data-i18n="fv_toggle">通膨精算 (FV)</span>
+        <div class="toggle-wrap">
+            <input type="checkbox" id="fv_toggle" class="toggle-cb hidden" onchange="toggleFVPanel()">
+            <label for="fv_toggle" class="toggle-label"></label>
+        </div>
+        <div id="fv_panel" class="hidden flex items-center gap-3 flex-wrap">
+            <div class="flex items-center gap-2">
+                <span class="fv-banner-label" data-i18n="inflation_rate">通膨率</span>
+                <input type="range" id="inflation_rate" min="0" max="10" step="0.5" value="3" class="w-28 accent-emerald-500 cursor-pointer" oninput="updateInflLabel();calculate();">
+                <span id="infl_disp" class="text-white font-black text-sm font-mono">3.0%</span>
+            </div>
+        </div>
+        <button onclick="clearAllData()" class="no-print ml-auto text-[10px] font-bold text-slate-500 hover:text-red-400 border border-slate-600 px-3 py-1.5 rounded-lg transition-colors" data-i18n="btn_clear">⟲ 清空</button>
     </div>
-    <footer id="print-footer">© <span id="year-display"></span> Elevatus Business Consultants. 本報告內容僅供初步財務規劃參考。</footer>
 
-    <script>
-        const dict = {
-            zh: { app_title: "保障需求分析", advisor: "顧問:", sec0_title: "00. 客戶基本資料", client_name: "客戶姓名", gender: "性別", male: "男", female: "女", age: "目前年齡", phone: "聯絡電話", email: "E-mail", child_count: "子女數量", notes: "諮詢備註", sec1_title: "01. 家庭責任與身故保障", mortgage: "房貸餘額 (USD)", other_debt: "其他個人/商業貸款", annual_income: "年收入 (USD)", income_years: "替代年數", edu_budget: "教育預算/人", child_sync: "子女數量 (同步)", sec2_title: "02. 醫療與重疾應急金", medical_oop: "醫療自付上限預留", recovery_fund: "重大疾病應急金", sec3_title: "03. 長期照護準備", cost_of_care_link: "查詢照護成本", ltc_duration: "預計月數", ltc_start_age: "啟動年齡", us_inhome: "In-Home Care", us_assisted: "Assisted Living", us_nursing: "Nursing Home", tw_monthly: "台灣照護月費估算", sec4_title: "04. 現有資產與保障", cur_ins_full: "現有總保額 (USD)", cur_assets_full: "流動性存款/投資", summary_title: "保障缺口分析總覽", fv_toggle: "通膨精算 (FV)", inflation_rate: "年通膨率", disp_life: "身故保障需求", disp_med: "重疾醫療需求", disp_ltc: "長期照護準備", disp_assets: "現有資產與保障", cur_ins_short: "現有總保額", cur_assets_short: "流動性存款/投資", gap_short: "家庭保障缺口", btn_save: "儲存諮詢紀錄", btn_print: "列印 PDF 報告", btn_clear: "⟲ 清空所有資料", filename_pref: "保障需求分析", yr_opts: ["5", "10", "15"], yr_labels: ["5 年 (過渡緩衝)", "10 年 (標準責任)", "15 年 (長期守護)"], ltc_opts: ["12", "24", "36", "48", "60"], ltc_labels: ["12", "24", "36 (3年-平均值)", "48", "60"], us_btn: "美國", tw_btn: "台灣", inf_note: "採用通膨率 (FV): ", child_name_lb: "姓名", inc_rep_label: "收入替代", custom_input: "✍️ 自訂輸入...", custom_yr_placeholder: "請輸入年數", custom_mo_placeholder: "請輸入月數" },
-            en: { app_title: "Coverage Needs Analysis", advisor: "Advisor:", sec0_title: "00. CLIENT INFORMATION", client_name: "Client Name", gender: "Gender", male: "Male", female: "Female", age: "Age", phone: "Phone", email: "E-mail", child_count: "NO. OF CHILDREN", notes: "Notes", sec1_title: "01. OBLIGATIONS & LIFE NEED", mortgage: "Mortgage Balance (USD)", other_debt: "Other Personal/Business Debt", annual_income: "Annual Income (USD)", income_years: "Income Replacement Years", edu_budget: "Education Budget / Child", child_sync: "NO. OF CHILDREN (SYNCED)", sec2_title: "02. LIVING BENEFITS & CRITICAL ILLNESS", medical_oop: "Medical Out-of-Pocket Max", recovery_fund: "Recovery Fund for Critical Illness", sec3_title: "03. LONG-TERM CARE PREPARATION", cost_of_care_link: "Cost of Care Calculator", ltc_duration: "Expected Duration (Months)", ltc_start_age: "Start Age", us_inhome: "In-Home Care", us_assisted: "Assisted Living", us_nursing: "Nursing Home", tw_monthly: "Estimated Taiwan LTC Monthly Cost", sec4_title: "04. CURRENT ASSETS", cur_ins_full: "Total Coverage (USD)", cur_assets_full: "Liquid Assets/Investments", summary_title: "GAP SUMMARY", fv_toggle: "Inflation (FV)", inflation_rate: "Inflation Rate", disp_life: "Life Insurance Need", disp_med: "Critical Illness Need", disp_ltc: "LTC Preparation", disp_assets: "Existing Assets & Protection", cur_ins_short: "Total Coverage", cur_assets_short: "Liquid Assets", gap_short: "Gap", btn_save: "Save Record", btn_print: "Print PDF", btn_clear: "⟲ Clear All Data", filename_pref: "Needs_Analysis", yr_opts: ["5", "10", "15"], yr_labels: ["5 Years (Buffer)", "10 Years (Standard)", "15 Years (Long-term)"], ltc_opts: ["12", "24", "36", "48", "60"], ltc_labels: ["12", "24", "36 (Avg - 3 Yrs)", "48", "60"], us_btn: "U.S.", tw_btn: "Taiwan", inf_note: "Applied Inflation Rate (FV): ", child_name_lb: "Name", inc_rep_label: "Replacement", custom_input: "✍️ Custom Input...", custom_yr_placeholder: "Enter Years", custom_mo_placeholder: "Enter Months" }
-        };
-        
-        let currentLang = 'zh'; let myChart = null; let currentLTCPath = 'US'; 
-        let isCleared = false; 
-        window.chartBreakdown = { life: [], med: [], ltc: [] }; 
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxEsNTWhldPnUc1xxnUHJcaH14Wbd0J1CMSOnhI9r_5ckZ-jRwHEhPR1lZdptHe3H6o/exec";
+    <div class="flex flex-col lg:flex-row gap-5 items-start">
 
-        let currentDisplayedGap = 0;
-        let gapAnimationId = null;
+        <!-- LEFT COLUMN: Inputs -->
+        <div class="w-full lg:w-[58%]">
 
-        window.onload = function() { 
-            document.getElementById('display_date').innerText = new Date().toLocaleDateString(); 
-            document.getElementById('year-display').innerText = new Date().getFullYear(); 
-            initChart(); 
-            syncDropdowns(); 
-            updateLangButtonUI(); 
-        };
+            <!-- S00: Client Info -->
+            <div class="card">
+                <h2 class="sec-title"><span class="sec-badge bg-blue-500">00</span><span data-i18n="sec0_title">客戶基本資料</span></h2>
+                <div class="grid grid-cols-2 gap-3">
+                    <div><label class="lbl" data-i18n="client_name">Client Name</label><input type="text" id="client_name" placeholder="王先生" class="inp"></div>
+                    <div><label class="lbl" data-i18n="gender">Sex</label><select id="client_gender" class="inp"><option value="男" data-i18n="male">男</option><option value="女" data-i18n="female">女</option></select></div>
+                    <div><label class="lbl" data-i18n="age">Current Age</label><input type="number" id="client_age" placeholder="35" class="inp" oninput="calculate()"></div>
+                    <div><label class="lbl" data-i18n="phone">Phone</label><input type="text" id="client_phone" placeholder="(XXX) XXX-XXXX" class="inp"></div>
+                    <div class="col-span-2"><label class="lbl" data-i18n="email">E-mail</label><input type="email" id="client_email" placeholder="example@email.com" class="inp"></div>
+                    <div class="col-span-2 flex justify-between items-end pt-2 border-t border-slate-100">
+                        <label class="lbl text-blue-600 mb-0" data-i18n="child_count">子女數量</label>
+                        <input type="number" id="master_child_count" placeholder="0" min="0" class="inp w-20 text-center py-2" oninput="generateChildRows()">
+                    </div>
+                    <div id="child_rows_container" class="col-span-2 space-y-2"></div>
+                    <div class="col-span-2"><label class="lbl" data-i18n="notes">Notes</label><input type="text" id="notes" placeholder="一家四口" class="inp text-sm"></div>
+                </div>
+            </div>
 
-        function toggleLang() { 
-            currentLang = currentLang === 'zh' ? 'en' : 'zh'; 
-            syncDropdowns(); 
-            updateLangButtonUI(); 
-        }
+            <!-- S01: Life / Death Benefit -->
+            <div class="card">
+                <h2 class="sec-title"><span class="sec-badge bg-red-500">01</span><span data-i18n="sec1_title">身故保障需求</span></h2>
+                <div class="grid grid-cols-2 gap-3">
+                    <div><label class="lbl" data-i18n="mortgage">Mortgage Balance</label><input type="text" id="mortgage" placeholder="$350,000" oninput="handleCurrencyInput(this)" class="inp"></div>
+                    <div><label class="lbl" data-i18n="other_debt">Other Debt</label><input type="text" id="other_debt" placeholder="$100,000" oninput="handleCurrencyInput(this)" class="inp"></div>
+                    <div><label class="lbl" data-i18n="annual_income">Annual Income</label><input type="text" id="annual_income" placeholder="$80,000" oninput="handleCurrencyInput(this)" class="inp"></div>
+                    <div>
+                        <label class="lbl" data-i18n="income_years">Income Replacement Years</label>
+                        <div class="relative">
+                            <select id="income_years" onchange="checkCustom('income_years')" class="inp"></select>
+                            <div id="income_years_custom_wrapper" class="hidden relative">
+                                <input type="number" id="income_years_custom" class="inp pr-8" oninput="calculate()">
+                                <button type="button" onclick="cancelCustom('income_years')" class="no-print absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs bg-slate-100 rounded px-1">✕</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Childcare costs -->
+                    <div class="col-span-2 bg-amber-50 rounded-xl p-3 border border-amber-100">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-[10px] font-bold text-amber-700 uppercase tracking-wide" data-i18n="childcare_title">👶 育兒年費 (至18歲)</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="flex-1"><label class="lbl" data-i18n="childcare_annual">每年育兒費用</label><input type="text" id="childcare_annual" placeholder="$20,000" oninput="handleCurrencyInput(this)" class="inp"></div>
+                            <div class="w-28 text-right">
+                                <label class="lbl" data-i18n="childcare_total">合計 (FV)</label>
+                                <p id="childcare_total_display" class="text-base font-black text-amber-700 font-mono">$0</p>
+                            </div>
+                        </div>
+                        <p id="childcare_detail" class="text-[10px] text-amber-600 mt-2 font-medium"></p>
+                    </div>
+                    <!-- Education -->
+                    <div><label class="lbl" data-i18n="edu_budget">Education Budget/Child</label><input type="text" id="edu_per_child" placeholder="$150,000" oninput="handleCurrencyInput(this)" class="inp"></div>
+                    <div class="flex flex-col justify-end"><label class="lbl" data-i18n="child_sync">子女數 (同步)</label><input type="text" id="child_count" class="inp text-center" readonly></div>
+                </div>
+            </div>
 
-        function updateLangButtonUI() {
-            const zh = document.getElementById('lang-zh'); const en = document.getElementById('lang-en');
-            if(currentLang === 'zh') { zh.className = "text-blue-600 font-black"; en.className = "text-slate-400"; }
-            else { en.className = "text-blue-600 font-black"; zh.className = "text-slate-400"; }
-            document.querySelectorAll('[data-i18n]').forEach(el => { const key = el.getAttribute('data-i18n'); if (dict[currentLang][key]) el.innerHTML = dict[currentLang][key]; });
-            document.getElementById('btn_us').innerText = dict[currentLang].us_btn; document.getElementById('btn_tw').innerText = dict[currentLang].tw_btn;
-            generateChildRows(); 
-        }
+            <!-- S02: CI / Living Benefits -->
+            <div class="card">
+                <h2 class="sec-title"><span class="sec-badge bg-orange-500">02</span><span data-i18n="sec2_title">醫療與重大疾病</span></h2>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="lbl" data-i18n="ci_income">CI 替代收入/年 <span class="text-blue-500">(可手動覆蓋)</span></label>
+                        <input type="text" id="ci_income" placeholder="同年收入" oninput="handleCurrencyInput(this)" class="inp">
+                    </div>
+                    <div>
+                        <label class="lbl" data-i18n="ci_years">替代年限</label>
+                        <div class="relative">
+                            <select id="ci_years" onchange="checkCustom('ci_years')" class="inp"></select>
+                            <div id="ci_years_custom_wrapper" class="hidden relative">
+                                <input type="number" id="ci_years_custom" class="inp pr-8" oninput="calculate()">
+                                <button type="button" onclick="cancelCustom('ci_years')" class="no-print absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs bg-slate-100 rounded px-1">✕</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-span-2">
+                        <label class="lbl" data-i18n="ci_fv_age">FV 計算至年齡 <span class="text-slate-400 normal-case">(預設65)</span></label>
+                        <input type="number" id="ci_fv_age" placeholder="65" class="inp w-28" oninput="calculate()">
+                    </div>
+                </div>
+            </div>
 
-        // 🚀 核心升級：A方案 Select 搭配 Custom Input 同步邏輯
-        function syncDropdowns() {
-            const yr_sel = document.getElementById('income_years'); 
-            const ltc_sel = document.getElementById('ltc_duration');
-            
-            const current_yr_val = yr_sel.value; 
-            const current_ltc_val = ltc_sel.value;
+            <!-- S03: LTC -->
+            <div class="card">
+                <h2 class="sec-title">
+                    <span class="sec-badge bg-purple-500">03</span>
+                    <span data-i18n="sec3_title">長期照護準備</span>
+                    <a href="https://www.genworth.com/aging-and-you/finances/cost-of-care.html" target="_blank" class="no-print ml-auto text-[9px] font-bold text-purple-500 underline flex items-center gap-1" data-i18n="cost_of_care_link">查詢照護成本 ↗</a>
+                </h2>
+                <div class="flex bg-slate-100 p-1 rounded-xl mb-4 gap-1 no-print">
+                    <button id="btn_us" onclick="setLTCPath('US')" class="flex-1 py-2.5 rounded-lg font-black text-xs bg-white shadow text-purple-600">美國</button>
+                    <button id="btn_tw" onclick="setLTCPath('TW')" class="flex-1 py-2.5 rounded-lg font-bold text-xs text-slate-500">台灣</button>
+                </div>
+                <div class="grid grid-cols-2 gap-3 mb-3">
+                    <div>
+                        <label class="lbl" data-i18n="ltc_duration">Expected Duration (Months)</label>
+                        <div class="relative">
+                            <select id="ltc_duration" onchange="checkCustom('ltc_duration')" class="inp"></select>
+                            <div id="ltc_duration_custom_wrapper" class="hidden relative">
+                                <input type="number" id="ltc_duration_custom" class="inp pr-8" oninput="calculate()">
+                                <button type="button" onclick="cancelCustom('ltc_duration')" class="no-print absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs bg-slate-100 rounded px-1">✕</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div><label class="lbl" data-i18n="ltc_start_age">Start Age</label><input type="number" id="ltc_start_age" placeholder="75" class="inp text-center" oninput="calculate()"></div>
+                </div>
+                <div id="us_ltc_details">
+                    <div class="ltc-card active" id="card_inhome" onclick="selectLtcType('inhome')"><input type="radio" name="ltc_type" id="radio_inhome" value="inhome" checked class="no-print mr-3"><div class="flex-grow"><label class="text-[9px] font-bold text-slate-400 block" data-i18n="us_inhome">In-Home Care</label><input type="text" id="us_inhome" placeholder="$5,529" class="w-full bg-transparent py-0.5 font-black text-slate-800 outline-none text-sm" oninput="handleCurrencyInput(this)"></div></div>
+                    <div class="ltc-card" id="card_assisted" onclick="selectLtcType('assisted')"><input type="radio" name="ltc_type" id="radio_assisted" value="assisted" class="no-print mr-3"><div class="flex-grow"><label class="text-[9px] font-bold text-slate-400 block" data-i18n="us_assisted">Assisted Living</label><input type="text" id="us_assisted" placeholder="$6,350" class="w-full bg-transparent py-0.5 font-black text-slate-800 outline-none text-sm" oninput="handleCurrencyInput(this)"></div></div>
+                    <div class="ltc-card" id="card_nursing" onclick="selectLtcType('nursing')"><input type="radio" name="ltc_type" id="radio_nursing" value="nursing" class="no-print mr-3"><div class="flex-grow"><label class="text-[9px] font-bold text-slate-400 block" data-i18n="us_nursing">Nursing Home</label><input type="text" id="us_nursing" placeholder="$8,015" class="w-full bg-transparent py-0.5 font-black text-slate-800 outline-none text-sm" oninput="handleCurrencyInput(this)"></div></div>
+                </div>
+                <div id="tw_ltc_details" class="hidden">
+                    <div class="ltc-card active border-purple-400 bg-purple-50/50"><div class="flex-grow px-2"><label class="text-[9px] font-bold text-purple-600 block" data-i18n="tw_monthly">Taiwan LTC Monthly</label><input type="text" id="tw_monthly" placeholder="$3,200" class="w-full bg-transparent py-0.5 font-black text-slate-900 outline-none text-sm" oninput="handleCurrencyInput(this)"></div></div>
+                </div>
+            </div>
 
-            const t = dict[currentLang];
-            const blankOpt = `<option value="" disabled hidden ${isCleared ? 'selected' : ''}></option>`;
+            <!-- S04: Retirement -->
+            <div class="card">
+                <h2 class="sec-title"><span class="sec-badge bg-sky-500">04</span><span data-i18n="sec4_title">退休生活需求</span></h2>
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <div><label class="lbl" data-i18n="retire_age">退休年齡</label><input type="number" id="retire_age" placeholder="65" class="inp text-center" oninput="calculate()"></div>
+                    <div><label class="lbl" data-i18n="life_exp">預期壽命</label><input type="number" id="life_exp" placeholder="99" class="inp text-center" oninput="calculate()"></div>
+                </div>
+                <p class="text-[10px] font-bold text-slate-400 mb-3 uppercase tracking-wide" data-i18n="monthly_exp_title">月支出 (現值，系統計算通膨未來值)</p>
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <div><label class="lbl" data-i18n="ret_basic">基本生活費</label><input type="text" id="ret_basic" placeholder="$4,000" oninput="handleCurrencyInput(this)" class="inp"></div>
+                    <div><label class="lbl" data-i18n="ret_medical">醫療費</label><input type="text" id="ret_medical" placeholder="$800" oninput="handleCurrencyInput(this)" class="inp"></div>
+                    <div><label class="lbl" data-i18n="ret_leisure">休閒旅遊</label><input type="text" id="ret_leisure" placeholder="$500" oninput="handleCurrencyInput(this)" class="inp"></div>
+                    <div><label class="lbl" data-i18n="ret_other">其他</label><input type="text" id="ret_other" placeholder="$200" oninput="handleCurrencyInput(this)" class="inp"></div>
+                </div>
+                <p class="text-[10px] font-bold text-slate-400 mb-3 uppercase tracking-wide" data-i18n="ret_income_title">退休收入來源 (現值)</p>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="lbl" data-i18n="ss_benefit">Social Security (月)</label>
+                        <input type="text" id="ss_benefit" placeholder="$2,000" oninput="handleCurrencyInput(this)" class="inp">
+                    </div>
+                    <div>
+                        <label class="lbl" data-i18n="ss_adj">SS 調整率 (預設70%)</label>
+                        <input type="number" id="ss_adj" placeholder="70" min="0" max="100" class="inp" oninput="calculate()">
+                    </div>
+                    <div>
+                        <label class="lbl" data-i18n="rental_income">租金收入/月 (現值)</label>
+                        <input type="text" id="rental_income" placeholder="$1,500" oninput="handleCurrencyInput(this)" class="inp">
+                    </div>
+                    <div>
+                        <label class="lbl" data-i18n="rental_adj">租金成長率 (%/年)</label>
+                        <input type="number" id="rental_adj" placeholder="3" min="0" class="inp" oninput="calculate()">
+                    </div>
+                </div>
+            </div>
 
-            yr_sel.innerHTML = blankOpt + t.yr_opts.map((val, i) => `<option value="${val}">${t.yr_labels[i]}</option>`).join('') + `<option value="custom">${t.custom_input}</option>`;
-            ltc_sel.innerHTML = blankOpt + t.ltc_opts.map((val, i) => `<option value="${val}">${t.ltc_labels[i]}</option>`).join('') + `<option value="custom">${t.custom_input}</option>`;
+            <!-- S05: Assets -->
+            <div class="card">
+                <h2 class="sec-title"><span class="sec-badge bg-emerald-500">05</span><span data-i18n="sec5_title">現有資產配置</span></h2>
 
-            if (current_yr_val && !isCleared) yr_sel.value = current_yr_val;
-            else if (!isCleared) yr_sel.value = '10';
+                <!-- Liquid -->
+                <div class="mb-4">
+                    <p class="text-[10px] font-black text-emerald-600 uppercase tracking-wide mb-2" data-i18n="asset_liquid_title">💵 流動性資產</p>
+                    <div class="grid grid-cols-2 gap-3 mb-2">
+                        <div><label class="lbl" data-i18n="liquid_assets">現金/存款/短期投資</label><input type="text" id="liquid_assets" placeholder="$100,000" oninput="handleCurrencyInput(this)" class="inp"></div>
+                    </div>
+                    <div id="liquid_alloc_ui" class="hidden"></div>
+                </div>
 
-            if (current_ltc_val && !isCleared) ltc_sel.value = current_ltc_val;
-            else if (!isCleared) ltc_sel.value = '36';
+                <!-- Real Estate -->
+                <div class="mb-4 bg-slate-50 rounded-xl p-3 border border-slate-100">
+                    <p class="text-[10px] font-black text-slate-600 uppercase tracking-wide mb-2" data-i18n="asset_re_title">🏠 投資房地產</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div><label class="lbl" data-i18n="re_value">現在市值</label><input type="text" id="re_value" placeholder="$500,000" oninput="handleCurrencyInput(this)" class="inp"></div>
+                        <div><label class="lbl" data-i18n="re_loan">未償貸款</label><input type="text" id="re_loan" placeholder="$300,000" oninput="handleCurrencyInput(this)" class="inp"></div>
+                        <div><label class="lbl" data-i18n="re_growth">年增值率 (%)</label><input type="number" id="re_growth" placeholder="3" class="inp" oninput="calculate()"></div>
+                        <div><label class="lbl" data-i18n="re_monthly_payment">每月還款</label><input type="text" id="re_monthly_payment" placeholder="$1,500" oninput="handleCurrencyInput(this)" class="inp"></div>
+                    </div>
+                    <div class="mt-2 flex justify-between items-center">
+                        <span class="text-[10px] text-slate-500 font-bold" data-i18n="re_future_equity">退休時預估淨值</span>
+                        <span id="re_future_equity_display" class="text-sm font-black text-emerald-600 font-mono">$0</span>
+                    </div>
+                    <div id="re_alloc_ui" class="hidden mt-2"></div>
+                </div>
 
-            document.getElementById('income_years_custom').placeholder = t.custom_yr_placeholder;
-            document.getElementById('ltc_duration_custom').placeholder = t.custom_mo_placeholder;
-        }
+                <!-- Life Insurance -->
+                <div class="mb-4">
+                    <p class="text-[10px] font-black text-red-500 uppercase tracking-wide mb-2" data-i18n="asset_life_title">🛡️ 人壽保險 → 身故保障</p>
+                    <div class="grid grid-cols-1 gap-3">
+                        <div><label class="lbl" data-i18n="life_ins_amount">壽險總保額</label><input type="text" id="life_ins_amount" placeholder="$500,000" oninput="handleCurrencyInput(this)" class="inp"></div>
+                    </div>
+                </div>
 
-        // 🚀 啟動自訂輸入
-        function checkCustom(baseId) {
-            const sel = document.getElementById(baseId);
-            if (sel.value === 'custom') {
-                sel.classList.add('hidden');
-                const wrapper = document.getElementById(baseId + '_custom_wrapper');
-                wrapper.classList.remove('hidden');
-                document.getElementById(baseId + '_custom').focus();
-            }
-            calculate();
-        }
+                <!-- Living Benefits / CI -->
+                <div class="mb-4">
+                    <p class="text-[10px] font-black text-orange-500 uppercase tracking-wide mb-2" data-i18n="asset_ci_title">⚕️ 生前福利保單 → 醫療/重疾</p>
+                    <div class="grid grid-cols-1 gap-3">
+                        <div><label class="lbl" data-i18n="ci_ins_amount">生前福利總保額</label><input type="text" id="ci_ins_amount" placeholder="$200,000" oninput="handleCurrencyInput(this)" class="inp"></div>
+                    </div>
+                </div>
 
-        // 🚀 取消自訂輸入，回到選單
-        function cancelCustom(baseId) {
-            document.getElementById(baseId + '_custom_wrapper').classList.add('hidden');
-            document.getElementById(baseId + '_custom').value = '';
-            const sel = document.getElementById(baseId);
-            sel.classList.remove('hidden');
-            sel.value = (baseId === 'income_years') ? '10' : '36';
-            calculate();
-        }
+                <!-- Annuity / LTC -->
+                <div class="mb-4">
+                    <p class="text-[10px] font-black text-purple-600 uppercase tracking-wide mb-2" data-i18n="asset_annuity_title">📅 年金 / 長照險</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div><label class="lbl" data-i18n="annuity_monthly">月給付額</label><input type="text" id="annuity_monthly" placeholder="$3,000" oninput="handleCurrencyInput(this)" class="inp"></div>
+                        <div><label class="lbl" data-i18n="annuity_years">給付年數</label><input type="number" id="annuity_years" placeholder="10" class="inp" oninput="calculate()"></div>
+                    </div>
+                    <div id="annuity_alloc_ui" class="hidden mt-2"></div>
+                </div>
 
-        // 🚀 獲取下拉或手動輸入的實際數值 (供精算用)
-        function getDropdownLogicalValue(baseId, defaultVal) {
-            const wrapper = document.getElementById(baseId + '_custom_wrapper');
-            if (!wrapper.classList.contains('hidden')) {
-                const customVal = document.getElementById(baseId + '_custom').value;
-                return customVal === '' ? (isCleared ? 0 : defaultVal) : parseInt(customVal) || 0;
-            } else {
-                const selVal = document.getElementById(baseId).value;
-                if (selVal === 'custom') return 0; 
-                if (selVal === '') return isCleared ? 0 : defaultVal;
-                return parseInt(selVal) || 0;
-            }
-        }
+                <!-- 529 -->
+                <div class="mb-4 bg-amber-50 rounded-xl p-3 border border-amber-100">
+                    <p class="text-[10px] font-black text-amber-700 uppercase tracking-wide mb-2" data-i18n="asset_529_title">🎓 529 教育帳戶 → 子女教育</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div><label class="lbl" data-i18n="s529_balance">現有餘額</label><input type="text" id="s529_balance" placeholder="$30,000" oninput="handleCurrencyInput(this)" class="inp"></div>
+                        <div><label class="lbl" data-i18n="s529_monthly">每月定期投入</label><input type="text" id="s529_monthly" placeholder="$500" oninput="handleCurrencyInput(this)" class="inp"></div>
+                        <div><label class="lbl" data-i18n="s529_rate">年化收益率 (%)</label><input type="number" id="s529_rate" placeholder="6" class="inp" oninput="calculate()"></div>
+                        <div class="flex flex-col justify-end"><label class="lbl" data-i18n="s529_fv">預估未來值</label><p id="s529_fv_display" class="text-sm font-black text-amber-700 font-mono py-2">$0</p></div>
+                    </div>
+                </div>
 
-        // 🚀 獲取下拉或手動輸入的顯示文字 (供圖表與 PDF 用)
-        function getDropdownDisplayLabel(baseId, defaultValStr) {
-            const wrapper = document.getElementById(baseId + '_custom_wrapper');
-            if (!wrapper.classList.contains('hidden')) {
-                const val = document.getElementById(baseId + '_custom').value;
-                if (val === '') return isCleared ? '0' : defaultValStr;
-                return val + (currentLang === 'zh' ? (baseId === 'income_years' ? ' 年' : ' 個月') : (baseId === 'income_years' ? ' Years' : ' Months'));
-            } else {
-                const sel = document.getElementById(baseId);
-                if (sel.value === '') return isCleared ? '0' : defaultValStr;
-                return sel.options[sel.selectedIndex]?.text || defaultValStr;
-            }
-        }
+                <!-- 401k -->
+                <div class="bg-sky-50 rounded-xl p-3 border border-sky-100">
+                    <p class="text-[10px] font-black text-sky-600 uppercase tracking-wide mb-2" data-i18n="asset_401k_title">📈 401(k) / 退休帳戶 → 退休準備</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div><label class="lbl" data-i18n="k401_balance">現有餘額</label><input type="text" id="k401_balance" placeholder="$200,000" oninput="handleCurrencyInput(this)" class="inp"></div>
+                        <div><label class="lbl" data-i18n="k401_annual">每年存入</label><input type="text" id="k401_annual" placeholder="$20,000" oninput="handleCurrencyInput(this)" class="inp"></div>
+                        <div><label class="lbl" data-i18n="k401_rate">年化報酬率 (%)</label><input type="number" id="k401_rate" placeholder="8" class="inp" oninput="calculate()"></div>
+                        <div><label class="lbl" data-i18n="k401_withdraw_age">提領年齡</label><input type="number" id="k401_withdraw_age" placeholder="65" class="inp text-center" oninput="calculate()"></div>
+                    </div>
+                    <div id="k401_warning" class="hidden warn-badge mt-2 w-full justify-center" data-i18n="k401_early_warn">⚠️ 早期提領 (< 59.5歲)：將產生10%罰款</div>
+                    <div class="mt-2 flex justify-between items-center">
+                        <span class="text-[10px] text-sky-600 font-bold" data-i18n="k401_fv_label">預估退休時帳戶價值</span>
+                        <span id="k401_fv_display" class="text-sm font-black text-sky-600 font-mono">$0</span>
+                    </div>
+                </div>
+            </div>
 
-        function formatUSD(v) { return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(v); }
-        function parseCurrency(s) { return parseFloat(String(s).replace(/[$,]/g, '')) || 0; }
-        
-        function handleCurrencyInput(el) { 
-            let cursor = el.selectionStart; let len = el.value.length; let val = el.value.replace(/[^\d]/g, ''); 
-            if (val === '') { el.value = ''; calculate(); return; } 
-            el.value = formatUSD(parseInt(val, 10)); 
-            el.setSelectionRange(cursor + (el.value.length - len), cursor + (el.value.length - len)); 
-            calculate(); 
-        }
-        
-        function toggleFV() { document.getElementById('inflation_control').classList.toggle('hidden', !document.getElementById('fv_toggle').checked); calculate(); }
-        function updateInflationLabel() { document.getElementById('inflation_display').innerText = document.getElementById('inflation_rate').value + '%'; }
+        </div><!-- end left col -->
 
-        function clearAllData() {
-            if(confirm(currentLang==='zh' ? '確定要清空所有輸入的資料嗎？(重新整理網頁可回復預設)' : 'Are you sure you want to clear all data? (Refresh page to restore defaults)')) {
-                isCleared = true; 
-                document.querySelectorAll('input').forEach(el => {
-                    if(el.type === 'text' || el.type === 'number' || el.type === 'email') {
-                        el.value = '';
-                        el.placeholder = ''; 
-                    }
-                });
+        <!-- RIGHT COLUMN: Summary -->
+        <div class="w-full lg:w-[42%] lg:sticky lg:top-6">
 
-                // 重置 Select 相關欄位
-                ['income_years', 'ltc_duration'].forEach(id => {
-                    const sel = document.getElementById(id);
-                    sel.value = ''; 
-                    sel.classList.remove('hidden');
-                    document.getElementById(id + '_custom_wrapper').classList.add('hidden');
-                    document.getElementById(id + '_custom').value = '';
-                });
+            <!-- Charts -->
+            <div class="card mb-4">
+                <h3 class="sec-title"><span class="sec-badge bg-slate-700">📊</span><span data-i18n="chart_title">需求 vs 資產 分析圖</span></h3>
+                <p class="text-[9px] text-slate-400 font-bold mb-3 uppercase" data-i18n="chart_hint">← 左右滑動查看各項目 | 外環=需求 內環=資產</p>
+                <div class="charts-strip" id="charts_strip">
+                    <!-- Chart cards generated by JS -->
+                </div>
+            </div>
 
-                generateChildRows(); 
-                calculate();
-            }
-        }
+            <!-- Gap Cards -->
+            <div id="gap_cards_container" class="space-y-3 mb-4"></div>
 
-        function getInputValue(id, type = 'currency', originalPlaceholder = '') {
-            const el = document.getElementById(id);
-            if (!el) return type === 'text' ? '' : 0;
-            let valStr = el.value;
-            if (valStr === '') {
-                valStr = isCleared ? (type === 'text' ? '' : '0') : (el.placeholder || originalPlaceholder || (type === 'text' ? '' : '0'));
-            }
-            if (type === 'currency') return parseCurrency(valStr);
-            if (type === 'number') return parseFloat(valStr) || 0;
-            return valStr;
-        }
+            <!-- Action Buttons -->
+            <div class="card no-print">
+                <div class="space-y-2">
+                    <button id="saveBtn" onclick="saveToSheet()" class="w-full bg-slate-900 text-white font-black py-3.5 rounded-xl shadow text-sm tracking-widest active:scale-95 transition-transform" data-i18n="btn_save">儲存諮詢紀錄</button>
+                    <button onclick="handlePrint()" class="w-full bg-white text-slate-600 font-bold py-3 rounded-xl text-sm border border-slate-200" data-i18n="btn_print">列印 PDF 報告</button>
+                </div>
+            </div>
 
-        function animateValue(id, start, end, duration) {
-            if (start === end) return;
-            const obj = document.getElementById(id);
-            if (gapAnimationId) cancelAnimationFrame(gapAnimationId); 
-            
-            let startTimestamp = null;
-            const step = (timestamp) => {
-                if (!startTimestamp) startTimestamp = timestamp;
-                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                const easeProgress = 1 - Math.pow(1 - progress, 3);
-                const currentVal = Math.floor(easeProgress * (end - start) + start);
-                
-                obj.innerText = formatUSD(currentVal);
-                if (progress < 1) {
-                    gapAnimationId = window.requestAnimationFrame(step);
-                } else {
-                    obj.innerText = formatUSD(end); 
-                }
-            };
-            gapAnimationId = window.requestAnimationFrame(step);
-        }
+        </div><!-- end right col -->
+    </div><!-- end flex -->
+</div><!-- end max-w -->
 
-        function calculate() {
-            const isFV = document.getElementById('fv_toggle').checked; const r = isFV ? (parseFloat(document.getElementById('inflation_rate').value)/100) : 0;
-            
-            const age = getInputValue('client_age', 'number', '35');
-            const mort = getInputValue('mortgage', 'currency', '$350,000'); 
-            const debt = getInputValue('other_debt', 'currency', '$100,000');
-            const ann = getInputValue('annual_income', 'currency', '$80,000'); 
-            
-            const yrs = getDropdownLogicalValue('income_years', 10);
-            
-            let replacement = r > 0 ? ann * (Math.pow(1 + r, yrs) - 1) / r : ann * yrs;
-            let eduT = 0; 
-            const eduP = getInputValue('edu_per_child', 'currency', '$150,000');
-            
-            document.querySelectorAll('.child-age-input').forEach(i => { 
-                let cAgeStr = i.value;
-                if(cAgeStr === '') cAgeStr = isCleared ? '0' : (i.placeholder || '0');
-                let cAge = parseInt(cAgeStr) || 0;
-                eduT += eduP * Math.pow(1 + r, Math.max(0, 18 - cAge)); 
-            });
-            
-            const lifeT = mort + debt + replacement + eduT;
-            
-            const medOOP_FV = getInputValue('medical_oop', 'currency', '$18,000') * Math.pow(1+r, Math.max(0, 65-age));
-            const medRec_FV = getInputValue('recovery_fund', 'currency', '$160,000') * Math.pow(1+r, Math.max(0, 65-age));
-            const medT = medOOP_FV + medRec_FV;
-            
-            const ltcBaseId = currentLTCPath==='US' ? 'us_'+document.querySelector('input[name="ltc_type"]:checked').value : 'tw_monthly';
-            let ltcOrig = '$3,200';
-            if (currentLTCPath==='US') {
-                const usType = document.querySelector('input[name="ltc_type"]:checked').value;
-                if(usType === 'inhome') ltcOrig = '$5,529';
-                if(usType === 'assisted') ltcOrig = '$6,350';
-                if(usType === 'nursing') ltcOrig = '$8,015';
-            }
+<footer class="text-center text-[8px] text-slate-400 py-6 border-t border-slate-200 mt-6">
+    © <span id="year_display"></span> Elevatus Business Consultants. 本報告內容僅供初步財務規劃參考，不構成投資或保險建議。
+</footer>
 
-            const ltcRate = getInputValue(ltcBaseId, 'currency', ltcOrig);
-            const ltcDur = getDropdownLogicalValue('ltc_duration', 36);
-            
-            const ltcStart = getInputValue('ltc_start_age', 'number', '75');
-            const ltcT = (ltcRate * ltcDur) * Math.pow(1+r, Math.max(0, ltcStart-age));
-            
-            const ins = getInputValue('current_insurance', 'currency', '$300,000'); 
-            const cash = getInputValue('current_assets', 'currency', '$100,000');
-            const gap = Math.max(0, (lifeT + medT + ltcT) - (ins + cash));
+<script>
+// ─────────────────────────────────────────────
+// DICT
+// ─────────────────────────────────────────────
+const dict = {
+    zh: {
+        app_title:"保障需求分析 V9.0", advisor:"顧問:", sec0_title:"00. 客戶基本資料", client_name:"客戶姓名", gender:"性別", male:"男", female:"女", age:"目前年齡", phone:"聯絡電話", email:"E-mail", child_count:"子女數量", notes:"諮詢備註",
+        sec1_title:"01. 身故保障需求", mortgage:"房貸餘額", other_debt:"其他負債", annual_income:"年收入", income_years:"收入替代年數", childcare_title:"👶 育兒年費 (至18歲)", childcare_annual:"每年育兒費用", childcare_total:"合計 (FV)", edu_budget:"教育預算/人", child_sync:"子女數 (同步)",
+        sec2_title:"02. 醫療與重大疾病", ci_income:"CI 替代收入/年 (可手動覆蓋)", ci_years:"替代年限", ci_fv_age:"FV 計算至年齡 (預設65)",
+        sec3_title:"03. 長期照護準備", cost_of_care_link:"查詢照護成本 ↗", ltc_duration:"預計月數", ltc_start_age:"啟動年齡", us_inhome:"In-Home Care", us_assisted:"Assisted Living", us_nursing:"Nursing Home", tw_monthly:"台灣照護月費",
+        sec4_title:"04. 退休生活需求", retire_age:"退休年齡", life_exp:"預期壽命", monthly_exp_title:"月支出 (現值，系統計算通膨未來值)", ret_basic:"基本生活費", ret_medical:"醫療費", ret_leisure:"休閒旅遊", ret_other:"其他", ret_income_title:"退休收入來源 (現值)", ss_benefit:"Social Security (月)", ss_adj:"SS 調整率 (預設70%)", rental_income:"租金收入/月 (現值)", rental_adj:"租金成長率 (%/年)",
+        sec5_title:"05. 現有資產配置", asset_liquid_title:"💵 流動性資產", liquid_assets:"現金/存款/短期投資", asset_re_title:"🏠 投資房地產", re_value:"現在市值", re_loan:"未償貸款", re_growth:"年增值率 (%)", re_monthly_payment:"每月還款", re_future_equity:"退休時預估淨值", asset_life_title:"🛡️ 人壽保險 → 身故保障", life_ins_amount:"壽險總保額", asset_ci_title:"⚕️ 生前福利保單 → 醫療/重疾", ci_ins_amount:"生前福利總保額", asset_annuity_title:"📅 年金 / 長照險", annuity_monthly:"月給付額", annuity_years:"給付年數", asset_529_title:"🎓 529 教育帳戶", s529_balance:"現有餘額", s529_monthly:"每月定期投入", s529_rate:"年化收益率 (%)", s529_fv:"預估未來值", asset_401k_title:"📈 401(k) / 退休帳戶", k401_balance:"現有餘額", k401_annual:"每年存入", k401_rate:"年化報酬率 (%)", k401_withdraw_age:"提領年齡", k401_early_warn:"⚠️ 早期提領 (< 59.5歲)：將產生10%罰款", k401_fv_label:"預估退休時帳戶價值",
+        chart_title:"需求 vs 資產 分析圖", chart_hint:"← 左右滑動查看各項目 | 外環=需求 內環=資產",
+        fv_toggle:"通膨精算 (FV)", inflation_rate:"通膨率", btn_save:"儲存諮詢紀錄", btn_print:"列印 PDF 報告", btn_clear:"⟲ 清空",
+        yr_opts:["5","10","15"], yr_labels:["5年(緩衝)","10年(標準)","15年(長守護)"],
+        ci_yr_opts:["2","3","5"], ci_yr_labels:["2年","3年","5年"],
+        ltc_opts:["12","24","36","48","60"], ltc_labels:["12月","24月","36月(平均)","48月","60月"],
+        custom_input:"✍️ 自訂...", custom_yr_ph:"請輸入年數", custom_mo_ph:"請輸入月數",
+        auto_alloc:"自動分配", manual_alloc:"手動",
+        gap_covered:"✅ 已覆蓋", gap_shortfall:"⚠️ 缺口",
+        chart_names:["身故保障","子女教育","醫療重疾","長期照護","退休準備"],
+        need_label:"需求", asset_label:"資產", gap_label:"缺口",
+        child_name_lb:"姓名", filename_pref:"保障需求分析",
+        inf_note:"通膨率(FV): ",
+        alloc_life:"→ 身故", alloc_ci:"→ 醫療", alloc_ret:"→ 退休", alloc_ltc:"→ 長照",
+    },
+    en: {
+        app_title:"Coverage Needs Analysis V9.0", advisor:"Advisor:", sec0_title:"00. CLIENT INFO", client_name:"Client Name", gender:"Gender", male:"Male", female:"Female", age:"Age", phone:"Phone", email:"E-mail", child_count:"No. of Children", notes:"Notes",
+        sec1_title:"01. LIFE / DEATH BENEFIT", mortgage:"Mortgage Balance", other_debt:"Other Debt", annual_income:"Annual Income", income_years:"Income Replacement Years", childcare_title:"👶 Childcare (to Age 18)", childcare_annual:"Annual Childcare Cost", childcare_total:"Total (FV)", edu_budget:"Education Budget/Child", child_sync:"Children (Synced)",
+        sec2_title:"02. CRITICAL ILLNESS", ci_income:"CI Income Replacement/Yr (Override)", ci_years:"Replacement Years", ci_fv_age:"FV Calc-to Age (default 65)",
+        sec3_title:"03. LONG-TERM CARE", cost_of_care_link:"Cost of Care ↗", ltc_duration:"Duration (Months)", ltc_start_age:"Start Age", us_inhome:"In-Home Care", us_assisted:"Assisted Living", us_nursing:"Nursing Home", tw_monthly:"Taiwan LTC Monthly",
+        sec4_title:"04. RETIREMENT NEEDS", retire_age:"Retire Age", life_exp:"Life Expectancy", monthly_exp_title:"Monthly Expenses (today's $, FV auto-calc)", ret_basic:"Basic Living", ret_medical:"Medical", ret_leisure:"Leisure/Travel", ret_other:"Other", ret_income_title:"Retirement Income (today's $)", ss_benefit:"Social Security (Monthly)", ss_adj:"SS Adj. Rate (default 70%)", rental_income:"Rental Income/Month", rental_adj:"Rental Growth (%/yr)",
+        sec5_title:"05. CURRENT ASSETS", asset_liquid_title:"💵 Liquid Assets", liquid_assets:"Cash/Savings/ST Investments", asset_re_title:"🏠 Investment Property", re_value:"Market Value", re_loan:"Outstanding Loan", re_growth:"Annual Appreciation (%)", re_monthly_payment:"Monthly Payment", re_future_equity:"Projected Equity at Retirement", asset_life_title:"🛡️ Life Insurance → Life Need", life_ins_amount:"Total Life Coverage", asset_ci_title:"⚕️ Living Benefits → CI Need", ci_ins_amount:"Total Living Benefits", asset_annuity_title:"📅 Annuity / LTC Policy", annuity_monthly:"Monthly Benefit", annuity_years:"Payment Years", asset_529_title:"🎓 529 Education Account", s529_balance:"Current Balance", s529_monthly:"Monthly Contribution", s529_rate:"Annual Return (%)", s529_fv:"Projected FV", asset_401k_title:"📈 401(k) / Retirement Account", k401_balance:"Current Balance", k401_annual:"Annual Contribution", k401_rate:"Annual Return (%)", k401_withdraw_age:"Withdrawal Age", k401_early_warn:"⚠️ Early Withdrawal (< 59.5): 10% penalty applies", k401_fv_label:"Projected Value at Retirement",
+        chart_title:"Needs vs Assets Analysis", chart_hint:"← Swipe to view each category | Outer=Need, Inner=Asset",
+        fv_toggle:"Inflation (FV)", inflation_rate:"Rate", btn_save:"Save Record", btn_print:"Print PDF", btn_clear:"⟲ Clear",
+        yr_opts:["5","10","15"], yr_labels:["5 Yrs (Buffer)","10 Yrs (Standard)","15 Yrs (Long-term)"],
+        ci_yr_opts:["2","3","5"], ci_yr_labels:["2 Years","3 Years","5 Years"],
+        ltc_opts:["12","24","36","48","60"], ltc_labels:["12 Mo","24 Mo","36 Mo (Avg)","48 Mo","60 Mo"],
+        custom_input:"✍️ Custom...", custom_yr_ph:"Enter Years", custom_mo_ph:"Enter Months",
+        auto_alloc:"Auto", manual_alloc:"Manual",
+        gap_covered:"✅ Covered", gap_shortfall:"⚠️ Shortfall",
+        chart_names:["Life","Education","CI/Med","LTC","Retirement"],
+        need_label:"Need", asset_label:"Asset", gap_label:"Gap",
+        child_name_lb:"Name", filename_pref:"Needs_Analysis",
+        inf_note:"Inflation (FV): ",
+        alloc_life:"→ Life", alloc_ci:"→ CI", alloc_ret:"→ Retire", alloc_ltc:"→ LTC",
+    }
+};
 
-            const t = dict[currentLang];
-            const yrLabel = getDropdownDisplayLabel('income_years', t.yr_labels[1]);
-            const displayLtcDur = getDropdownDisplayLabel('ltc_duration', t.ltc_labels[2]);
-            
-            window.chartBreakdown = {
-                life: [`【${t.disp_life}: ${formatUSD(lifeT)}】`, `${t.mortgage}: ${formatUSD(mort)}`, `${t.other_debt}: ${formatUSD(debt)}`, `${yrLabel} ${t.inc_rep_label}: ${formatUSD(replacement)}`, `${t.edu_budget}: ${formatUSD(eduT)}`],
-                med: [`【${t.disp_med}: ${formatUSD(medT)}】`, `${t.medical_oop}: ${formatUSD(medOOP_FV)}`, `${t.recovery_fund}: ${formatUSD(medRec_FV)}`],
-                ltc: [`【${t.disp_ltc}: ${formatUSD(ltcT)}】`, `${currentLang==='zh'?'預計月費':'Monthly Rate'}: ${formatUSD(ltcRate)}`, `${t.ltc_duration}: ${displayLtcDur}`, `${t.ltc_start_age}: ${ltcStart}`]
-            };
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+let currentLang = 'zh';
+let currentLTCPath = 'US';
+let isCleared = false;
+let charts = {};
+// Allocation state: fraction of liquid/re/annuity going to each bucket
+let allocState = {
+    liquid:  { life:0.5, ci:0.5, ret:0, ltc:0, mode:'auto' },
+    re:      { life:0.5, ci:0,   ret:0.5, ltc:0, mode:'auto' },
+    annuity: { life:0,   ci:0,   ret:0.5, ltc:0.5, mode:'auto' },
+};
 
-            document.getElementById('life_need_display').innerText = formatUSD(lifeT); 
-            document.getElementById('medical_need_display').innerText = formatUSD(medT);
-            document.getElementById('ltc_need_display').innerText = formatUSD(ltcT); 
-            document.getElementById('merged_assets_display').innerText = formatUSD(ins + cash);
-            
-            animateValue('total_gap_val', currentDisplayedGap, gap, 600);
-            currentDisplayedGap = gap;
-            
-            updateChart(lifeT, medT, ltcT, ins, cash);
-        }
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxEsNTWhldPnUc1xxnUHJcaH14Wbd0J1CMSOnhI9r_5ckZ-jRwHEhPR1lZdptHe3H6o/exec";
 
-        function initChart() {
-            const ctx = document.getElementById('gapChart').getContext('2d');
-            myChart = new Chart(ctx, {
-                type: 'doughnut', 
-                data: { 
-                    datasets: [
-                        { data: [1, 1, 1], backgroundColor: ['#ef4444', '#f97316', '#a855f7'], borderWidth: 0, weight: 1.5 }, 
-                        { data: [1, 1, 1], backgroundColor: ['#10b981', '#6ee7b7', '#f1f5f9'], borderWidth: 0, weight: 1 }
-                    ] 
-                },
-                options: { 
-                    cutout: '45%', responsive: true, maintainAspectRatio: false, 
-                    plugins: { 
-                        legend: { display: false }, 
-                        tooltip: { 
-                            backgroundColor: 'rgba(15, 23, 42, 0.95)', titleFont: { size: 14, weight: '900' }, bodyFont: { size: 12 }, padding: 16, cornerRadius: 12, 
-                            callbacks: {
-                                title: (i) => { const t = dict[currentLang]; return i[0].datasetIndex === 0 ? [t.disp_life, t.disp_med, t.disp_ltc][i[0].dataIndex] : [t.cur_ins_short, t.cur_assets_short, t.gap_short][i[0].dataIndex]; },
-                                label: (ctx) => { if (ctx.datasetIndex === 0) { const keys = ['life','med','ltc']; return window.chartBreakdown[keys[ctx.dataIndex]]; } else return (currentLang==='zh'?"總計: ":"Total: ") + formatUSD(ctx.parsed); }
+// Stores rich breakdown lines for each chart's tooltip
+// Index: 0=life,1=edu,2=ci,3=ltc,4=ret
+// Each entry: { needLines:[], assetLines:[], gapLines:[] }
+window.chartBreakdowns = Array(5).fill(null).map(()=>({needLines:[],assetLines:[],gapLines:[]}));
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+window.onload = function() {
+    document.getElementById('display_date').innerText = new Date().toLocaleDateString();
+    document.getElementById('year_display').innerText = new Date().getFullYear();
+    document.getElementById('ph-date').innerText = new Date().toLocaleDateString();
+    syncDropdowns();
+    updateLangUI();
+    initCharts();
+    renderAllocUI('liquid', ['life','ci'], 'liquid_alloc_ui');
+    renderAllocUI('re', ['life','ret'], 're_alloc_ui');
+    renderAllocUI('annuity', ['ltc','ret'], 'annuity_alloc_ui');
+    calculate();
+};
+
+// ─────────────────────────────────────────────
+// LANG
+// ─────────────────────────────────────────────
+function toggleLang() {
+    currentLang = currentLang === 'zh' ? 'en' : 'zh';
+    syncDropdowns();
+    updateLangUI();
+}
+function updateLangUI() {
+    const zh = document.getElementById('lang-zh'), en = document.getElementById('lang-en');
+    zh.className = currentLang==='zh' ? 'text-blue-600 font-black' : 'text-slate-400';
+    en.className = currentLang==='en' ? 'text-blue-600 font-black' : 'text-slate-400';
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[currentLang][key] !== undefined) el.innerHTML = dict[currentLang][key];
+    });
+    document.getElementById('btn_us').innerText = currentLang==='zh' ? '美國' : 'U.S.';
+    document.getElementById('btn_tw').innerText = currentLang==='zh' ? '台灣' : 'Taiwan';
+    // Refresh chart titles
+    const t2 = dict[currentLang];
+    for(let i=0;i<5;i++){
+        const el=document.getElementById('chart_title_'+i);
+        if(el) el.innerText=t2.chart_names[i];
+    }
+    generateChildRows();
+    renderAllocUI('liquid', ['life','ci'], 'liquid_alloc_ui');
+    renderAllocUI('re', ['life','ret'], 're_alloc_ui');
+    renderAllocUI('annuity', ['ltc','ret'], 'annuity_alloc_ui');
+    calculate();
+}
+
+// ─────────────────────────────────────────────
+// DROPDOWNS
+// ─────────────────────────────────────────────
+function syncDropdowns() {
+    const t = dict[currentLang];
+    const blank = `<option value="" disabled hidden ${isCleared?'selected':''}></option>`;
+    const customOpt = `<option value="custom">${t.custom_input}</option>`;
+    
+    const yr = document.getElementById('income_years');
+    const prev_yr = yr.value;
+    yr.innerHTML = blank + t.yr_opts.map((v,i)=>`<option value="${v}">${t.yr_labels[i]}</option>`).join('') + customOpt;
+    yr.value = (prev_yr && prev_yr!=='') ? prev_yr : (!isCleared ? '10' : '');
+
+    const ci = document.getElementById('ci_years');
+    const prev_ci = ci.value;
+    ci.innerHTML = blank + t.ci_yr_opts.map((v,i)=>`<option value="${v}">${t.ci_yr_labels[i]}</option>`).join('') + customOpt;
+    ci.value = (prev_ci && prev_ci!=='') ? prev_ci : (!isCleared ? '3' : '');
+
+    const ltc = document.getElementById('ltc_duration');
+    const prev_ltc = ltc.value;
+    ltc.innerHTML = blank + t.ltc_opts.map((v,i)=>`<option value="${v}">${t.ltc_labels[i]}</option>`).join('') + customOpt;
+    ltc.value = (prev_ltc && prev_ltc!=='') ? prev_ltc : (!isCleared ? '36' : '');
+
+    document.getElementById('income_years_custom').placeholder = t.custom_yr_ph;
+    document.getElementById('ci_years_custom').placeholder = t.custom_yr_ph;
+    document.getElementById('ltc_duration_custom').placeholder = t.custom_mo_ph;
+}
+function checkCustom(id) {
+    const sel = document.getElementById(id);
+    if (sel.value === 'custom') {
+        sel.classList.add('hidden');
+        document.getElementById(id+'_custom_wrapper').classList.remove('hidden');
+        document.getElementById(id+'_custom').focus();
+    }
+    calculate();
+}
+function cancelCustom(id) {
+    document.getElementById(id+'_custom_wrapper').classList.add('hidden');
+    document.getElementById(id+'_custom').value = '';
+    const sel = document.getElementById(id);
+    sel.classList.remove('hidden');
+    const defaults = { income_years:'10', ci_years:'3', ltc_duration:'36' };
+    sel.value = defaults[id] || '';
+    calculate();
+}
+function getDropdownVal(id, def) {
+    const wrapper = document.getElementById(id+'_custom_wrapper');
+    if (!wrapper.classList.contains('hidden')) {
+        const v = document.getElementById(id+'_custom').value;
+        return v==='' ? (isCleared ? 0 : def) : (parseInt(v)||0);
+    }
+    const sel = document.getElementById(id);
+    if (!sel.value || sel.value==='custom' || sel.value==='') return isCleared ? 0 : def;
+    return parseInt(sel.value)||0;
+}
+function getDropdownLabel(id, defLabel) {
+    const wrapper = document.getElementById(id+'_custom_wrapper');
+    if (!wrapper.classList.contains('hidden')) {
+        const v = document.getElementById(id+'_custom').value;
+        if (v==='') return isCleared ? '0' : defLabel;
+        const suffix = (id==='ltc_duration') ? (currentLang==='zh'?' 月':' Mo') : (currentLang==='zh'?' 年':' Yrs');
+        return v + suffix;
+    }
+    const sel = document.getElementById(id);
+    if (!sel.value || sel.value==='') return isCleared ? '0' : defLabel;
+    return sel.options[sel.selectedIndex]?.text || defLabel;
+}
+
+// ─────────────────────────────────────────────
+// FV TOGGLE
+// ─────────────────────────────────────────────
+function toggleFVPanel() {
+    document.getElementById('fv_panel').classList.toggle('hidden', !document.getElementById('fv_toggle').checked);
+    calculate();
+}
+function updateInflLabel() {
+    document.getElementById('infl_disp').innerText = document.getElementById('inflation_rate').value + '%';
+}
+function getR() {
+    if (!document.getElementById('fv_toggle').checked) return 0;
+    return parseFloat(document.getElementById('inflation_rate').value)/100 || 0;
+}
+
+// ─────────────────────────────────────────────
+// INPUT HELPERS
+// ─────────────────────────────────────────────
+function fmtUSD(v) { return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:0,maximumFractionDigits:0}).format(v); }
+function parseCur(s) { return parseFloat(String(s).replace(/[$,]/g,''))||0; }
+function handleCurrencyInput(el) {
+    let cur=el.selectionStart, len=el.value.length;
+    let v=el.value.replace(/[^\d]/g,'');
+    if(v===''){el.value='';calculate();return;}
+    el.value=fmtUSD(parseInt(v,10));
+    el.setSelectionRange(cur+(el.value.length-len),cur+(el.value.length-len));
+    calculate();
+}
+function getVal(id, type='currency', ph='0') {
+    const el=document.getElementById(id); if(!el) return type==='text'?'':0;
+    let v=el.value;
+    if(v==='') v=isCleared?(type==='text'?'':'0'):(el.placeholder||ph||'0');
+    if(type==='currency') return parseCur(v);
+    if(type==='number') return parseFloat(v)||0;
+    return v;
+}
+function getAge() { return getVal('client_age','number','35')||35; }
+function getRetireAge() { return getVal('retire_age','number','65')||65; }
+function getLifeExp() { return getVal('life_exp','number','99')||99; }
+
+// ─────────────────────────────────────────────
+// CHILD ROWS
+// ─────────────────────────────────────────────
+function generateChildRows() {
+    const masterEl = document.getElementById('master_child_count');
+    const countStr = masterEl.value==='' ? (isCleared?'0':'0') : masterEl.value;
+    const count = parseInt(countStr)||0;
+    document.getElementById('child_count').value = masterEl.value;
+    if(isCleared) document.getElementById('child_count').placeholder='';
+    const container = document.getElementById('child_rows_container');
+    const saved = Array.from(container.children).map(r=>({
+        name: r.querySelector('.child-name').value,
+        gender: r.querySelector('.child-gender')?.value,
+        age: r.querySelector('.child-age-input').value
+    }));
+    container.innerHTML='';
+    const t = dict[currentLang];
+    for(let i=0;i<count;i++){
+        const d=saved[i]||{name:'',gender:'男',age:''};
+        const namePh = isCleared?'':`${t.child_name_lb} ${i+1}`;
+        const agePh = isCleared?'':'0';
+        const row=document.createElement('div');
+        row.className='bg-slate-50 p-2 rounded-xl border border-slate-100';
+        row.innerHTML=`
+            <div class="flex gap-2">
+                <div class="flex-1"><label class="text-[8px] font-bold text-slate-400 block">${t.child_name_lb}</label><input type="text" class="child-name w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-bold" placeholder="${namePh}" value="${d.name}"></div>
+                <div class="w-20"><label class="text-[8px] font-bold text-slate-400 block">${t.gender}</label><select class="child-gender w-full bg-white border border-slate-200 rounded-lg px-1 py-1.5 text-xs font-bold"><option value="男" ${d.gender==='男'?'selected':''}>${t.male}</option><option value="女" ${d.gender==='女'?'selected':''}>${t.female}</option></select></div>
+                <div class="w-16"><label class="text-[8px] font-bold text-slate-400 block">${t.age}</label><input type="number" class="child-age-input w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-bold" placeholder="${agePh}" value="${d.age}" oninput="calculate()"></div>
+            </div>`;
+        container.appendChild(row);
+    }
+    if(!isCleared) calculate();
+}
+
+// ─────────────────────────────────────────────
+// ALLOCATION UI
+// ─────────────────────────────────────────────
+function renderAllocUI(assetKey, buckets, containerId) {
+    const container = document.getElementById(containerId);
+    if(!container) return;
+    const t = dict[currentLang];
+    const state = allocState[assetKey];
+    const isManual = state.mode === 'manual';
+    
+    // Show alloc UI only if there's a value
+    const amtMap = { liquid:'liquid_assets', re:'re_value', annuity:'annuity_monthly' };
+    const el = document.getElementById(amtMap[assetKey]);
+    if(!el || (!el.value && !el.placeholder)) { container.classList.add('hidden'); return; }
+    container.classList.remove('hidden');
+
+    const bucketLabels = { life: t.alloc_life||'→ Life', ci: t.alloc_ci||'→ CI', ret: t.alloc_ret||'→ Retire', ltc: t.alloc_ltc||'→ LTC' };
+    
+    let html = `<div class="flex gap-2 mb-1">
+        <button class="alloc-mode-btn ${!isManual?'active':''}" onclick="setAllocMode('${assetKey}','auto')">${t.auto_alloc}</button>
+        <button class="alloc-mode-btn ${isManual?'active':''}" onclick="setAllocMode('${assetKey}','manual')">${t.manual_alloc}</button>
+    </div>`;
+    
+    buckets.forEach(b => {
+        const pct = Math.round((state[b]||0)*100);
+        html += `<div class="alloc-row">
+            <span class="alloc-label">${bucketLabels[b]||b}</span>
+            <input type="number" class="inp alloc-pct" min="0" max="100" value="${pct}" ${!isManual?'readonly':''}
+                onchange="setAllocPct('${assetKey}','${b}',this.value)">
+            <span class="text-[9px] text-slate-400 font-bold">%</span>
+        </div>`;
+    });
+    container.innerHTML = html;
+}
+function setAllocMode(assetKey, mode) {
+    allocState[assetKey].mode = mode;
+    if(mode==='auto') {
+        // Reset to default
+        if(assetKey==='liquid') { allocState.liquid.life=0.5; allocState.liquid.ci=0.5; }
+        if(assetKey==='re') { allocState.re.life=0.5; allocState.re.ret=0.5; }
+        if(assetKey==='annuity') { allocState.annuity.ltc=0.5; allocState.annuity.ret=0.5; }
+    }
+    const bucketMap = { liquid:['life','ci'], re:['life','ret'], annuity:['ltc','ret'] };
+    renderAllocUI(assetKey, bucketMap[assetKey], assetKey+'_alloc_ui');
+    calculate();
+}
+function setAllocPct(assetKey, bucket, val) {
+    allocState[assetKey][bucket] = Math.min(100, Math.max(0, parseFloat(val)||0))/100;
+    calculate();
+}
+
+// ─────────────────────────────────────────────
+// MAIN CALCULATE
+// ─────────────────────────────────────────────
+function calculate() {
+    const r = getR();
+    const age = getAge();
+    const retireAge = getRetireAge();
+    const lifeExp = getLifeExp();
+    const retireYears = Math.max(0, lifeExp - retireAge);
+    const yearsToRetire = Math.max(0, retireAge - age);
+
+    // ── S01: Life Need ──────────────────────
+    const mort = getVal('mortgage','currency','$350,000');
+    const debt = getVal('other_debt','currency','$100,000');
+    const ann = getVal('annual_income','currency','$80,000');
+    const yrs = getDropdownVal('income_years',10);
+    let replacement = r>0 ? ann*((Math.pow(1+r,yrs)-1)/r) : ann*yrs;
+
+    // Childcare: per child, each year up to 18
+    const childcareAnnual = getVal('childcare_annual','currency','$20,000') || 20000;
+    let childcareTotal = 0;
+    let childcareDetail = [];
+    document.querySelectorAll('.child-age-input').forEach(inp => {
+        let cAgeStr = inp.value;
+        if(cAgeStr==='') cAgeStr = isCleared?'0':(inp.placeholder||'0');
+        const cAge = parseInt(cAgeStr)||0;
+        const yearsLeft = Math.max(0, 18-cAge);
+        let childFV = r>0 ? childcareAnnual*((Math.pow(1+r,yearsLeft)-1)/r) : childcareAnnual*yearsLeft;
+        childcareTotal += childFV;
+        childcareDetail.push(`${yearsLeft}yr × ${fmtUSD(childcareAnnual)} = ${fmtUSD(childFV)}`);
+    });
+    document.getElementById('childcare_total_display').innerText = fmtUSD(childcareTotal);
+    document.getElementById('childcare_detail').innerText = childcareDetail.join(' | ');
+
+    // Education
+    let eduTotal = 0;
+    const eduP = getVal('edu_per_child','currency','$150,000');
+    document.querySelectorAll('.child-age-input').forEach(inp => {
+        let cAgeStr = inp.value;
+        if(cAgeStr==='') cAgeStr = isCleared?'0':(inp.placeholder||'0');
+        const cAge = parseInt(cAgeStr)||0;
+        eduTotal += eduP * Math.pow(1+r, Math.max(0,18-cAge));
+    });
+
+    const lifeNeed = mort + debt + replacement + childcareTotal;
+    const eduNeed = eduTotal;
+
+    // ── S02: CI Need ──────────────────────
+    const ciIncomeBase = getVal('annual_income','currency','$80,000');
+    let ciOverride = getVal('ci_income','currency','0');
+    const ciIncome = ciOverride > 0 ? ciOverride : ciIncomeBase;
+    const ciYrs = getDropdownVal('ci_years',3);
+    const ciFvAge = getVal('ci_fv_age','number','65') || 65;
+    const ciFvYears = Math.max(0, ciFvAge - age);
+    let ciReplacement = r>0 ? ciIncome*((Math.pow(1+r,ciYrs)-1)/r) : ciIncome*ciYrs;
+    const ciNeed = ciReplacement * Math.pow(1+r, ciFvYears);
+
+    // ── S03: LTC Need ──────────────────────
+    const ltcBaseId = currentLTCPath==='US' ? 'us_'+document.querySelector('input[name="ltc_type"]:checked').value : 'tw_monthly';
+    const ltcDefaultMap = { us_inhome:'$5,529', us_assisted:'$6,350', us_nursing:'$8,015', tw_monthly:'$3,200' };
+    const ltcRate = getVal(ltcBaseId,'currency', ltcDefaultMap[ltcBaseId]||'$5,529');
+    const ltcDur = getDropdownVal('ltc_duration',36);
+    const ltcStart = getVal('ltc_start_age','number','75')||75;
+    const ltcNeed = ltcRate * ltcDur * Math.pow(1+r, Math.max(0,ltcStart-age));
+
+    // ── S04: Retirement Need ──────────────────────
+    const retBasic  = getVal('ret_basic','currency','$4,000');
+    const retMed    = getVal('ret_medical','currency','$800');
+    const retLeisure= getVal('ret_leisure','currency','$500');
+    const retOther  = getVal('ret_other','currency','$200');
+    const retMonthlyNow = retBasic + retMed + retLeisure + retOther;
+    const retMonthlyFV = retMonthlyNow * Math.pow(1+r, yearsToRetire);
+
+    const ssBenefit = getVal('ss_benefit','currency','$2,000');
+    const ssAdj = (getVal('ss_adj','number','70')||70)/100;
+    const ssMonthlyFV = ssBenefit * ssAdj * Math.pow(1+r, yearsToRetire);
+
+    const rentalNow = getVal('rental_income','currency','$1,500');
+    const rentalGrowth = (getVal('rental_adj','number','3')||3)/100;
+    const rentalFV = rentalNow * Math.pow(1+rentalGrowth, yearsToRetire);
+
+    const retNetMonthly = Math.max(0, retMonthlyFV - ssMonthlyFV - rentalFV);
+    // Annuity PV formula for retirement corpus
+    const annR = r > 0 ? r/12 : 0.001;
+    const n = retireYears * 12;
+    const retNeed = retNetMonthly > 0 && n > 0
+        ? retNetMonthly * (1 - Math.pow(1+annR,-n)) / annR
+        : retNetMonthly * n;
+
+    // ── S05: Assets ──────────────────────
+    const liquid = getVal('liquid_assets','currency','$100,000');
+    
+    // Investment property future equity
+    const reValue = getVal('re_value','currency','$500,000');
+    const reLoan  = getVal('re_loan','currency','$300,000');
+    const reGrowthRate = (getVal('re_growth','number','3')||3)/100;
+    const reMonthlyPmt = getVal('re_monthly_payment','currency','$1,500');
+    const reFVValue = reValue * Math.pow(1+reGrowthRate, yearsToRetire);
+    // Remaining loan balance: standard amortization
+    const loanR = 0.06/12; // assume 6% mortgage rate for amortization
+    const remainingLoan = reLoan > 0 
+        ? reLoan * Math.pow(1+loanR, yearsToRetire*12) - reMonthlyPmt*((Math.pow(1+loanR,yearsToRetire*12)-1)/loanR)
+        : 0;
+    const reEquityFV = Math.max(0, reFVValue - Math.max(0, remainingLoan));
+    document.getElementById('re_future_equity_display').innerText = fmtUSD(reEquityFV);
+
+    // Life insurance
+    const lifeIns = getVal('life_ins_amount','currency','$500,000');
+
+    // Living benefits / CI insurance
+    const ciIns = getVal('ci_ins_amount','currency','$200,000');
+
+    // Annuity
+    const annuityMonthly = getVal('annuity_monthly','currency','$3,000');
+    const annuityYrs = getVal('annuity_years','number','10')||10;
+    const annuityTotal = annuityMonthly * 12 * annuityYrs;
+
+    // 529
+    const s529Bal = getVal('s529_balance','currency','$30,000');
+    const s529Monthly = getVal('s529_monthly','currency','$500');
+    const s529Rate = (getVal('s529_rate','number','6')||6)/100;
+    // Years = oldest child's years to 18
+    let s529Years = 0;
+    let maxChildAge = 0;
+    document.querySelectorAll('.child-age-input').forEach(inp => {
+        const cAge = parseInt(inp.value||inp.placeholder||'0')||0;
+        if(cAge > maxChildAge) maxChildAge = cAge;
+    });
+    s529Years = Math.max(0, 18 - maxChildAge);
+    if(s529Years===0 && !isCleared) s529Years = 10; // default if no children
+    const s529Monthly_yearly = s529Monthly * 12;
+    const s529FV = s529Bal*Math.pow(1+s529Rate,s529Years) + (s529Rate>0 ? s529Monthly_yearly*((Math.pow(1+s529Rate,s529Years)-1)/s529Rate) : s529Monthly_yearly*s529Years);
+    document.getElementById('s529_fv_display').innerText = fmtUSD(s529FV);
+
+    // 401k
+    const k401Bal = getVal('k401_balance','currency','$200,000');
+    const k401Annual = getVal('k401_annual','currency','$20,000');
+    const k401Rate = (getVal('k401_rate','number','8')||8)/100;
+    const k401WithdrawAge = getVal('k401_withdraw_age','number','65')||65;
+    const k401Years = Math.max(0, k401WithdrawAge - age);
+    let k401FV = k401Bal * Math.pow(1+k401Rate,k401Years);
+    // Add annual contributions
+    if(k401Rate>0) k401FV += k401Annual * ((Math.pow(1+k401Rate,k401Years)-1)/k401Rate);
+    else k401FV += k401Annual * k401Years;
+    const isEarlyWithdraw = k401WithdrawAge < 59.5;
+    const k401FVnet = isEarlyWithdraw ? k401FV * 0.9 : k401FV;
+    document.getElementById('k401_warning').classList.toggle('hidden', !isEarlyWithdraw);
+    document.getElementById('k401_fv_display').innerText = fmtUSD(k401FVnet);
+
+    // ── Allocate shared assets ──────────────────────
+    const liquidToLife = liquid * allocState.liquid.life;
+    const liquidToCI   = liquid * allocState.liquid.ci;
+    const reToLife     = reEquityFV * allocState.re.life;
+    const reToRet      = reEquityFV * allocState.re.ret;
+    const annuityToLTC = annuityTotal * allocState.annuity.ltc;
+    const annuityToRet = annuityTotal * allocState.annuity.ret;
+
+    // Asset buckets
+    const lifeAssets = lifeIns + liquidToLife + reToLife;
+    const eduAssets  = s529FV;
+    const ciAssets   = ciIns + liquidToCI;
+    const ltcAssets  = annuityToLTC;
+    const retAssets  = k401FVnet + reToRet + annuityToRet;
+
+    // ── Update charts & gap cards ──────────────────────
+    const needs = [lifeNeed, eduNeed, ciNeed, ltcNeed, retNeed];
+    const assets= [lifeAssets, eduAssets, ciAssets, ltcAssets, retAssets];
+
+    // Build rich tooltip breakdowns
+    const t2 = dict[currentLang];
+    const isFV = document.getElementById('fv_toggle').checked;
+    const fvTag = isFV ? ` (FV@${document.getElementById('inflation_rate').value}%)` : '';
+
+    window.chartBreakdowns[0] = {
+        needLines: [
+            `【${t2.chart_names[0]}: ${fmtUSD(lifeNeed)}】`,
+            `${t2.mortgage}: ${fmtUSD(mort)}`,
+            `${t2.other_debt}: ${fmtUSD(debt)}`,
+            `${getDropdownLabel('income_years', t2.yr_labels[1])} ${t2.income_years}: ${fmtUSD(replacement)}`,
+            `${t2.childcare_title}: ${fmtUSD(childcareTotal)}${fvTag}`,
+        ],
+        assetLines: [
+            `【${t2.asset_label}: ${fmtUSD(lifeAssets)}】`,
+            `${t2.life_ins_amount}: ${fmtUSD(lifeIns)}`,
+            `${t2.liquid_assets} (${Math.round(allocState.liquid.life*100)}%): ${fmtUSD(liquidToLife)}`,
+            `${t2.re_future_equity} (${Math.round(allocState.re.life*100)}%): ${fmtUSD(reToLife)}`,
+        ]
+    };
+
+    window.chartBreakdowns[1] = {
+        needLines: [
+            `【${t2.chart_names[1]}: ${fmtUSD(eduNeed)}】`,
+            `${t2.edu_budget} × ${document.getElementById('master_child_count').value||0} ${currentLang==='zh'?'人':'children'}${fvTag}`,
+        ],
+        assetLines: [
+            `【${t2.asset_label}: ${fmtUSD(eduAssets)}】`,
+            `529 FV (${(getVal('s529_rate','number','6')||6)}% × ${s529Years}yr): ${fmtUSD(s529FV)}`,
+        ]
+    };
+
+    window.chartBreakdowns[2] = {
+        needLines: [
+            `【${t2.chart_names[2]}: ${fmtUSD(ciNeed)}】`,
+            `${t2.ci_income}: ${fmtUSD(ciIncome)}`,
+            `${t2.ci_years}: ${getDropdownLabel('ci_years','3')}`,
+            `FV ${currentLang==='zh'?'計算至':'to age'} ${ciFvAge}${fvTag}`,
+        ],
+        assetLines: [
+            `【${t2.asset_label}: ${fmtUSD(ciAssets)}】`,
+            `${t2.ci_ins_amount}: ${fmtUSD(ciIns)}`,
+            `${t2.liquid_assets} (${Math.round(allocState.liquid.ci*100)}%): ${fmtUSD(liquidToCI)}`,
+        ]
+    };
+
+    window.chartBreakdowns[3] = {
+        needLines: [
+            `【${t2.chart_names[3]}: ${fmtUSD(ltcNeed)}】`,
+            `${currentLang==='zh'?'月費':'Monthly'}: ${fmtUSD(ltcRate)}`,
+            `${t2.ltc_duration}: ${getDropdownLabel('ltc_duration', t2.ltc_labels[2])}`,
+            `${t2.ltc_start_age}: ${ltcStart}${fvTag}`,
+        ],
+        assetLines: [
+            `【${t2.asset_label}: ${fmtUSD(ltcAssets)}】`,
+            `${t2.annuity_monthly} × ${annuityYrs}yr (${Math.round(allocState.annuity.ltc*100)}%): ${fmtUSD(annuityToLTC)}`,
+        ]
+    };
+
+    window.chartBreakdowns[4] = {
+        needLines: [
+            `【${t2.chart_names[4]}: ${fmtUSD(retNeed)}】`,
+            `${currentLang==='zh'?'退休年數':'Retire Yrs'}: ${retireYears} (${retireAge}→${lifeExp})`,
+            `${currentLang==='zh'?'月淨支出(FV)':'Net Monthly(FV)'}: ${fmtUSD(retNetMonthly)}`,
+            `SS: ${fmtUSD(ssMonthlyFV)}/mo | ${currentLang==='zh'?'租金':'Rental'}: ${fmtUSD(rentalFV)}/mo`,
+        ],
+        assetLines: [
+            `【${t2.asset_label}: ${fmtUSD(retAssets)}】`,
+            `401k FV: ${fmtUSD(k401FVnet)}${isEarlyWithdraw?' ⚠️-10%':''}`,
+            `${t2.re_future_equity} (${Math.round(allocState.re.ret*100)}%): ${fmtUSD(reToRet)}`,
+            `${t2.annuity_monthly} (${Math.round(allocState.annuity.ret*100)}%): ${fmtUSD(annuityToRet)}`,
+        ]
+    };
+
+    updateCharts(needs, assets);
+    renderGapCards(needs, assets);
+    
+    // Update alloc UIs to reflect values
+    renderAllocUI('liquid', ['life','ci'], 'liquid_alloc_ui');
+    renderAllocUI('re', ['life','ret'], 're_alloc_ui');
+    renderAllocUI('annuity', ['ltc','ret'], 'annuity_alloc_ui');
+}
+
+// ─────────────────────────────────────────────
+// CHARTS
+// ─────────────────────────────────────────────
+const NEED_COLORS  = ['#ef4444','#f59e0b','#f97316','#a855f7','#0ea5e9'];
+const ASSET_COLORS = ['#10b981','#16a34a','#14b8a6','#6366f1','#06b6d4'];
+const NEED_PALE    = ['#fecaca','#fde68a','#fed7aa','#e9d5ff','#bae6fd'];
+
+function initCharts() {
+    const strip = document.getElementById('charts_strip');
+    strip.innerHTML = '';
+    const t = dict[currentLang];
+    for(let i=0;i<5;i++){
+        const card = document.createElement('div');
+        card.className = 'chart-card';
+        card.innerHTML = `
+            <div class="chart-card-title" id="chart_title_${i}">${t.chart_names[i]}</div>
+            <div class="chart-wrap" style="width:140px;height:140px;">
+                <canvas id="chart_${i}" width="140" height="140"></canvas>
+                <div class="chart-center-text">
+                    <span class="chart-center-pct" id="chart_pct_${i}" style="color:${NEED_COLORS[i]}">0%</span>
+                    <span class="chart-center-sub">${t.asset_label}</span>
+                </div>
+            </div>
+            <div id="chart_gap_${i}" class="text-[9px] font-bold mt-1 text-center"></div>
+        `;
+        strip.appendChild(card);
+        const ctx = document.getElementById('chart_'+i).getContext('2d');
+        const idx = i; // capture for closure
+        charts[i] = new Chart(ctx, {
+            type:'doughnut',
+            data:{
+                datasets:[
+                    { data:[1,1], backgroundColor:[ASSET_COLORS[i],'#f1f5f9'], borderWidth:0, weight:1.6, label:'asset' },
+                    { data:[1,1], backgroundColor:[NEED_COLORS[i],NEED_PALE[i]], borderWidth:0, weight:0.6, label:'need' }
+                ]
+            },
+            options:{
+                cutout:'40%', responsive:false, maintainAspectRatio:false,
+                plugins:{
+                    legend:{ display:false },
+                    tooltip:{
+                        backgroundColor:'rgba(10,16,30,0.97)',
+                        titleFont:{ size:12, weight:'900', family:"'Noto Sans TC',sans-serif" },
+                        bodyFont:{ size:11, family:"'Noto Sans TC',sans-serif" },
+                        padding:14, cornerRadius:12, boxPadding:4,
+                        caretSize:6,
+                        // Position tooltip to avoid clipping off-screen in scroll strip
+                        position: 'nearest',
+                        callbacks:{
+                            title(items) {
+                                const t2 = dict[currentLang];
+                                const ds = items[0].datasetIndex;
+                                const di = items[0].dataIndex;
+                                const bd = window.chartBreakdowns[idx];
+                                if(ds===1) return t2.chart_names[idx] + ' — ' + t2.need_label;
+                                if(ds===0 && di===0) return t2.chart_names[idx] + ' — ' + t2.asset_label;
+                                return t2.chart_names[idx] + ' — ' + t2.gap_label;
+                            },
+                            label(item) {
+                                const ds = item.datasetIndex;
+                                const di = item.dataIndex;
+                                const bd = window.chartBreakdowns[idx];
+                                if(!bd) return fmtUSD(item.parsed);
+                                // Outer ring (dataset 1): need breakdown
+                                if(ds===1 && di===0) return bd.needLines;
+                                // Inner ring (dataset 0, index 0): asset breakdown
+                                if(ds===0 && di===0) return bd.assetLines;
+                                // Inner ring (dataset 0, index 1): gap
+                                if(ds===0 && di===1) {
+                                    const t2=dict[currentLang];
+                                    return [`${t2.gap_label}: ${fmtUSD(item.parsed)}`];
+                                }
+                                return [];
+                            },
+                            labelColor(item) {
+                                if(item.datasetIndex===1) return { borderColor:NEED_COLORS[idx], backgroundColor:NEED_COLORS[idx], borderRadius:3 };
+                                if(item.dataIndex===0) return { borderColor:ASSET_COLORS[idx], backgroundColor:ASSET_COLORS[idx], borderRadius:3 };
+                                return { borderColor:'#ef4444', backgroundColor:'#ef4444', borderRadius:3 };
                             }
-                        } 
-                    } 
+                        }
+                    }
                 }
-            });
-        }
+            }
+        });
+    }
+}
 
-        function updateChart(life, med, ltc, ins, cash) { 
-            if (!myChart) return; 
-            const gap = Math.max(0, (life + med + ltc) - (ins + cash)); 
-            myChart.data.datasets[0].data = [life, med, ltc]; 
-            myChart.data.datasets[1].data = [ins, cash, gap]; 
-            myChart.update(); 
-        }
-        
-        function generateChildRows() { 
-            const masterEl = document.getElementById('master_child_count');
-            const countStr = masterEl.value === '' ? (isCleared ? '0' : '1') : masterEl.value;
-            const count = parseInt(countStr) || 0; 
-            
-            const syncEl = document.getElementById('child_count');
-            syncEl.value = masterEl.value; 
-            if(isCleared) syncEl.placeholder = '';
+function updateCharts(needs, assets) {
+    const t = dict[currentLang];
+    for(let i=0;i<5;i++){
+        const need = needs[i] || 0;
+        const asset = assets[i] || 0;
+        const covered = Math.min(asset, need);
+        const gap = Math.max(0, need - asset);
+        const pct = need > 0 ? Math.min(100, Math.round(asset/need*100)) : (asset>0?100:0);
 
-            const container = document.getElementById('child_rows_container'); 
-            const savedData = Array.from(container.children).map(r => ({ name: r.querySelector('.child-name').value, gender: r.querySelector('.child-gender')?.value, age: r.querySelector('.child-age-input').value })); 
-            container.innerHTML = ''; 
-            for (let i = 0; i < count; i++) { 
-                const data = savedData[i] || { name: '', gender: '男', age: '' }; 
-                const namePlaceholder = isCleared ? "" : `${dict[currentLang].child_name_lb} ${i+1}`;
-                const agePlaceholder = isCleared ? "" : "0";
-
-                const row = document.createElement('div'); 
-                row.className = 'bg-slate-50 p-2 rounded-xl border border-slate-100 child-data-row'; 
-                row.innerHTML = `
-                    <div class="child-name-col inline-block w-1/3 align-top mr-2"><label class="text-[8px] font-bold text-slate-400 block">${dict[currentLang].child_name_lb}</label><input type="text" class="child-name w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-bold" placeholder="${namePlaceholder}" value="${data.name}"></div>
-                    <div class="child-gender-col inline-block w-1/4 align-top mr-2"><label class="text-[8px] font-bold text-slate-400 block">${dict[currentLang].gender}</label><select class="child-gender w-full bg-white border border-slate-200 rounded-lg px-1 py-1.5 text-xs font-bold"><option value="男" ${data.gender==='男'?'selected':''}>${dict[currentLang].male}</option><option value="女" ${data.gender==='女'?'selected':''}>${dict[currentLang].female}</option></select></div>
-                    <div class="child-age-col inline-block w-1/4 align-top"><label class="text-[8px] font-bold text-slate-400 block">${dict[currentLang].age}</label><input type="number" class="child-age-input w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-bold" placeholder="${agePlaceholder}" value="${data.age}" oninput="calculate()"></div>`; 
-                container.appendChild(row); 
-            } 
-            if(!isCleared) calculate(); 
+        if(charts[i]){
+            charts[i].data.datasets[0].data = [covered, Math.max(0.01, gap)]; // inner: covered vs gap
+            charts[i].data.datasets[1].data = [need, Math.max(0.01, gap)];    // outer: need vs blank
+            charts[i].update('none');
         }
-
-        function handlePrint() { 
-            const isFV = document.getElementById('fv_toggle').checked;
-            const note = document.getElementById('inflation_note_print');
-            if(isFV) { note.innerText = dict[currentLang].inf_note + document.getElementById('inflation_rate').value + "%"; note.style.display = 'block'; }
-            else { note.style.display = 'none'; }
-            
-            const originalTitle = document.title; const advisor = document.getElementById('consultant_name').value || "Advisor"; 
-            const dateStr = new Date().toISOString().split('T')[0].replace(/-/g, ''); 
-            document.title = `${dict[currentLang].filename_pref}_${dateStr}_${advisor}`; 
-            window.print(); setTimeout(() => { document.title = originalTitle; }, 1000); 
+        const pctEl = document.getElementById('chart_pct_'+i);
+        if(pctEl){
+            pctEl.innerText = pct+'%';
+            pctEl.style.color = pct>=100 ? '#10b981' : NEED_COLORS[i];
         }
-
-        function setLTCPath(p) { 
-            currentLTCPath = p; 
-            document.getElementById('btn_us').className = (p==='US')?"flex-1 py-3 rounded-lg font-black text-xs bg-white shadow text-purple-600":"flex-1 py-3 rounded-lg font-bold text-xs text-slate-500"; 
-            document.getElementById('btn_tw').className = (p==='TW')?"flex-1 py-3 rounded-lg font-black text-xs bg-white shadow text-purple-600":"flex-1 py-3 rounded-lg font-bold text-xs text-slate-500"; 
-            document.getElementById('us_ltc_details').classList.toggle('hidden', p!=='US'); 
-            document.getElementById('tw_ltc_details').classList.toggle('hidden', p!=='TW'); 
-            calculate(); 
+        const gapEl = document.getElementById('chart_gap_'+i);
+        if(gapEl){
+            if(gap>0){
+                gapEl.innerHTML = `<span style="color:${NEED_COLORS[i]}">${t.gap_label}: ${fmtUSD(gap)}</span>`;
+            } else {
+                gapEl.innerHTML = `<span style="color:#10b981">✓ ${t.gap_covered}</span>`;
+            }
         }
-        
-        function selectLtcType(t) { 
-            document.getElementById('radio_'+t).checked = true; 
-            ['inhome', 'assisted', 'nursing'].forEach(x => { if(document.getElementById('card_'+x)) document.getElementById('card_'+x).classList.toggle('active', x===t); }); 
-            calculate(); 
-        }
+    }
+}
 
-        async function saveToSheet() {
-            const btn = document.getElementById('saveBtn'); const original = btn.innerText; btn.innerText = 'Syncing...'; btn.disabled = true;
-            try {
-                const childDetailsStr = Array.from(document.querySelectorAll('#child_rows_container > div')).map(r => {
-                    let n = r.querySelector('.child-name').value;
-                    if(n === '') n = isCleared ? '' : r.querySelector('.child-name').placeholder;
-                    let g = r.querySelector('.child-gender').value;
-                    let a = r.querySelector('.child-age-input').value;
-                    if(a === '') a = isCleared ? '0' : r.querySelector('.child-age-input').placeholder;
-                    return `${n}(${g},${a}歲)`;
-                }).join('; ');
-                
-                const t = dict[currentLang];
+// ─────────────────────────────────────────────
+// GAP CARDS
+// ─────────────────────────────────────────────
+function renderGapCards(needs, assets) {
+    const t = dict[currentLang];
+    const container = document.getElementById('gap_cards_container');
+    container.innerHTML = '';
+    for(let i=0;i<5;i++){
+        const need = needs[i]||0;
+        const asset = assets[i]||0;
+        const gap = Math.max(0, need-asset);
+        const covered = gap===0;
+        const pct = need>0 ? Math.min(100,Math.round(asset/need*100)) : (asset>0?100:0);
+        const card = document.createElement('div');
+        card.className = `gap-card ${covered?'gap-ok':'gap-warn'}`;
+        card.innerHTML = `
+            <div class="flex justify-between items-start mb-1">
+                <div>
+                    <div class="gap-label" style="color:${covered?'#16a34a':NEED_COLORS[i]}">${t.chart_names[i]}</div>
+                    <div class="gap-val">${covered ? t.gap_covered : '− '+fmtUSD(gap)}</div>
+                </div>
+                <div class="text-right">
+                    <div class="gap-label">${t.need_label}</div>
+                    <div class="text-sm font-black font-mono text-slate-600">${fmtUSD(need)}</div>
+                    <div class="gap-label mt-1">${t.asset_label}</div>
+                    <div class="text-sm font-black font-mono" style="color:${ASSET_COLORS[i]}">${fmtUSD(asset)}</div>
+                </div>
+            </div>
+            <div class="gap-bar-wrap"><div class="gap-bar" style="width:${pct}%"></div></div>
+            <div class="text-[9px] text-slate-400 font-bold mt-1 text-right">${pct}% ${t.asset_label}</div>
+        `;
+        container.appendChild(card);
+    }
+}
 
-                const payload = {
-                    consultant: document.getElementById('consultant_name').value, 
-                    name: getInputValue('client_name', 'text'), 
-                    gender: document.getElementById('client_gender').value,
-                    age: getInputValue('client_age', 'number'), 
-                    phone: getInputValue('client_phone', 'text'),
-                    email: getInputValue('client_email', 'text'),
-                    childCount: getInputValue('master_child_count', 'number'), 
-                    childDetails: childDetailsStr, 
-                    isFV: document.getElementById('fv_toggle').checked ? "Yes" : "No", 
-                    inflationRate: document.getElementById('inflation_rate').value + "%",
-                    mortgage: formatUSD(getInputValue('mortgage', 'currency')), 
-                    otherDebt: formatUSD(getInputValue('other_debt', 'currency')), 
-                    annualIncome: formatUSD(getInputValue('annual_income', 'currency')), 
-                    incomeYears: getDropdownDisplayLabel('income_years', t.yr_labels[1]), 
-                    eduPerChild: formatUSD(getInputValue('edu_per_child', 'currency')),
-                    medicalOop: formatUSD(getInputValue('medical_oop', 'currency')), 
-                    recoveryFund: formatUSD(getInputValue('recovery_fund', 'currency')), 
-                    ltcPath: currentLTCPath, 
-                    ltcType: currentLTCPath === 'US' ? document.querySelector('input[name="ltc_type"]:checked').value : 'TW_Monthly',
-                    ltcMonthly: formatUSD(getInputValue(currentLTCPath==='US'?'us_'+document.querySelector('input[name="ltc_type"]:checked').value:'tw_monthly', 'currency')),
-                    ltcDuration: getDropdownDisplayLabel('ltc_duration', t.ltc_labels[2]),
-                    ltcStartAge: getInputValue('ltc_start_age', 'number'),
-                    currentIns: formatUSD(getInputValue('current_insurance', 'currency')), 
-                    currentAssets: formatUSD(getInputValue('current_assets', 'currency')), 
-                    lifeNeed: document.getElementById('life_need_display').innerText,
-                    medNeed: document.getElementById('medical_need_display').innerText,
-                    ltcNeed: document.getElementById('ltc_need_display').innerText,
-                    assets: document.getElementById('merged_assets_display').innerText,
-                    totalGap: document.getElementById('total_gap_val').innerText,
-                    notes: getInputValue('notes', 'text')
-                };
-                await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-                alert('✅ 諮詢紀錄已成功儲存。');
-            } catch (e) { alert('儲存失敗'); } finally { btn.innerText = original; btn.disabled = false; }
-        }
-    </script>
+// ─────────────────────────────────────────────
+// LTC
+// ─────────────────────────────────────────────
+function setLTCPath(p) {
+    currentLTCPath = p;
+    document.getElementById('btn_us').className = (p==='US')
+        ? 'flex-1 py-2.5 rounded-lg font-black text-xs bg-white shadow text-purple-600'
+        : 'flex-1 py-2.5 rounded-lg font-bold text-xs text-slate-500';
+    document.getElementById('btn_tw').className = (p==='TW')
+        ? 'flex-1 py-2.5 rounded-lg font-black text-xs bg-white shadow text-purple-600'
+        : 'flex-1 py-2.5 rounded-lg font-bold text-xs text-slate-500';
+    document.getElementById('us_ltc_details').classList.toggle('hidden', p!=='US');
+    document.getElementById('tw_ltc_details').classList.toggle('hidden', p!=='TW');
+    calculate();
+}
+function selectLtcType(t) {
+    document.getElementById('radio_'+t).checked = true;
+    ['inhome','assisted','nursing'].forEach(x => {
+        if(document.getElementById('card_'+x))
+            document.getElementById('card_'+x).classList.toggle('active', x===t);
+    });
+    calculate();
+}
+
+// ─────────────────────────────────────────────
+// CLEAR
+// ─────────────────────────────────────────────
+function clearAllData() {
+    const msg = currentLang==='zh'?'確定要清空所有資料嗎？':'Clear all data?';
+    if(!confirm(msg)) return;
+    isCleared = true;
+    document.querySelectorAll('input[type="text"],input[type="number"],input[type="email"]').forEach(el=>{
+        el.value=''; el.placeholder='';
+    });
+    ['income_years','ci_years','ltc_duration'].forEach(id=>{
+        const sel=document.getElementById(id);
+        sel.value=''; sel.classList.remove('hidden');
+        document.getElementById(id+'_custom_wrapper').classList.add('hidden');
+        document.getElementById(id+'_custom').value='';
+    });
+    generateChildRows();
+    calculate();
+}
+
+// ─────────────────────────────────────────────
+// PRINT
+// ─────────────────────────────────────────────
+function handlePrint() {
+    const orig = document.title;
+    const advisor = document.getElementById('consultant_name').value||'Advisor';
+    const dateStr = new Date().toISOString().split('T')[0].replace(/-/g,'');
+    const t = dict[currentLang];
+    document.title = `${t.filename_pref}_${dateStr}_${advisor}`;
+    window.print();
+    setTimeout(()=>{ document.title=orig; },1200);
+}
+
+// ─────────────────────────────────────────────
+// SAVE
+// ─────────────────────────────────────────────
+async function saveToSheet() {
+    const btn = document.getElementById('saveBtn');
+    const orig = btn.innerText;
+    btn.innerText = 'Syncing...'; btn.disabled = true;
+    try {
+        const t = dict[currentLang];
+        const childStr = Array.from(document.querySelectorAll('#child_rows_container > div')).map(r=>{
+            const n=r.querySelector('.child-name').value||r.querySelector('.child-name').placeholder||'';
+            const g=r.querySelector('.child-gender').value;
+            const a=r.querySelector('.child-age-input').value||r.querySelector('.child-age-input').placeholder||'0';
+            return `${n}(${g},${a})`;
+        }).join('; ');
+
+        const payload = {
+            consultant: document.getElementById('consultant_name').value,
+            name: getVal('client_name','text'), gender: document.getElementById('client_gender').value,
+            age: getVal('client_age','number'), phone: getVal('client_phone','text'), email: getVal('client_email','text'),
+            childCount: getVal('master_child_count','number'), childDetails: childStr,
+            isFV: document.getElementById('fv_toggle').checked?'Yes':'No',
+            inflationRate: document.getElementById('inflation_rate').value+'%',
+            mortgage: fmtUSD(getVal('mortgage','currency')),
+            otherDebt: fmtUSD(getVal('other_debt','currency')),
+            annualIncome: fmtUSD(getVal('annual_income','currency')),
+            incomeYears: getDropdownLabel('income_years', t.yr_labels[1]),
+            childcareAnnual: fmtUSD(getVal('childcare_annual','currency')),
+            childcareTotal: document.getElementById('childcare_total_display').innerText,
+            eduPerChild: fmtUSD(getVal('edu_per_child','currency')),
+            ciIncome: fmtUSD(getVal('ci_income','currency')),
+            ciYears: getDropdownLabel('ci_years','3'),
+            ciFvAge: getVal('ci_fv_age','number','65'),
+            ltcPath: currentLTCPath,
+            ltcType: currentLTCPath==='US'?document.querySelector('input[name="ltc_type"]:checked').value:'TW',
+            ltcMonthly: fmtUSD(getVal(currentLTCPath==='US'?'us_'+document.querySelector('input[name="ltc_type"]:checked').value:'tw_monthly','currency')),
+            ltcDuration: getDropdownLabel('ltc_duration', t.ltc_labels[2]),
+            ltcStartAge: getVal('ltc_start_age','number'),
+            retireAge: getVal('retire_age','number'),
+            lifeExp: getVal('life_exp','number'),
+            retBasic: fmtUSD(getVal('ret_basic','currency')),
+            retMedical: fmtUSD(getVal('ret_medical','currency')),
+            retLeisure: fmtUSD(getVal('ret_leisure','currency')),
+            retOther: fmtUSD(getVal('ret_other','currency')),
+            ssBenefit: fmtUSD(getVal('ss_benefit','currency')),
+            ssAdj: (getVal('ss_adj','number','70')||70)+'%',
+            rentalIncome: fmtUSD(getVal('rental_income','currency')),
+            liquidAssets: fmtUSD(getVal('liquid_assets','currency')),
+            reValue: fmtUSD(getVal('re_value','currency')),
+            reLoan: fmtUSD(getVal('re_loan','currency')),
+            reEquityFV: document.getElementById('re_future_equity_display').innerText,
+            lifeIns: fmtUSD(getVal('life_ins_amount','currency')),
+            ciIns: fmtUSD(getVal('ci_ins_amount','currency')),
+            annuityMonthly: fmtUSD(getVal('annuity_monthly','currency')),
+            annuityYears: getVal('annuity_years','number'),
+            s529Balance: fmtUSD(getVal('s529_balance','currency')),
+            s529Monthly: fmtUSD(getVal('s529_monthly','currency')),
+            s529Rate: (getVal('s529_rate','number','6')||6)+'%',
+            s529FV: document.getElementById('s529_fv_display').innerText,
+            k401Balance: fmtUSD(getVal('k401_balance','currency')),
+            k401Annual: fmtUSD(getVal('k401_annual','currency')),
+            k401Rate: (getVal('k401_rate','number','8')||8)+'%',
+            k401WithdrawAge: getVal('k401_withdraw_age','number'),
+            k401FV: document.getElementById('k401_fv_display').innerText,
+            notes: getVal('notes','text'),
+            gapCards: Array.from(document.querySelectorAll('#gap_cards_container .gap-val')).map(e=>e.innerText).join(' | ')
+        };
+        await fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', body:JSON.stringify(payload) });
+        alert('✅ '+(currentLang==='zh'?'諮詢紀錄已成功儲存。':'Record saved successfully.'));
+    } catch(e) {
+        alert(currentLang==='zh'?'儲存失敗，請檢查網路連線。':'Save failed. Check network connection.');
+    } finally {
+        btn.innerText=orig; btn.disabled=false;
+    }
+}
+</script>
 </body>
 </html>
