@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Elevatus 保障需求分析系統 V9.1</title>
+    <title>Elevatus 保障需求分析系統 V9.2</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -82,12 +82,12 @@
         .charts-strip::-webkit-scrollbar { height:4px; }
         .charts-strip::-webkit-scrollbar-track { background:#f1f5f9; border-radius:2px; }
         .charts-strip::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:2px; }
-        .chart-card { flex-shrink:0; width:200px; scroll-snap-align:start; background:white; border-radius:1rem; border:1px solid var(--border); padding:0.875rem; text-align:center; overflow:visible; position:relative; }
-        .chart-card-title { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); margin-bottom:0.5rem; }
-        .chart-wrap { position:relative; width:140px; height:140px; margin:0 auto 0.5rem; }
+        .chart-card { flex-shrink:0; width:240px; scroll-snap-align:start; background:white; border-radius:1.25rem; border:1px solid var(--border); padding:1.25rem; text-align:center; overflow:visible; position:relative; }
+        .chart-card-title { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); margin-bottom:0.75rem; }
+        .chart-wrap { position:relative; width:180px; height:180px; margin:0 auto 0.75rem; }
         .chart-center-text { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none; }
-        .chart-center-pct { font-size:1.1rem; font-weight:900; font-family:'DM Mono',monospace; line-height:1; }
-        .chart-center-sub { font-size:7px; font-weight:700; color:var(--muted); margin-top:2px; }
+        .chart-center-pct { font-size:1.5rem; font-weight:900; font-family:'DM Mono',monospace; line-height:1; }
+        .chart-center-sub { font-size:9px; font-weight:700; color:var(--muted); margin-top:3px; }
 
         .ltc-card { display:flex; align-items:center; padding:0.75rem; border-radius:0.75rem; border:2px solid #f1f5f9; cursor:pointer; transition:all 0.15s; margin-bottom:0.5rem; }
         .ltc-card.active { border-color:#a855f7; background:#faf5ff; }
@@ -1058,14 +1058,14 @@ function initCharts() {
         card.className = 'chart-card';
         card.innerHTML = `
             <div class="chart-card-title" id="chart_title_${i}">${t.chart_names[i]}</div>
-            <div class="chart-wrap" style="width:140px;height:140px;">
-                <canvas id="chart_${i}" width="140" height="140"></canvas>
+            <div class="chart-wrap" style="width:180px;height:180px;">
+                <canvas id="chart_${i}" width="180" height="180"></canvas>
                 <div class="chart-center-text">
                     <span class="chart-center-pct" id="chart_pct_${i}" style="color:${NEED_COLORS[i]}">0%</span>
                     <span class="chart-center-sub">${t.asset_label}</span>
                 </div>
             </div>
-            <div id="chart_gap_${i}" class="text-[9px] font-bold mt-1 text-center"></div>
+            <div id="chart_gap_${i}" class="text-xs font-bold mt-1 text-center"></div>
         `;
         strip.appendChild(card);
         const ctx = document.getElementById('chart_'+i).getContext('2d');
