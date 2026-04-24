@@ -17,7 +17,7 @@
 :root{--bg:#f0f4f8;--card:#fff;--border:#e2e8f0;--text:#1e293b;--muted:#64748b;--subtle:#94a3b8;}
 *{box-sizing:border-box;}
 body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text);-webkit-tap-highlight-color:transparent;min-height:100vh;}
-.card{background:var(--card);border-radius:1.25rem;border:1px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,.04);padding:1.5rem;margin-bottom:1rem;}
+.card{background:var(--card);border-radius:1.25rem;border:1px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,.04);padding:1.5rem;margin-bottom:.75rem;}
 .lbl{display:block;font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem;}
 .inp{width:100%;background:#f8fafc;border:1.5px solid var(--border);border-radius:.625rem;padding:.625rem .75rem;font-size:14px;font-weight:700;color:var(--text);outline:none;transition:border-color .15s,box-shadow .15s;-webkit-appearance:none;font-family:'Noto Sans TC',sans-serif;}
 .inp:focus{border-color:#3b82f6;background:white;box-shadow:0 0 0 3px rgba(59,130,246,.1);}
@@ -30,8 +30,8 @@ select.inp{cursor:pointer;}
 .toggle-cb:checked+.toggle-label{background:#10b981;}
 .toggle-cb:checked+.toggle-label:after{left:21px;}
 /* Accordion sections */
-.acc-section{background:var(--card);border-radius:1.25rem;border:1px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,.04);margin-bottom:1rem;overflow:hidden;}
-.acc-header{display:flex;align-items:center;gap:.65rem;padding:1rem 1.25rem;cursor:pointer;user-select:none;width:100%;transition:background .15s;}
+.acc-section{background:var(--card);border-radius:1.25rem;border:1px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,.04);margin-bottom:.75rem;overflow:hidden;}
+.acc-header{display:flex;align-items:center;gap:.65rem;padding:.875rem 1.25rem;cursor:pointer;user-select:none;width:100%;transition:background .15s;}
 .acc-header:hover{background:#f8fafc;}
 .acc-badge{display:inline-flex;align-items:center;justify-content:center;width:1.7rem;height:1.7rem;border-radius:50%;font-size:.65rem;font-weight:900;color:white;flex-shrink:0;}
 .acc-title{font-size:.875rem;font-weight:900;letter-spacing:.02em;flex:1;}
@@ -41,16 +41,16 @@ select.inp{cursor:pointer;}
 .acc-body.open{opacity:1;}
 .acc-inner{padding:0 1.25rem 1.25rem;}
 /* Analysis blocks (right panel) */
-.ab{background:var(--card);border-radius:1.25rem;border:1px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,.04);margin-bottom:1rem;overflow:hidden;}
-.ab-header{display:flex;align-items:center;gap:.6rem;padding:.875rem 1.1rem;cursor:pointer;user-select:none;transition:background .15s;}
+.ab{background:var(--card);border-radius:1.25rem;border:1px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,.04);margin-bottom:.75rem;overflow:hidden;}
+.ab-header{display:flex;align-items:center;gap:.6rem;padding:.875rem 1.25rem;cursor:pointer;user-select:none;transition:background .15s;}
 .ab-header:hover{background:#f8fafc;}
 .ab-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
-.ab-name{font-size:.8rem;font-weight:900;letter-spacing:.03em;flex:1;}
-.ab-toggle{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--border);background:white;display:inline-flex;align-items:center;justify-content:center;font-size:16px;line-height:1;font-weight:300;color:var(--muted);transition:all .25s;flex-shrink:0;}
+.ab-name{font-size:.875rem;font-weight:900;letter-spacing:.02em;flex:1;}
+.ab-toggle{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--border);background:white;display:inline-flex;align-items:center;justify-content:center;font-size:18px;line-height:1;font-weight:300;color:var(--muted);transition:all .25s;flex-shrink:0;}
 .ab-toggle.open{background:#1e293b;color:white;border-color:#1e293b;transform:rotate(45deg);}
 .ab-body{overflow:hidden;transition:max-height .38s cubic-bezier(.4,0,.2,1),opacity .25s;max-height:0;opacity:0;}
 .ab-body.open{opacity:1;}
-.ab-inner{padding:.75rem 1.1rem 1rem;}
+.ab-inner{padding:.75rem 1.25rem 1.25rem;}
 /* Gap row */
 .gap-row{display:flex;align-items:center;gap:.875rem;}
 .gap-chart-wrap{position:relative;flex-shrink:0;width:130px;height:130px;}
@@ -205,7 +205,7 @@ footer{display:none;}
 </div></div></div>
 
 <!-- S02: Education -->
-<div class="acc-section"><div class="acc-header" onclick="toggleAcc('02','ab_02')">
+<div class="acc-section"><div class="acc-header" onclick="syncToggle('02','ab_02')">
     <span class="acc-badge" style="background:#f59e0b">02</span>
     <span class="acc-title" data-i18n="sec2_title">子女教育規劃</span>
     <span class="acc-toggle" id="acc_toggle_02">+</span>
@@ -368,16 +368,16 @@ footer{display:none;}
 </div><!-- end left col -->
 
 <!-- ══ RIGHT COLUMN ══ -->
-<div id="right-col" class="w-full lg:w-[44%] lg:sticky lg:top-6 space-y-0">
+<div id="right-col" class="w-full lg:w-[44%] lg:sticky lg:top-6">
 
     <!-- Education: always open, not synced to left -->
     <div class="ab" id="ab_02">
-        <div class="ab-header" onclick="toggleAb('ab_02')">
+        <div class="ab-header" onclick="syncToggle('02','ab_02')">
             <span class="ab-dot" style="background:#f59e0b"></span>
             <span class="ab-name" style="color:#b45309" data-i18n="chart_names_edu">子女教育</span>
-            <span class="ab-toggle open" id="abt_ab_02">+</span>
+            <span class="ab-toggle" id="abt_ab_02">+</span>
         </div>
-        <div class="ab-body open" id="abb_ab_02" style="max-height:600px;"><div class="ab-inner">
+        <div class="ab-body" id="abb_ab_02" style="max-height:0;"><div class="ab-inner">
             <div class="gap-row">
                 <div class="gap-chart-wrap"><canvas id="chart_1" width="130" height="130"></canvas><div class="gap-chart-center"><span class="gap-pct" id="chart_pct_1" style="color:#f59e0b">0%</span><span class="gap-pct-sub" data-i18n="asset_label">資產</span></div></div>
                 <div class="gap-info" id="gap_info_1"></div>
@@ -522,12 +522,17 @@ function toggleAb(id){
     body&&body.classList.contains('open')?closeAb(id):openAb(id);
 }
 // Sync left<->right on desktop only
+// Called from either left acc header or right ab header — always checks acc state as source of truth
 function syncToggle(secId,abId){
     const isDesktop=window.innerWidth>=1024;
     const accBody=document.getElementById('acc_body_'+secId);
     const accOpen=accBody&&accBody.classList.contains('open');
+    // Toggle the left section
     accOpen?closeAcc(secId):openAcc(secId);
-    if(isDesktop){ accOpen?closeAb(abId):openAb(abId); }
+    // On desktop, sync right panel to match new state (opposite of current = !accOpen)
+    if(isDesktop){
+        accOpen?closeAb(abId):openAb(abId);
+    }
 }
 
 // Mobile: inject ab blocks into mobile slots
