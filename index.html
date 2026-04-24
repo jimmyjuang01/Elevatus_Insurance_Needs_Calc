@@ -139,16 +139,15 @@ footer{display:none;}
 
 <!-- FV Banner -->
 <div class="fv-banner no-print mb-5">
-    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide" data-i18n="fv_toggle">通膨精算 (FV)</span>
-    <div class="flex items-center gap-2">
-        <input type="checkbox" id="fv_toggle" class="toggle-cb hidden" onchange="toggleFVPanel()">
-        <label for="fv_toggle" class="toggle-label"></label>
-    </div>
-    <div id="fv_panel" class="hidden flex items-center gap-3 flex-wrap">
-        <span class="text-[10px] font-bold text-slate-400 uppercase" data-i18n="inflation_rate">通膨率</span>
+    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide" data-i18n="fv_label">通膨率 (FV)</span>
+    <div class="flex items-center gap-3">
         <input type="range" id="inflation_rate" min="0" max="10" step="0.5" value="3" class="w-28 accent-emerald-500 cursor-pointer" oninput="updateInflLabel();calculate();">
-        <span id="infl_disp" class="text-white font-black text-sm font-mono">3.0%</span>
+        <div class="flex items-center gap-1">
+            <input type="number" id="infl_input" min="0" max="10" step="0.5" value="3" class="w-14 bg-slate-700 text-white font-black text-sm text-center rounded-lg px-2 py-1 outline-none border border-slate-600 focus:border-emerald-400" oninput="syncInflFromInput();calculate();">
+            <span class="text-slate-400 font-bold text-sm">%</span>
+        </div>
     </div>
+    <p class="text-[10px] text-slate-500 hidden sm:block" data-i18n="fv_hint">需求推算至事件發生時點 | 資產以各自報酬率推算</p>
     <button onclick="clearAllData()" class="no-print ml-auto text-[10px] font-bold text-slate-500 hover:text-red-400 border border-slate-600 px-3 py-1.5 rounded-lg transition-colors" data-i18n="btn_clear">⟲ 清空</button>
 </div>
 
@@ -178,7 +177,7 @@ footer{display:none;}
 </div></div></div>
 
 <!-- S01: Life -->
-<div class="acc-section"><div class="acc-header" onclick="toggleAcc('01','ab_01')">
+<div class="acc-section"><div class="acc-header" onclick="syncToggle('01','ab_01')">
     <span class="acc-badge" style="background:#ef4444">01</span>
     <span class="acc-title" data-i18n="sec1_title">身故保障需求</span>
     <span class="acc-toggle" id="acc_toggle_01">+</span>
@@ -191,8 +190,15 @@ footer{display:none;}
             <div class="relative"><select id="income_years" onchange="checkCustom('income_years')" class="inp"></select>
             <div id="income_years_custom_wrapper" class="hidden relative"><input type="number" id="income_years_custom" class="inp pr-8" oninput="calculate()"><button type="button" onclick="cancelCustom('income_years')" class="no-print absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs bg-slate-100 rounded px-1">✕</button></div></div>
         </div>
+        <div class="col-span-2 flex items-end gap-3 bg-red-50 rounded-xl p-3 border border-red-100">
+            <div class="flex-1"><label class="lbl text-red-500" data-i18n="death_age">預計身故年齡 (FV基準)</label><input type="number" id="death_age" placeholder="80" class="inp text-center" oninput="calculate()"></div>
+            <div class="flex-1 text-right">
+                <label class="lbl" data-i18n="life_need_fv_label">身故保障需求 (FV)</label>
+                <p id="life_need_fv_display" class="text-base font-black text-red-600 font-mono">$0</p>
+            </div>
+        </div>
         <div class="col-span-2 bg-amber-50 rounded-xl p-3 border border-amber-100">
-            <div class="flex justify-between items-center mb-2"><span class="text-[10px] font-bold text-amber-700 uppercase tracking-wide" data-i18n="childcare_title">👶 育兒年費 (至18歲)</span></div>
+            <div class="flex justify-between items-center mb-2"><span class="text-[10px] font-bold text-amber-700 uppercase tracking-wide" data-i18n="childcare_title">👶 育兒年費 (至18歲，通膨推算)</span></div>
             <div class="flex items-center gap-3">
                 <div class="flex-1"><label class="lbl" data-i18n="childcare_annual">每年育兒費用</label><input type="text" id="childcare_annual" placeholder="$20,000" oninput="handleCurrencyInput(this)" class="inp"></div>
                 <div class="w-28 text-right"><label class="lbl" data-i18n="childcare_total">合計 (FV)</label><p id="childcare_total_display" class="text-base font-black text-amber-700 font-mono">$0</p></div>
@@ -235,7 +241,7 @@ footer{display:none;}
 </div></div></div>
 
 <!-- S03: CI -->
-<div class="acc-section"><div class="acc-header" onclick="toggleAcc('03','ab_03')">
+<div class="acc-section"><div class="acc-header" onclick="syncToggle('03','ab_03')">
     <span class="acc-badge" style="background:#f97316">03</span>
     <span class="acc-title" data-i18n="sec3_title">醫療與重大疾病</span>
     <span class="acc-toggle" id="acc_toggle_03">+</span>
@@ -246,7 +252,17 @@ footer{display:none;}
             <div class="relative"><select id="ci_years" onchange="checkCustom('ci_years')" class="inp"></select>
             <div id="ci_years_custom_wrapper" class="hidden relative"><input type="number" id="ci_years_custom" class="inp pr-8" oninput="calculate()"><button type="button" onclick="cancelCustom('ci_years')" class="no-print absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs bg-slate-100 rounded px-1">✕</button></div></div>
         </div>
-        <div class="col-span-2"><label class="lbl" data-i18n="ci_fv_age">FV 計算至年齡 <span class="text-slate-400 normal-case font-normal">(預設65)</span></label><input type="number" id="ci_fv_age" placeholder="65" class="inp w-28" oninput="calculate()"></div>
+        <div class="col-span-2"><label class="lbl" data-i18n="ci_fv_age">需求 FV 計算至年齡 <span class="text-slate-400 normal-case font-normal">(預設65，資產同步推算至此年齡)</span></label><input type="number" id="ci_fv_age" placeholder="65" class="inp w-28" oninput="calculate()"></div>
+    </div>
+    <!-- HSA -->
+    <div class="bg-orange-50 rounded-xl p-3 border border-orange-100 mt-3">
+        <p class="text-[10px] font-black text-orange-600 uppercase tracking-wide mb-2" data-i18n="hsa_title">🏥 HSA / 醫療儲蓄帳戶</p>
+        <div class="grid grid-cols-2 gap-3">
+            <div><label class="lbl" data-i18n="hsa_balance">現有餘額</label><input type="text" id="hsa_balance" placeholder="$10,000" oninput="handleCurrencyInput(this)" class="inp"></div>
+            <div><label class="lbl" data-i18n="hsa_annual">每年存入</label><input type="text" id="hsa_annual" placeholder="$4,000" oninput="handleCurrencyInput(this)" class="inp"></div>
+            <div><label class="lbl" data-i18n="hsa_rate">年化報酬率 (%)</label><input type="number" id="hsa_rate" placeholder="3" class="inp" oninput="calculate()"></div>
+            <div class="flex flex-col justify-end"><label class="lbl" data-i18n="hsa_fv">預估未來值 (at CI年齡)</label><p id="hsa_fv_display" class="text-sm font-black text-orange-600 font-mono py-2">$0</p></div>
+        </div>
     </div>
     <div class="mobile-slot" id="ms_03"></div>
 </div></div></div>
@@ -314,7 +330,10 @@ footer{display:none;}
 </div><div class="acc-body" id="acc_body_06"><div class="acc-inner space-y-4">
     <div>
         <p class="text-[10px] font-black text-emerald-600 uppercase tracking-wide mb-2" data-i18n="asset_liquid_title">💵 流動性資產</p>
-        <div><label class="lbl" data-i18n="liquid_assets">現金/存款/短期投資</label><input type="text" id="liquid_assets" placeholder="$100,000" oninput="handleCurrencyInput(this)" class="inp"></div>
+        <div class="grid grid-cols-2 gap-3 mb-2">
+            <div><label class="lbl" data-i18n="liquid_assets">現金/存款/短期投資</label><input type="text" id="liquid_assets" placeholder="$100,000" oninput="handleCurrencyInput(this)" class="inp"></div>
+            <div><label class="lbl" data-i18n="liquid_rate">年化報酬率 (%)</label><input type="number" id="liquid_rate" placeholder="3" class="inp" oninput="calculate()"></div>
+        </div>
         <div id="liquid_alloc_ui" class="mt-2"></div>
     </div>
     <div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
@@ -333,7 +352,7 @@ footer{display:none;}
     </div>
     <div>
         <p class="text-[10px] font-black text-red-500 uppercase tracking-wide mb-2" data-i18n="asset_life_title">🛡️ 人壽保險 → 身故保障</p>
-        <div><label class="lbl" data-i18n="life_ins_amount">壽險總保額</label><input type="text" id="life_ins_amount" placeholder="$500,000" oninput="handleCurrencyInput(this)" class="inp"></div>
+        <div><label class="lbl" data-i18n="life_ins_amount">身故給付 <span class="text-slate-400 normal-case font-normal">(保額，或填入較高的現金價值)</span></label><input type="text" id="life_ins_amount" placeholder="$500,000" oninput="handleCurrencyInput(this)" class="inp"></div>
     </div>
     <div>
         <p class="text-[10px] font-black text-orange-500 uppercase tracking-wide mb-2" data-i18n="asset_ci_title">⚕️ 生前福利保單 → 醫療/重疾</p>
@@ -474,8 +493,8 @@ footer{display:none;}
 
 <script>
 // ── DICT ──
-const dict={zh:{app_title:"保障需求分析 V9.1",advisor:"顧問:",sec0_title:"客戶基本資料",client_name:"客戶姓名",gender:"性別",male:"男",female:"女",age:"目前年齡",phone:"聯絡電話",email:"E-mail",child_count:"子女數量",notes:"諮詢備註",sec1_title:"身故保障需求",mortgage:"房貸餘額",other_debt:"其他負債",annual_income:"年收入",income_years:"收入替代年數",childcare_title:"👶 育兒年費 (至18歲)",childcare_annual:"每年育兒費用",childcare_total:"合計 (FV)",sec2_title:"子女教育規劃",edu_need_title:"📚 教育費用需求",edu_annual:"年度教育預算/人",edu_years:"就讀年數",child_sync:"子女數 (同步)",asset_529_title:"🎓 529 教育帳戶",s529_balance:"現有餘額",s529_monthly:"每月定期投入",s529_rate:"年化收益率 (%)",s529_fv:"預估未來值",sec3_title:"醫療與重大疾病",ci_income:"CI 替代收入/年",ci_years:"替代年限",ci_fv_age:"FV 計算至年齡 (預設65)",sec4_title:"長期照護準備",ltc_duration:"預計月數",ltc_start_age:"啟動年齡",us_inhome:"In-Home Care",us_assisted:"Assisted Living",us_nursing:"Nursing Home",tw_monthly:"台灣照護月費",sec5_title:"退休生活需求",retire_age:"退休年齡",life_exp:"預期壽命",monthly_exp_title:"月支出 (現值)",ret_basic:"基本生活費",ret_medical:"醫療費",ret_leisure:"休閒旅遊",ret_other:"其他",ret_income_title:"退休收入來源 (現值)",ss_benefit:"Social Security (月)",ss_adj:"SS 調整率 (預設70%)",rental_income:"租金收入/月",rental_adj:"租金成長率 (%/年)",sec6_title:"現有資產配置",asset_liquid_title:"💵 流動性資產",liquid_assets:"現金/存款/短期投資",asset_re_title:"🏠 投資房地產",re_value:"現在市值",re_loan:"未償貸款",re_growth:"年增值率 (%)",re_monthly_payment:"每月還款",re_future_equity:"退休時預估淨值",asset_life_title:"🛡️ 人壽保險 → 身故保障",life_ins_amount:"壽險總保額",asset_ci_title:"⚕️ 生前福利保單 → 醫療/重疾",ci_ins_amount:"生前福利總保額",asset_annuity_title:"📅 年金 / 長照險",annuity_monthly:"月給付額",annuity_years:"給付年數",asset_401k_title:"📈 401(k) / 退休帳戶",k401_balance:"現有餘額",k401_annual:"每年存入",k401_rate:"年化報酬率 (%)",k401_withdraw_age:"提領年齡",k401_early_warn:"⚠️ 早期提領 (<59.5歲)：將產生10%罰款",k401_fv_label:"預估退休時帳戶價值",asset_overview_title:"資產分配總覽",fv_toggle:"通膨精算 (FV)",inflation_rate:"通膨率",btn_save:"儲存諮詢紀錄",btn_print:"列印 PDF 報告",btn_clear:"⟲ 清空",yr_opts:["5","10","15"],yr_labels:["5年(緩衝)","10年(標準)","15年(長守護)"],ci_yr_opts:["2","3","5"],ci_yr_labels:["2年","3年","5年"],ltc_opts:["12","24","36","48","60"],ltc_labels:["12月","24月","36月(平均)","48月","60月"],custom_input:"✍️ 自訂...",custom_yr_ph:"請輸入年數",custom_mo_ph:"請輸入月數",auto_alloc:"自動分配",manual_alloc:"手動",gap_covered:"✅ 已覆蓋",chart_names:["身故保障","子女教育","醫療重疾","長期照護","退休準備"],chart_names_life:"身故保障",chart_names_edu:"子女教育",chart_names_ci:"醫療重疾",chart_names_ltc:"長期照護",chart_names_ret:"退休準備",need_label:"需求",asset_label:"資產",gap_label:"缺口",child_name_lb:"姓名",filename_pref:"保障需求分析",alloc_life:"→ 身故",alloc_ci:"→ 醫療",alloc_ret:"→ 退休",alloc_ltc:"→ 長照",asset_names:{liquid:"流動資產",re:"投資房淨值",lifeIns:"人壽保險",ciIns:"生前福利",annuity:"年金/長照險",s529:"529帳戶",k401:"401(k)"}},
-en:{app_title:"Coverage Needs Analysis V9.1",advisor:"Advisor:",sec0_title:"Client Information",client_name:"Client Name",gender:"Gender",male:"Male",female:"Female",age:"Age",phone:"Phone",email:"E-mail",child_count:"No. of Children",notes:"Notes",sec1_title:"Life / Death Benefit",mortgage:"Mortgage Balance",other_debt:"Other Debt",annual_income:"Annual Income",income_years:"Income Replacement Years",childcare_title:"👶 Childcare (to Age 18)",childcare_annual:"Annual Childcare Cost",childcare_total:"Total (FV)",sec2_title:"Education Planning",edu_need_title:"📚 Education Need",edu_annual:"Annual Budget/Child",edu_years:"Years of Study",child_sync:"Children (Synced)",asset_529_title:"🎓 529 Account",s529_balance:"Current Balance",s529_monthly:"Monthly Contribution",s529_rate:"Annual Return (%)",s529_fv:"Projected FV",sec3_title:"Critical Illness",ci_income:"CI Income/Yr (Override)",ci_years:"Replacement Years",ci_fv_age:"FV Calc-to Age (default 65)",sec4_title:"Long-Term Care",ltc_duration:"Duration (Months)",ltc_start_age:"Start Age",us_inhome:"In-Home Care",us_assisted:"Assisted Living",us_nursing:"Nursing Home",tw_monthly:"Taiwan LTC Monthly",sec5_title:"Retirement Needs",retire_age:"Retire Age",life_exp:"Life Expectancy",monthly_exp_title:"Monthly Expenses (today's $)",ret_basic:"Basic Living",ret_medical:"Medical",ret_leisure:"Leisure/Travel",ret_other:"Other",ret_income_title:"Retirement Income (today's $)",ss_benefit:"Social Security (Monthly)",ss_adj:"SS Adj. Rate (default 70%)",rental_income:"Rental Income/Month",rental_adj:"Rental Growth (%/yr)",sec6_title:"Current Assets",asset_liquid_title:"💵 Liquid Assets",liquid_assets:"Cash/Savings/ST Investments",asset_re_title:"🏠 Investment Property",re_value:"Market Value",re_loan:"Outstanding Loan",re_growth:"Annual Appreciation (%)",re_monthly_payment:"Monthly Payment",re_future_equity:"Projected Equity at Retirement",asset_life_title:"🛡️ Life Insurance → Life Need",life_ins_amount:"Total Life Coverage",asset_ci_title:"⚕️ Living Benefits → CI Need",ci_ins_amount:"Total Living Benefits",asset_annuity_title:"📅 Annuity / LTC Policy",annuity_monthly:"Monthly Benefit",annuity_years:"Payment Years",asset_401k_title:"📈 401(k) / Retirement Account",k401_balance:"Current Balance",k401_annual:"Annual Contribution",k401_rate:"Annual Return (%)",k401_withdraw_age:"Withdrawal Age",k401_early_warn:"⚠️ Early Withdrawal (<59.5): 10% penalty applies",k401_fv_label:"Projected Value at Retirement",asset_overview_title:"Asset Allocation Summary",fv_toggle:"Inflation (FV)",inflation_rate:"Rate",btn_save:"Save Record",btn_print:"Print PDF",btn_clear:"⟲ Clear",yr_opts:["5","10","15"],yr_labels:["5 Yrs (Buffer)","10 Yrs (Standard)","15 Yrs (Long-term)"],ci_yr_opts:["2","3","5"],ci_yr_labels:["2 Years","3 Years","5 Years"],ltc_opts:["12","24","36","48","60"],ltc_labels:["12 Mo","24 Mo","36 Mo (Avg)","48 Mo","60 Mo"],custom_input:"✍️ Custom...",custom_yr_ph:"Enter Years",custom_mo_ph:"Enter Months",auto_alloc:"Auto",manual_alloc:"Manual",gap_covered:"✅ Covered",chart_names:["Life","Education","CI/Med","LTC","Retirement"],chart_names_life:"Life",chart_names_edu:"Education",chart_names_ci:"CI/Med",chart_names_ltc:"LTC",chart_names_ret:"Retirement",need_label:"Need",asset_label:"Asset",gap_label:"Gap",child_name_lb:"Name",filename_pref:"Needs_Analysis",alloc_life:"→ Life",alloc_ci:"→ CI",alloc_ret:"→ Retire",alloc_ltc:"→ LTC",asset_names:{liquid:"Liquid Assets",re:"Property Equity",lifeIns:"Life Ins.",ciIns:"Living Benefits",annuity:"Annuity/LTC",s529:"529 Acct",k401:"401(k)"}}};
+const dict={zh:{app_title:"保障需求分析 V9.2",advisor:"顧問:",fv_label:"通膨率 (FV)",fv_hint:"需求推算至事件發生時點 | 資產以各自報酬率推算",sec0_title:"客戶基本資料",client_name:"客戶姓名",gender:"性別",male:"男",female:"女",age:"目前年齡",phone:"聯絡電話",email:"E-mail",child_count:"子女數量",notes:"諮詢備註",sec1_title:"身故保障需求",mortgage:"房貸餘額",other_debt:"其他負債",annual_income:"年收入",income_years:"收入替代年數",death_age:"預計身故年齡 (FV基準)",life_need_fv_label:"身故保障需求 (FV)",childcare_title:"👶 育兒年費 (至18歲，通膨推算)",childcare_annual:"每年育兒費用",childcare_total:"合計 (FV)",sec2_title:"子女教育規劃",edu_need_title:"📚 教育費用需求",edu_annual:"年度教育預算/人",edu_years:"就讀年數",child_sync:"子女數 (同步)",asset_529_title:"🎓 529 教育帳戶",s529_balance:"現有餘額",s529_monthly:"每月定期投入",s529_rate:"年化收益率 (%)",s529_fv:"預估未來值 (18歲時)",sec3_title:"醫療與重大疾病",ci_income:"CI 替代收入/年 (可手動覆蓋)",ci_years:"替代年限",ci_fv_age:"需求 FV 計算至年齡 (預設65，資產同步推算至此年齡)",hsa_title:"🏥 HSA / 醫療儲蓄帳戶",hsa_balance:"現有餘額",hsa_annual:"每年存入",hsa_rate:"年化報酬率 (%)",hsa_fv:"預估未來值 (at CI年齡)",sec4_title:"長期照護準備",ltc_duration:"預計月數",ltc_start_age:"啟動年齡",us_inhome:"In-Home Care",us_assisted:"Assisted Living",us_nursing:"Nursing Home",tw_monthly:"台灣照護月費",sec5_title:"退休生活需求",retire_age:"退休年齡",life_exp:"預期壽命",monthly_exp_title:"月支出 (現值)",ret_basic:"基本生活費",ret_medical:"醫療費",ret_leisure:"休閒旅遊",ret_other:"其他",ret_income_title:"退休收入來源 (現值)",ss_benefit:"Social Security (月)",ss_adj:"SS 調整率 (預設70%)",rental_income:"租金收入/月",rental_adj:"租金成長率 (%/年)",sec6_title:"現有資產配置",asset_liquid_title:"💵 流動性資產",liquid_assets:"現金/存款/短期投資",liquid_rate:"年化報酬率 (%)",asset_re_title:"🏠 投資房地產",re_value:"現在市值",re_loan:"未償貸款",re_growth:"年增值率 (%)",re_monthly_payment:"每月還款",re_future_equity:"退休時預估淨值",asset_life_title:"🛡️ 人壽保險 → 身故保障",life_ins_amount:"身故給付 (保額或現金價值取較高值)",asset_ci_title:"⚕️ 生前福利保單 → 醫療/重疾",ci_ins_amount:"生前福利總保額",asset_annuity_title:"📅 年金 / 長照險",annuity_monthly:"月給付額",annuity_years:"給付年數",asset_401k_title:"📈 401(k) / 退休帳戶",k401_balance:"現有餘額",k401_annual:"每年存入",k401_rate:"年化報酬率 (%)",k401_withdraw_age:"提領年齡",k401_early_warn:"⚠️ 早期提領 (<59.5歲)：將產生10%罰款",k401_fv_label:"預估退休時帳戶價值",asset_overview_title:"資產分配總覽",inflation_rate:"通膨率",btn_save:"儲存諮詢紀錄",btn_print:"列印 PDF 報告",btn_clear:"⟲ 清空",yr_opts:["5","10","15"],yr_labels:["5年(緩衝)","10年(標準)","15年(長守護)"],ci_yr_opts:["2","3","5"],ci_yr_labels:["2年","3年","5年"],ltc_opts:["12","24","36","48","60"],ltc_labels:["12月","24月","36月(平均)","48月","60月"],custom_input:"✍️ 自訂...",custom_yr_ph:"請輸入年數",custom_mo_ph:"請輸入月數",auto_alloc:"自動分配",manual_alloc:"手動",gap_covered:"✅ 已覆蓋",chart_names:["身故保障","子女教育","醫療重疾","長期照護","退休準備"],chart_names_life:"身故保障",chart_names_edu:"子女教育",chart_names_ci:"醫療重疾",chart_names_ltc:"長期照護",chart_names_ret:"退休準備",need_label:"需求 (FV)",asset_label:"資產 (FV)",gap_label:"缺口",child_name_lb:"姓名",filename_pref:"保障需求分析",alloc_life:"→ 身故",alloc_ci:"→ 醫療",alloc_ret:"→ 退休",alloc_ltc:"→ 長照",asset_names:{liquid:"流動資產",re:"投資房淨值",lifeIns:"人壽保險",ciIns:"生前福利",annuity:"年金/長照險",s529:"529帳戶",k401:"401(k)",hsa:"HSA醫療帳戶"}},
+en:{app_title:"Coverage Needs Analysis V9.2",advisor:"Advisor:",fv_label:"Inflation Rate (FV)",fv_hint:"Needs projected to event date | Assets grow at own rate",sec0_title:"Client Information",client_name:"Client Name",gender:"Gender",male:"Male",female:"Female",age:"Age",phone:"Phone",email:"E-mail",child_count:"No. of Children",notes:"Notes",sec1_title:"Life / Death Benefit",mortgage:"Mortgage Balance",other_debt:"Other Debt",annual_income:"Annual Income",income_years:"Income Replacement Years",death_age:"Projected Death Age (FV Basis)",life_need_fv_label:"Life Need (FV)",childcare_title:"👶 Childcare (to Age 18, inflation-adjusted)",childcare_annual:"Annual Childcare Cost",childcare_total:"Total (FV)",sec2_title:"Education Planning",edu_need_title:"📚 Education Need",edu_annual:"Annual Budget/Child",edu_years:"Years of Study",child_sync:"Children (Synced)",asset_529_title:"🎓 529 Account",s529_balance:"Current Balance",s529_monthly:"Monthly Contribution",s529_rate:"Annual Return (%)",s529_fv:"Projected FV (at Age 18)",sec3_title:"Critical Illness",ci_income:"CI Income/Yr (Override)",ci_years:"Replacement Years",ci_fv_age:"Need FV Calc-to Age (default 65, assets synced to same age)",hsa_title:"🏥 HSA / Medical Savings",hsa_balance:"Current Balance",hsa_annual:"Annual Contribution",hsa_rate:"Annual Return (%)",hsa_fv:"Projected FV (at CI Age)",sec4_title:"Long-Term Care",ltc_duration:"Duration (Months)",ltc_start_age:"Start Age",us_inhome:"In-Home Care",us_assisted:"Assisted Living",us_nursing:"Nursing Home",tw_monthly:"Taiwan LTC Monthly",sec5_title:"Retirement Needs",retire_age:"Retire Age",life_exp:"Life Expectancy",monthly_exp_title:"Monthly Expenses (today's $)",ret_basic:"Basic Living",ret_medical:"Medical",ret_leisure:"Leisure/Travel",ret_other:"Other",ret_income_title:"Retirement Income (today's $)",ss_benefit:"Social Security (Monthly)",ss_adj:"SS Adj. Rate (default 70%)",rental_income:"Rental Income/Month",rental_adj:"Rental Growth (%/yr)",sec6_title:"Current Assets",asset_liquid_title:"💵 Liquid Assets",liquid_assets:"Cash/Savings/ST Investments",liquid_rate:"Annual Return (%)",asset_re_title:"🏠 Investment Property",re_value:"Market Value",re_loan:"Outstanding Loan",re_growth:"Annual Appreciation (%)",re_monthly_payment:"Monthly Payment",re_future_equity:"Projected Equity at Retirement",asset_life_title:"🛡️ Life Insurance → Life Need",life_ins_amount:"Death Benefit (Face or Cash Value, whichever higher)",asset_ci_title:"⚕️ Living Benefits → CI Need",ci_ins_amount:"Total Living Benefits",asset_annuity_title:"📅 Annuity / LTC Policy",annuity_monthly:"Monthly Benefit",annuity_years:"Payment Years",asset_401k_title:"📈 401(k) / Retirement Account",k401_balance:"Current Balance",k401_annual:"Annual Contribution",k401_rate:"Annual Return (%)",k401_withdraw_age:"Withdrawal Age",k401_early_warn:"⚠️ Early Withdrawal (<59.5): 10% penalty applies",k401_fv_label:"Projected Value at Retirement",asset_overview_title:"Asset Allocation Summary",inflation_rate:"Inflation Rate",btn_save:"Save Record",btn_print:"Print PDF",btn_clear:"⟲ Clear",yr_opts:["5","10","15"],yr_labels:["5 Yrs (Buffer)","10 Yrs (Standard)","15 Yrs (Long-term)"],ci_yr_opts:["2","3","5"],ci_yr_labels:["2 Years","3 Years","5 Years"],ltc_opts:["12","24","36","48","60"],ltc_labels:["12 Mo","24 Mo","36 Mo (Avg)","48 Mo","60 Mo"],custom_input:"✍️ Custom...",custom_yr_ph:"Enter Years",custom_mo_ph:"Enter Months",auto_alloc:"Auto",manual_alloc:"Manual",gap_covered:"✅ Covered",chart_names:["Life","Education","CI/Med","LTC","Retirement"],chart_names_life:"Life",chart_names_edu:"Education",chart_names_ci:"CI/Med",chart_names_ltc:"LTC",chart_names_ret:"Retirement",need_label:"Need (FV)",asset_label:"Asset (FV)",gap_label:"Gap",child_name_lb:"Name",filename_pref:"Needs_Analysis",alloc_life:"→ Life",alloc_ci:"→ CI",alloc_ret:"→ Retire",alloc_ltc:"→ LTC",asset_names:{liquid:"Liquid Assets",re:"Property Equity",lifeIns:"Life Insurance",ciIns:"Living Benefits",annuity:"Annuity/LTC",s529:"529 Acct",k401:"401(k)",hsa:"HSA"}}};
 
 // ── STATE ──
 let currentLang='zh',currentLTCPath='US',isCleared=false,charts={};
@@ -603,9 +622,17 @@ function getDropdownVal(id,def){const w=document.getElementById(id+'_custom_wrap
 function getDropdownLabel(id,defLabel){const w=document.getElementById(id+'_custom_wrapper');if(!w.classList.contains('hidden')){const v=document.getElementById(id+'_custom').value;if(v==='')return isCleared?'0':defLabel;const suf=(id==='ltc_duration')?(currentLang==='zh'?' 月':' Mo'):(currentLang==='zh'?' 年':' Yrs');return v+suf;}const sel=document.getElementById(id);if(!sel.value||sel.value==='')return isCleared?'0':defLabel;return sel.options[sel.selectedIndex]?.text||defLabel;}
 
 // ── FV ──
-function toggleFVPanel(){document.getElementById('fv_panel').classList.toggle('hidden',!document.getElementById('fv_toggle').checked);calculate();}
-function updateInflLabel(){document.getElementById('infl_disp').innerText=document.getElementById('inflation_rate').value+'%';}
-function getR(){if(!document.getElementById('fv_toggle').checked)return 0;return parseFloat(document.getElementById('inflation_rate').value)/100||0;}
+function updateInflLabel(){
+    const v=parseFloat(document.getElementById('inflation_rate').value)||0;
+    document.getElementById('infl_input').value=v.toFixed(1);
+}
+function syncInflFromInput(){
+    const v=parseFloat(document.getElementById('infl_input').value)||0;
+    const clamped=Math.min(10,Math.max(0,v));
+    document.getElementById('inflation_rate').value=clamped;
+}
+function getR(){ return parseFloat(document.getElementById('inflation_rate').value)/100||0; }
+function getDeathAge(){ return getVal('death_age','number','80')||80; }
 
 // ── HELPERS ──
 function fmtUSD(v){return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:0,maximumFractionDigits:0}).format(v);}
@@ -641,83 +668,125 @@ function setAllocPct(key,bucket,val){allocState[key][bucket]=Math.min(100,Math.m
 
 // ── CALCULATE ──
 function calculate(){
-    const r=getR(),age=getAge(),retireAge=getRetireAge(),lifeExp=getLifeExp();
-    const retireYears=Math.max(0,lifeExp-retireAge),yearsToRetire=Math.max(0,retireAge-age);
-    // S01
-    const mort=getVal('mortgage','currency','$350,000'),debt=getVal('other_debt','currency','$100,000'),ann=getVal('annual_income','currency','$80,000');
+    const r=getR(), age=getAge(), retireAge=getRetireAge(), lifeExp=getLifeExp();
+    const retireYears=Math.max(0,lifeExp-retireAge), yearsToRetire=Math.max(0,retireAge-age);
+    const deathAge=getDeathAge(), yearsToDeathAge=Math.max(0,deathAge-age);
+
+    // S01: Life Need — debts nominal, income/childcare FV pushed to death age
+    const mort=getVal('mortgage','currency','$350,000'), debt=getVal('other_debt','currency','$100,000'), ann=getVal('annual_income','currency','$80,000');
     const yrs=getDropdownVal('income_years',10);
-    const replacement=r>0?ann*((Math.pow(1+r,yrs)-1)/r):ann*yrs;
+    const replacementNominal=r>0?ann*((Math.pow(1+r,yrs)-1)/r):ann*yrs;
+    const replacementFV=replacementNominal*Math.pow(1+r,yearsToDeathAge);
     const childcareAnnual=getVal('childcare_annual','currency','$20,000')||20000;
-    let childcareTotal=0,childcareDetails=[];
-    document.querySelectorAll('.child-age-input').forEach(inp=>{const cAge=parseInt(inp.value||inp.placeholder||'0')||0,yl=Math.max(0,18-cAge);const cFV=r>0?childcareAnnual*((Math.pow(1+r,yl)-1)/r):childcareAnnual*yl;childcareTotal+=cFV;childcareDetails.push(`${yl}yr×${fmtUSD(childcareAnnual)}=${fmtUSD(cFV)}`);});
+    let childcareTotal=0, childcareDetails=[];
+    document.querySelectorAll('.child-age-input').forEach(inp=>{
+        const cAge=parseInt(inp.value||inp.placeholder||'0')||0, yl=Math.max(0,18-cAge);
+        const childcareAt18=r>0?childcareAnnual*((Math.pow(1+r,yl)-1)/r):childcareAnnual*yl;
+        const childcareFV=childcareAt18*Math.pow(1+r,yearsToDeathAge);
+        childcareTotal+=childcareFV; childcareDetails.push(`${yl}yr×${fmtUSD(childcareAnnual)}@death=${fmtUSD(childcareFV)}`);
+    });
     document.getElementById('childcare_total_display').innerText=fmtUSD(childcareTotal);
     document.getElementById('childcare_detail').innerText=childcareDetails.join(' | ');
-    const lifeNeed=mort+debt+replacement+childcareTotal;
-    // S02
-    const eduAnnual=getVal('edu_per_child','currency','$30,000'),eduYears=getVal('edu_years','number','4')||4;
-    let eduTotal=0,eduDetails=[];
-    document.querySelectorAll('.child-age-input').forEach(inp=>{const cAge=parseInt(inp.value||inp.placeholder||'0')||0,ytc=Math.max(0,18-cAge);const atC=r>0?eduAnnual*((Math.pow(1+r,eduYears)-1)/r):eduAnnual*eduYears;const cFV=atC*Math.pow(1+r,ytc);eduTotal+=cFV;eduDetails.push(`${fmtUSD(eduAnnual)}/yr×${eduYears}yr=${fmtUSD(cFV)}`);});
-    if(eduDetails.length===0&&eduAnnual>0&&!isCleared){const cFV=r>0?eduAnnual*((Math.pow(1+r,eduYears)-1)/r):eduAnnual*eduYears;eduTotal=cFV;eduDetails.push(`${fmtUSD(eduAnnual)}/yr×${eduYears}yr=${fmtUSD(cFV)}`);}
+    const lifeNeed=mort+debt+replacementFV+childcareTotal;
+    const lifeFVdisplay=document.getElementById('life_need_fv_display'); if(lifeFVdisplay) lifeFVdisplay.innerText=fmtUSD(lifeNeed);
+
+    // S02: Education — FV at each child's age 18
+    const eduAnnual=getVal('edu_per_child','currency','$30,000'), eduYears=getVal('edu_years','number','4')||4;
+    let eduTotal=0, eduDetails=[];
+    document.querySelectorAll('.child-age-input').forEach(inp=>{
+        const cAge=parseInt(inp.value||inp.placeholder||'0')||0, ytc=Math.max(0,18-cAge);
+        const costAtCollege=r>0?eduAnnual*((Math.pow(1+r,eduYears)-1)/r):eduAnnual*eduYears;
+        const costFV=costAtCollege*Math.pow(1+r,ytc);
+        eduTotal+=costFV; eduDetails.push(`${fmtUSD(eduAnnual)}/yr×${eduYears}yr@18=${fmtUSD(costFV)}`);
+    });
+    if(eduDetails.length===0&&eduAnnual>0&&!isCleared){
+        const costFV=r>0?eduAnnual*((Math.pow(1+r,eduYears)-1)/r):eduAnnual*eduYears;
+        eduTotal=costFV; eduDetails.push(`${fmtUSD(eduAnnual)}/yr×${eduYears}yr=${fmtUSD(costFV)}`);
+    }
     const ede=document.getElementById('edu_detail'),edt=document.getElementById('edu_total_display');
-    if(ede)ede.innerText=eduDetails.join(' | ');if(edt)edt.innerText=fmtUSD(eduTotal);
-    // 529
-    const s529Bal=getVal('s529_balance','currency','$30,000'),s529Monthly=getVal('s529_monthly','currency','$500'),s529Rate=(getVal('s529_rate','number','6')||6)/100;
-    let maxCA=0;document.querySelectorAll('.child-age-input').forEach(inp=>{const a=parseInt(inp.value||inp.placeholder||'0')||0;if(a>maxCA)maxCA=a;});
+    if(ede)ede.innerText=eduDetails.join(' | '); if(edt)edt.innerText=fmtUSD(eduTotal);
+    // 529 FV at oldest child's age 18 (529 own return rate, B2: always grows)
+    const s529Bal=getVal('s529_balance','currency','$30,000'), s529Monthly=getVal('s529_monthly','currency','$500');
+    const s529Rate=(getVal('s529_rate','number','6')||6)/100;
+    let maxCA=0; document.querySelectorAll('.child-age-input').forEach(inp=>{const a=parseInt(inp.value||inp.placeholder||'0')||0;if(a>maxCA)maxCA=a;});
     const s529Yrs=Math.max(1,18-maxCA);
     const s529FV=s529Bal*Math.pow(1+s529Rate,s529Yrs)+(s529Rate>0?s529Monthly*12*((Math.pow(1+s529Rate,s529Yrs)-1)/s529Rate):s529Monthly*12*s529Yrs);
     document.getElementById('s529_fv_display').innerText=fmtUSD(s529FV);
     const eduNeed=eduTotal;
-    // S03
+
+    // S03: CI — FV at ci_fv_age
     const ciIncomeInput=getVal('ci_income','currency','0');
     const ciIncome=ciIncomeInput>0?ciIncomeInput:ann;
-    const ciYrs=getDropdownVal('ci_years',3),ciFvAge=getVal('ci_fv_age','number','65')||65;
-    const ciRepl=r>0?ciIncome*((Math.pow(1+r,ciYrs)-1)/r):ciIncome*ciYrs;
-    const ciNeed=ciRepl*Math.pow(1+r,Math.max(0,ciFvAge-age));
-    // S04
+    const ciYrs=getDropdownVal('ci_years',3), ciFvAge=getVal('ci_fv_age','number','65')||65;
+    const yearsToCI=Math.max(0,ciFvAge-age);
+    const ciReplNominal=r>0?ciIncome*((Math.pow(1+r,ciYrs)-1)/r):ciIncome*ciYrs;
+    const ciNeed=ciReplNominal*Math.pow(1+r,yearsToCI);
+    // HSA FV at ci_fv_age (own return rate, always grows per B2)
+    const hsaBal=getVal('hsa_balance','currency','$10,000'), hsaAnnual=getVal('hsa_annual','currency','$4,000');
+    const hsaRate=(getVal('hsa_rate','number','3')||3)/100;
+    let hsaFV=hsaBal*Math.pow(1+hsaRate,yearsToCI);
+    hsaFV+=hsaRate>0?hsaAnnual*((Math.pow(1+hsaRate,yearsToCI)-1)/hsaRate):hsaAnnual*yearsToCI;
+    document.getElementById('hsa_fv_display').innerText=fmtUSD(hsaFV);
+
+    // S04: LTC — FV at ltc start age
     const ltcBaseId=currentLTCPath==='US'?'us_'+document.querySelector('input[name="ltc_type"]:checked').value:'tw_monthly';
     const ltcDef={us_inhome:'$5,529',us_assisted:'$6,350',us_nursing:'$8,015',tw_monthly:'$3,200'};
-    const ltcRate=getVal(ltcBaseId,'currency',ltcDef[ltcBaseId]||'$5,529'),ltcDur=getDropdownVal('ltc_duration',36),ltcStart=getVal('ltc_start_age','number','75')||75;
+    const ltcRate=getVal(ltcBaseId,'currency',ltcDef[ltcBaseId]||'$5,529');
+    const ltcDur=getDropdownVal('ltc_duration',36), ltcStart=getVal('ltc_start_age','number','75')||75;
     const ltcNeed=ltcRate*ltcDur*Math.pow(1+r,Math.max(0,ltcStart-age));
-    // S05
+
+    // S05: Retirement — FV at retire age
     const retMonthlyFV=(getVal('ret_basic','currency','$4,000')+getVal('ret_medical','currency','$800')+getVal('ret_leisure','currency','$500')+getVal('ret_other','currency','$200'))*Math.pow(1+r,yearsToRetire);
     const ssAdj=(getVal('ss_adj','number','70')||70)/100;
     const ssMonthlyFV=getVal('ss_benefit','currency','$2,000')*ssAdj*Math.pow(1+r,yearsToRetire);
     const rentalFV=getVal('rental_income','currency','$1,500')*Math.pow(1+(getVal('rental_adj','number','3')||3)/100,yearsToRetire);
     const retNetMonthly=Math.max(0,retMonthlyFV-ssMonthlyFV-rentalFV);
-    const annR=r>0?r/12:.001,n=retireYears*12;
+    const annR=r>0?r/12:.001, n=retireYears*12;
     const retNeed=retNetMonthly>0&&n>0?retNetMonthly*(1-Math.pow(1+annR,-n))/annR:retNetMonthly*n;
-    // S06 assets
-    const liquid=getVal('liquid_assets','currency','$100,000');
-    const reValue=getVal('re_value','currency','$500,000'),reLoan=getVal('re_loan','currency','$300,000');
+
+    // S06: Assets — each FV at corresponding time point
+    const liquidNow=getVal('liquid_assets','currency','$100,000');
+    const liquidRt=(getVal('liquid_rate','number','3')||3)/100;
+    const liquidFVatDeath=liquidNow*Math.pow(1+liquidRt,yearsToDeathAge);
+    const liquidFVatCI=liquidNow*Math.pow(1+liquidRt,yearsToCI);
+    const reValue=getVal('re_value','currency','$500,000'), reLoan=getVal('re_loan','currency','$300,000');
     const reFV=reValue*Math.pow(1+(getVal('re_growth','number','3')||3)/100,yearsToRetire);
-    const lR=.06/12,ytr12=yearsToRetire*12;
+    const lR=.06/12, ytr12=yearsToRetire*12;
     const remLoan=reLoan>0?Math.max(0,reLoan*Math.pow(1+lR,ytr12)-getVal('re_monthly_payment','currency','$1,500')*((Math.pow(1+lR,ytr12)-1)/lR)):0;
     const reEquityFV=Math.max(0,reFV-remLoan);
     document.getElementById('re_future_equity_display').innerText=fmtUSD(reEquityFV);
-    const lifeIns=getVal('life_ins_amount','currency','$500,000'),ciIns=getVal('ci_ins_amount','currency','$200,000');
+    const lifeIns=getVal('life_ins_amount','currency','$500,000'); // fixed nominal
+    const ciIns=getVal('ci_ins_amount','currency','$200,000');     // fixed nominal
     const annuityTotal=getVal('annuity_monthly','currency','$3,000')*12*(getVal('annuity_years','number','10')||10);
-    const k401Bal=getVal('k401_balance','currency','$200,000'),k401Annual=getVal('k401_annual','currency','$20,000'),k401Rate=(getVal('k401_rate','number','8')||8)/100;
-    const k401WA=getVal('k401_withdraw_age','number','65')||65,k401Yrs=Math.max(0,k401WA-age);
-    let k401FV=k401Bal*Math.pow(1+k401Rate,k401Yrs);k401FV+=k401Rate>0?k401Annual*((Math.pow(1+k401Rate,k401Yrs)-1)/k401Rate):k401Annual*k401Yrs;
-    const isEarly=k401WA<59.5,k401FVnet=isEarly?k401FV*.9:k401FV;
+    const k401Bal=getVal('k401_balance','currency','$200,000'), k401Annual=getVal('k401_annual','currency','$20,000');
+    const k401Rate=(getVal('k401_rate','number','8')||8)/100;
+    const k401WA=getVal('k401_withdraw_age','number','65')||65, k401Yrs=Math.max(0,k401WA-age);
+    let k401FV=k401Bal*Math.pow(1+k401Rate,k401Yrs);
+    k401FV+=k401Rate>0?k401Annual*((Math.pow(1+k401Rate,k401Yrs)-1)/k401Rate):k401Annual*k401Yrs;
+    const isEarly=k401WA<59.5, k401FVnet=isEarly?k401FV*.9:k401FV;
     document.getElementById('k401_warning').classList.toggle('hidden',!isEarly);
     document.getElementById('k401_fv_display').innerText=fmtUSD(k401FVnet);
-    // Allocate
-    const liquidToLife=liquid*allocState.liquid.life,liquidToCI=liquid*allocState.liquid.ci;
-    const reToLife=reEquityFV*allocState.re.life,reToRet=reEquityFV*allocState.re.ret;
-    const annuityToLTC=annuityTotal*allocState.annuity.ltc,annuityToRet=annuityTotal*allocState.annuity.ret;
-    const lifeAssets=lifeIns+liquidToLife+reToLife,eduAssets=s529FV,ciAssets=ciIns+liquidToCI,ltcAssets=annuityToLTC,retAssets=k401FVnet+reToRet+annuityToRet;
-    const needs=[lifeNeed,eduNeed,ciNeed,ltcNeed,retNeed],assets=[lifeAssets,eduAssets,ciAssets,ltcAssets,retAssets];
-    const fvTag=document.getElementById('fv_toggle').checked?` (FV@${document.getElementById('inflation_rate').value}%)`:'';
+
+    // Allocate — liquid uses correct FV per time point
+    const liquidToLife=liquidFVatDeath*allocState.liquid.life;
+    const liquidToCI=liquidFVatCI*allocState.liquid.ci;
+    const reToLife=reEquityFV*allocState.re.life, reToRet=reEquityFV*allocState.re.ret;
+    const annuityToLTC=annuityTotal*allocState.annuity.ltc, annuityToRet=annuityTotal*allocState.annuity.ret;
+    const lifeAssets=lifeIns+liquidToLife+reToLife;
+    const eduAssets=s529FV;
+    const ciAssets=ciIns+hsaFV+liquidToCI;
+    const ltcAssets=annuityToLTC;
+    const retAssets=k401FVnet+reToRet+annuityToRet;
+    const needs=[lifeNeed,eduNeed,ciNeed,ltcNeed,retNeed], assets=[lifeAssets,eduAssets,ciAssets,ltcAssets,retAssets];
     const t2=dict[currentLang];
-    window.chartBreakdowns[0]={needLines:[`【${t2.chart_names[0]}: ${fmtUSD(lifeNeed)}】`,`${t2.mortgage}: ${fmtUSD(mort)}`,`${t2.other_debt}: ${fmtUSD(debt)}`,`${getDropdownLabel('income_years',t2.yr_labels[1])}: ${fmtUSD(replacement)}`,`${t2.childcare_annual}: ${fmtUSD(childcareTotal)}${fvTag}`],assetLines:[`【${t2.asset_label}: ${fmtUSD(lifeAssets)}】`,`${t2.life_ins_amount}: ${fmtUSD(lifeIns)}`,`${t2.liquid_assets}(${Math.round(allocState.liquid.life*100)}%): ${fmtUSD(liquidToLife)}`,`${t2.re_future_equity}(${Math.round(allocState.re.life*100)}%): ${fmtUSD(reToLife)}`]};
-    window.chartBreakdowns[1]={needLines:[`【${t2.chart_names[1]}: ${fmtUSD(eduNeed)}】`,`${t2.edu_annual}: ${fmtUSD(eduAnnual)}`,`${t2.edu_years}: ${eduYears}${currentLang==='zh'?'年':'yrs'}${fvTag}`],assetLines:[`【${t2.asset_label}: ${fmtUSD(eduAssets)}】`,`529 FV(${(getVal('s529_rate','number','6')||6)}%×${s529Yrs}yr): ${fmtUSD(s529FV)}`]};
-    window.chartBreakdowns[2]={needLines:[`【${t2.chart_names[2]}: ${fmtUSD(ciNeed)}】`,`${t2.ci_income}: ${fmtUSD(ciIncome)}`,`${t2.ci_years}: ${getDropdownLabel('ci_years','3')}`,`FV ${currentLang==='zh'?'至':'to'} ${ciFvAge}${fvTag}`],assetLines:[`【${t2.asset_label}: ${fmtUSD(ciAssets)}】`,`${t2.ci_ins_amount}: ${fmtUSD(ciIns)}`,`${t2.liquid_assets}(${Math.round(allocState.liquid.ci*100)}%): ${fmtUSD(liquidToCI)}`]};
-    window.chartBreakdowns[3]={needLines:[`【${t2.chart_names[3]}: ${fmtUSD(ltcNeed)}】`,`${currentLang==='zh'?'月費':'Monthly'}: ${fmtUSD(ltcRate)}`,`${t2.ltc_duration}: ${getDropdownLabel('ltc_duration',t2.ltc_labels[2])}`,`${t2.ltc_start_age}: ${ltcStart}${fvTag}`],assetLines:[`【${t2.asset_label}: ${fmtUSD(ltcAssets)}】`,`${t2.annuity_monthly}×${getVal('annuity_years','number','10')||10}yr(${Math.round(allocState.annuity.ltc*100)}%): ${fmtUSD(annuityToLTC)}`]};
-    window.chartBreakdowns[4]={needLines:[`【${t2.chart_names[4]}: ${fmtUSD(retNeed)}】`,`${currentLang==='zh'?'退休年數':'Yrs'}: ${retireYears}(${retireAge}→${lifeExp})`,`${currentLang==='zh'?'月淨支出':'Net Monthly'}(FV): ${fmtUSD(retNetMonthly)}`,`SS: ${fmtUSD(ssMonthlyFV)}/mo`],assetLines:[`【${t2.asset_label}: ${fmtUSD(retAssets)}】`,`401k: ${fmtUSD(k401FVnet)}${isEarly?' ⚠️':''}`,`${t2.re_future_equity}(${Math.round(allocState.re.ret*100)}%): ${fmtUSD(reToRet)}`,`${t2.annuity_monthly}(${Math.round(allocState.annuity.ret*100)}%): ${fmtUSD(annuityToRet)}`]};
-    updateCharts(needs,assets);renderGapInfos(needs,assets);
-    renderAssetOverview({liquid,liquidToLife,liquidToCI,reEquityFV,reToLife,reToRet,lifeIns,ciIns,annuityTotal,annuityToLTC,annuityToRet,s529FV,k401FVnet,isEarly});
-    renderAllocUI('liquid',['life','ci'],'liquid_alloc_ui');renderAllocUI('re',['life','ret'],'re_alloc_ui');renderAllocUI('annuity',['ltc','ret'],'annuity_alloc_ui');
+    window.chartBreakdowns[0]={needLines:[`【${t2.chart_names[0]}: ${fmtUSD(lifeNeed)}】`,`${t2.mortgage}: ${fmtUSD(mort)}`,`${t2.other_debt}: ${fmtUSD(debt)}`,`${getDropdownLabel('income_years',t2.yr_labels[1])}→FV@${deathAge}: ${fmtUSD(replacementFV)}`,`育兒費→FV@${deathAge}: ${fmtUSD(childcareTotal)}`],assetLines:[`【${t2.asset_label}: ${fmtUSD(lifeAssets)}】`,`身故給付(固定): ${fmtUSD(lifeIns)}`,`流動資產FV@${deathAge}(${Math.round(allocState.liquid.life*100)}%): ${fmtUSD(liquidToLife)}`,`投資房FV@退休(${Math.round(allocState.re.life*100)}%): ${fmtUSD(reToLife)}`]};
+    window.chartBreakdowns[1]={needLines:[`【${t2.chart_names[1]}: ${fmtUSD(eduNeed)}】`,`${t2.edu_annual}: ${fmtUSD(eduAnnual)}`,`${t2.edu_years}: ${eduYears}yr → FV@18歲`],assetLines:[`【${t2.asset_label}: ${fmtUSD(eduAssets)}】`,`529 FV@18歲 (${(getVal('s529_rate','number','6')||6)}%×${s529Yrs}yr): ${fmtUSD(s529FV)}`]};
+    window.chartBreakdowns[2]={needLines:[`【${t2.chart_names[2]}: ${fmtUSD(ciNeed)}】`,`CI收入: ${fmtUSD(ciIncome)}`,`${getDropdownLabel('ci_years','3')} → FV@${ciFvAge}`],assetLines:[`【${t2.asset_label}: ${fmtUSD(ciAssets)}】`,`生前福利(固定): ${fmtUSD(ciIns)}`,`HSA FV@${ciFvAge} (${(getVal('hsa_rate','number','3')||3)}%): ${fmtUSD(hsaFV)}`,`流動資產FV@${ciFvAge}(${Math.round(allocState.liquid.ci*100)}%): ${fmtUSD(liquidToCI)}`]};
+    window.chartBreakdowns[3]={needLines:[`【${t2.chart_names[3]}: ${fmtUSD(ltcNeed)}】`,`月費: ${fmtUSD(ltcRate)}`,`${getDropdownLabel('ltc_duration',t2.ltc_labels[2])} → FV@${ltcStart}`],assetLines:[`【${t2.asset_label}: ${fmtUSD(ltcAssets)}】`,`年金(固定,${Math.round(allocState.annuity.ltc*100)}%): ${fmtUSD(annuityToLTC)}`]};
+    window.chartBreakdowns[4]={needLines:[`【${t2.chart_names[4]}: ${fmtUSD(retNeed)}】`,`退休年數: ${retireYears} (${retireAge}→${lifeExp})`,`月淨支出FV@${retireAge}: ${fmtUSD(retNetMonthly)}`,`SS: ${fmtUSD(ssMonthlyFV)}/mo`],assetLines:[`【${t2.asset_label}: ${fmtUSD(retAssets)}】`,`401k FV@${k401WA}: ${fmtUSD(k401FVnet)}${isEarly?' ⚠️':''}`,`投資房FV(${Math.round(allocState.re.ret*100)}%): ${fmtUSD(reToRet)}`,`年金(${Math.round(allocState.annuity.ret*100)}%): ${fmtUSD(annuityToRet)}`]};
+    updateCharts(needs,assets); renderGapInfos(needs,assets);
+    renderAssetOverview({liquidNow,liquidToLife,liquidToCI,reEquityFV,reToLife,reToRet,lifeIns,ciIns,annuityTotal,annuityToLTC,annuityToRet,s529FV,k401FVnet,isEarly,hsaFV});
+    renderAllocUI('liquid',['life','ci'],'liquid_alloc_ui'); renderAllocUI('re',['life','ret'],'re_alloc_ui'); renderAllocUI('annuity',['ltc','ret'],'annuity_alloc_ui');
 }
 
 // ── CHARTS ──
@@ -745,10 +814,22 @@ function renderGapInfos(needs,assets){
 // ── ASSET OVERVIEW ──
 function renderAssetOverview(v){
     const t=dict[currentLang],nc=t.chart_names,an=t.asset_names;
-    const rows=[{n:an.lifeIns,val:v.lifeIns,tags:[{l:nc[0],c:'#ef4444',p:100}]},{n:an.ciIns,val:v.ciIns,tags:[{l:nc[2],c:'#f97316',p:100}]},{n:an.liquid,val:v.liquid,tags:[{l:nc[0],c:'#ef4444',p:Math.round(allocState.liquid.life*100)},{l:nc[2],c:'#f97316',p:Math.round(allocState.liquid.ci*100)}]},{n:an.re,val:v.reEquityFV,tags:[{l:nc[0],c:'#ef4444',p:Math.round(allocState.re.life*100)},{l:nc[4],c:'#0ea5e9',p:Math.round(allocState.re.ret*100)}]},{n:an.annuity,val:v.annuityTotal,tags:[{l:nc[3],c:'#a855f7',p:Math.round(allocState.annuity.ltc*100)},{l:nc[4],c:'#0ea5e9',p:Math.round(allocState.annuity.ret*100)}]},{n:an.s529,val:v.s529FV,tags:[{l:nc[1],c:'#f59e0b',p:100}]},{n:an.k401,val:v.k401FVnet,tags:[{l:nc[4],c:'#0ea5e9',p:100}]}];
+    const rows=[
+        {n:an.lifeIns,  val:v.lifeIns,     tags:[{l:nc[0],c:'#ef4444',p:100}]},
+        {n:an.ciIns,    val:v.ciIns,        tags:[{l:nc[2],c:'#f97316',p:100}]},
+        {n:an.hsa,      val:v.hsaFV,        tags:[{l:nc[2],c:'#f97316',p:100}]},
+        {n:an.liquid,   val:v.liquidNow,    tags:[{l:nc[0],c:'#ef4444',p:Math.round(allocState.liquid.life*100)},{l:nc[2],c:'#f97316',p:Math.round(allocState.liquid.ci*100)}]},
+        {n:an.re,       val:v.reEquityFV,   tags:[{l:nc[0],c:'#ef4444',p:Math.round(allocState.re.life*100)},{l:nc[4],c:'#0ea5e9',p:Math.round(allocState.re.ret*100)}]},
+        {n:an.annuity,  val:v.annuityTotal, tags:[{l:nc[3],c:'#a855f7',p:Math.round(allocState.annuity.ltc*100)},{l:nc[4],c:'#0ea5e9',p:Math.round(allocState.annuity.ret*100)}]},
+        {n:an.s529,     val:v.s529FV,       tags:[{l:nc[1],c:'#f59e0b',p:100}]},
+        {n:an.k401,     val:v.k401FVnet,    tags:[{l:nc[4],c:'#0ea5e9',p:100}]},
+    ];
     let html='';
-    rows.forEach(row=>{const tagsHtml=row.tags.filter(t=>t.p>0).map(tg=>`<span class="asset-tag" style="background:${tg.c}18;color:${tg.c}">${tg.l} ${tg.p}%</span>`).join('');html+=`<div class="asset-row"><div><div style="font-size:11px;font-weight:700;">${row.n}</div><div style="margin-top:3px;">${tagsHtml}</div></div><div style="font-size:12px;font-weight:900;font-family:'DM Mono',monospace;color:#10b981;white-space:nowrap;padding-left:.5rem;">${fmtUSD(row.val)}</div></div>`;});
-    const el=document.getElementById('asset_overview_content');if(el)el.innerHTML=html;
+    rows.forEach(row=>{
+        const tagsHtml=row.tags.filter(tg=>tg.p>0).map(tg=>`<span class="asset-tag" style="background:${tg.c}18;color:${tg.c}">${tg.l} ${tg.p}%</span>`).join('');
+        html+=`<div class="asset-row"><div><div style="font-size:11px;font-weight:700;">${row.n}</div><div style="margin-top:3px;">${tagsHtml}</div></div><div style="font-size:12px;font-weight:900;font-family:'DM Mono',monospace;color:#10b981;white-space:nowrap;padding-left:.5rem;">${fmtUSD(row.val)}</div></div>`;
+    });
+    const el=document.getElementById('asset_overview_content'); if(el) el.innerHTML=html;
 }
 
 // ── LTC ──
@@ -756,7 +837,8 @@ function setLTCPath(p){currentLTCPath=p;document.getElementById('btn_us').classN
 function selectLtcType(t){document.getElementById('radio_'+t).checked=true;['inhome','assisted','nursing'].forEach(x=>{document.getElementById('card_'+x)?.classList.toggle('active',x===t);});calculate();}
 
 // ── CLEAR ──
-function clearAllData(){if(!confirm(currentLang==='zh'?'確定要清空所有資料嗎？':'Clear all data?'))return;isCleared=true;document.querySelectorAll('input[type="text"],input[type="number"],input[type="email"]').forEach(el=>{el.value='';el.placeholder='';});['income_years','ci_years','ltc_duration'].forEach(id=>{const sel=document.getElementById(id);sel.value='';sel.classList.remove('hidden');document.getElementById(id+'_custom_wrapper').classList.add('hidden');document.getElementById(id+'_custom').value='';});generateChildRows();calculate();}
+function clearAllData(){if(!confirm(currentLang==='zh'?'確定要清空所有資料嗎？':'Clear all data?'))return;isCleared=true;document.querySelectorAll('input[type="text"],input[type="number"],input[type="email"]').forEach(el=>{el.value='';el.placeholder='';});['income_years','ci_years','ltc_duration'].forEach(id=>{const sel=document.getElementById(id);sel.value='';sel.classList.remove('hidden');document.getElementById(id+'_custom_wrapper').classList.add('hidden');document.getElementById(id+'_custom').value='';});// Reset inflation to default
+document.getElementById('inflation_rate').value=3;document.getElementById('infl_input').value='3.0';generateChildRows();calculate();}
 
 // ── PRINT ──
 function handlePrint(){const orig=document.title,advisor=document.getElementById('consultant_name').value||'Advisor',dateStr=new Date().toISOString().split('T')[0].replace(/-/g,'');document.title=`${dict[currentLang].filename_pref}_${dateStr}_${advisor}`;window.print();setTimeout(()=>{document.title=orig;},1200);}
